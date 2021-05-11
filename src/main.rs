@@ -1,3 +1,5 @@
+use pinpoint::entrypoint;
+
 fn main() {
-    println!("Hello, world!");
+    entrypoint();
 }
