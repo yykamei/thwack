@@ -5,7 +5,9 @@ use std::process::exit;
 use crate::error::{Error, Result};
 
 pub fn entrypoint(args: &mut Args) -> Result<()> {
-    let name = args.next().expect("The first argument is supposed to be a program name.");
+    let name = args
+        .next()
+        .expect("The first argument is supposed to be a program name.");
     match args.next() {
         Some(query) => {
             println!("You hit this command with: `{} {}`", name, query);
@@ -13,7 +15,9 @@ pub fn entrypoint(args: &mut Args) -> Result<()> {
         }
         None => {
             eprintln!("USAGE: {} QUERY", name);
-            Err(Error::insufficient_query("You must pass query as the first argument."))
+            Err(Error::insufficient_query(
+                "You must pass query as the first argument.",
+            ))
         }
     }
 }
