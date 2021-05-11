@@ -1,5 +1,6 @@
 use pinpoint::entrypoint;
+use std::env;
 
 fn main() {
-    entrypoint();
+    entrypoint(&mut env::args());
 }
