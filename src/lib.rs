@@ -3,3 +3,4 @@ pub use cli::safe_exit;
 
 mod cli;
 mod error;
+mod finder;
