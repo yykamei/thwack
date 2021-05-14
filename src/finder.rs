@@ -113,9 +113,11 @@ impl MatchedPath {
     // TODO: Present with colorized value with emphasized positions.
 }
 
+// Forward slashes are not allowed in a filename, so this is supposed to work.
+// See https://docs.microsoft.com/en-us/windows/win32/fileio/naming-a-file#naming-conventions
 #[cfg(target_os = "windows")]
 fn normalize_query(query: &str) -> String {
-    query.replace('/', '\\')
+    query.replace('/', "\\")
 }
 
 #[cfg(not(target_os = "windows"))]
