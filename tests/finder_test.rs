@@ -37,7 +37,10 @@ fn returns_filtered_paths_with_emoji_coffee() {
         let path = matched.unwrap();
         paths.push(path);
     }
-    let mut paths: Vec<String> = paths.iter().map(|m| m.relative.clone()).collect();
+    let mut paths: Vec<String> = paths
+        .iter()
+        .map(|m| m.relative.replace('\\', "/"))
+        .collect();
     paths.sort();
     assert_eq!(paths.len(), 3);
     assert_eq!(paths, vec!["lib/a/b/c/☕.js", "src/a/☕.js", "☕.txt"]);
