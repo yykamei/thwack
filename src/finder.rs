@@ -46,7 +46,6 @@ impl Iterator for Finder {
             Ok(path) => path,
             Err(e) => return Some(Err(Error::from(e))),
         };
-        assert!(path.is_absolute()); // TODO: Remove later
         if path.is_dir() {
             match path.read_dir() {
                 Ok(dir) => {
@@ -56,7 +55,17 @@ impl Iterator for Finder {
                 Err(e) => Some(Err(Error::from(e))),
             }
         } else {
-            match MatchedPath::new(&self.query, &self.root, &path) {
+            assert!(path.is_absolute()); // TODO: Remove later
+            let absolute = match path.to_str() {
+                Some(path) => path,
+                None => {
+                    return Some(Err(Error::invalid_unicode(&format!(
+                        "The path `{:?}` does not seem to valid unicode.",
+                        path
+                    ))))
+                }
+            };
+            match MatchedPath::new(&self.query, &self.root, absolute) {
                 Some(matched) => Some(Ok(matched)),
                 None => self.next(),
             }
@@ -78,8 +87,7 @@ impl Display for MatchedPath {
 }
 
 impl MatchedPath {
-    pub(super) fn new(query: &str, root: &str, path: &Path) -> Option<Self> {
-        let absolute = path.to_str()?;
+    pub(super) fn new(query: &str, root: &str, absolute: &str) -> Option<Self> {
         let relative = absolute
             .strip_prefix(root)
             .expect("The passed root must be prefix of the path.");
