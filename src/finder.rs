@@ -93,7 +93,7 @@ impl MatchedPath {
             .expect("The passed root must be prefix of the path.");
         let relative = &relative[1..]; // NOTE: Delete the prefix of slash
         let mut positions: Vec<usize> = vec![];
-        for char in query.chars() {
+        for char in normalize_query(query).chars() {
             let begin = if let Some(pos) = positions.last() {
                 pos + 1
             } else {
@@ -111,4 +111,14 @@ impl MatchedPath {
         })
     }
     // TODO: Present with colorized value with emphasized positions.
+}
+
+#[cfg(target_os = "windows")]
+fn normalize_query(query: &str) -> &str {
+    query.replace('/', '\\')
+}
+
+#[cfg(not(target_os = "windows"))]
+fn normalize_query(query: &str) -> &str {
+    query
 }
