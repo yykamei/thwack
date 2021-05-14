@@ -114,7 +114,7 @@ impl MatchedPath {
 }
 
 #[cfg(target_os = "windows")]
-fn normalize_query(query: &str) -> &str {
+fn normalize_query(query: &str) -> String {
     query.replace('/', '\\')
 }
 
