@@ -75,9 +75,9 @@ impl Iterator for Finder {
 
 #[derive(Debug)]
 pub struct MatchedPath {
-    absolute: String,
-    relative: String,
-    positions: Vec<usize>,
+    pub absolute: String,
+    pub relative: String,
+    pub positions: Vec<usize>,
 }
 
 impl Display for MatchedPath {
@@ -93,7 +93,7 @@ impl MatchedPath {
             .expect("The passed root must be prefix of the path.");
         let relative = &relative[1..]; // NOTE: Delete the prefix of slash
         let mut positions: Vec<usize> = vec![];
-        for char in query.chars() {
+        for char in normalize_query(query).chars() {
             let begin = if let Some(pos) = positions.last() {
                 pos + 1
             } else {
@@ -111,4 +111,16 @@ impl MatchedPath {
         })
     }
     // TODO: Present with colorized value with emphasized positions.
+}
+
+// Forward slashes are not allowed in a filename, so this is supposed to work.
+// See https://docs.microsoft.com/en-us/windows/win32/fileio/naming-a-file#naming-conventions
+#[cfg(target_os = "windows")]
+fn normalize_query(query: &str) -> String {
+    query.replace('/', "\\")
+}
+
+#[cfg(not(target_os = "windows"))]
+fn normalize_query(query: &str) -> &str {
+    query
 }
