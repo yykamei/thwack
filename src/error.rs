@@ -1,5 +1,6 @@
 use std::error;
 use std::fmt::{self, Display, Formatter};
+use std::io;
 use std::result::Result as StdResult;
 
 const FAILURE: i32 = 1;
@@ -9,13 +10,14 @@ pub type Result<T> = StdResult<T, Error>;
 #[derive(Debug)]
 pub enum ErrorKind {
     InsufficientQuery,
+    IO,
 }
 
 #[derive(Debug)]
 pub struct Error {
     pub(crate) message: String,
     pub kind: ErrorKind,
-    pub(crate) source: Option<Box<dyn error::Error>>,
+    pub source: Option<Box<dyn error::Error>>,
     pub exit_code: i32,
 }
 
@@ -37,6 +39,20 @@ impl Error {
             message: message.to_string(),
             kind: ErrorKind::InsufficientQuery,
             source: None,
+            exit_code: FAILURE,
+        }
+    }
+}
+
+impl From<io::Error> for Error {
+    fn from(error: io::Error) -> Self {
+        Self {
+            message: format!(
+                "Unhandled IO error happened. See the details from .source: {}",
+                error
+            ),
+            kind: ErrorKind::IO,
+            source: Some(Box::new(error)),
             exit_code: FAILURE,
         }
     }

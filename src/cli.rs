@@ -1,8 +1,9 @@
-use std::env::Args;
+use std::env::{current_dir, Args};
 use std::io::Write;
 use std::process::exit;
 
 use crate::error::{Error, Result};
+use crate::finder::Finder;
 
 pub fn entrypoint(args: &mut Args) -> Result<()> {
     let name = args
@@ -10,7 +11,11 @@ pub fn entrypoint(args: &mut Args) -> Result<()> {
         .expect("The first argument is supposed to be a program name.");
     match args.next() {
         Some(query) => {
-            println!("You hit this command with: `{} {}`", name, query);
+            let finder = Finder::new(current_dir()?, &query)?;
+            for path in finder {
+                let path = path?;
+                println!("{}", path.to_string_lossy()); // FIXME: Implement more appropriately, plus sorting is required.
+            }
             Ok(())
         }
         None => {
