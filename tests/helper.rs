@@ -21,6 +21,7 @@ pub fn create_tree() -> io::Result<TempDir> {
     let _ = File::create(tmp.path().join("LICENSE"))?;
     let _ = File::create(tmp.path().join("README.md"))?;
     let _ = File::create(tmp.path().join("lib/a/b/c/index.js"))?;
+    let _ = File::create(tmp.path().join("lib/a/b/c/☕.js"))?;
     let _ = File::create(tmp.path().join("lib/a/b/index.js"))?;
     let _ = File::create(tmp.path().join("lib/a/index.js"))?;
     let _ = File::create(tmp.path().join("lib/bar.js"))?;
@@ -31,9 +32,10 @@ pub fn create_tree() -> io::Result<TempDir> {
     let _ = File::create(tmp.path().join("src/a/b/c/index.js"))?;
     let _ = File::create(tmp.path().join("src/a/b/index.js"))?;
     let _ = File::create(tmp.path().join("src/a/index.js"))?;
-    let _ = File::create(tmp.path().join("src/a/☕️.js"))?;
+    let _ = File::create(tmp.path().join("src/a/☕.js"))?;
     let _ = File::create(tmp.path().join("src/foo.js"))?;
     let _ = File::create(tmp.path().join("src/index.js"))?;
     let _ = File::create(tmp.path().join("tsconfig.json"))?;
+    let _ = File::create(tmp.path().join("☕.txt"))?;
     Ok(tmp)
 }

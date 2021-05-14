@@ -75,9 +75,9 @@ impl Iterator for Finder {
 
 #[derive(Debug)]
 pub struct MatchedPath {
-    absolute: String,
-    relative: String,
-    positions: Vec<usize>,
+    pub absolute: String,
+    pub relative: String,
+    pub positions: Vec<usize>,
 }
 
 impl Display for MatchedPath {
