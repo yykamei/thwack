@@ -1,4 +1,4 @@
-use std::env::{current_dir, Args};
+use std::env::Args;
 use std::io::Write;
 use std::process::exit;
 
@@ -11,10 +11,11 @@ pub fn entrypoint(args: &mut Args) -> Result<()> {
         .expect("The first argument is supposed to be a program name.");
     match args.next() {
         Some(query) => {
-            let finder = Finder::new(current_dir()?, &query)?;
+            // TODO: Receive path from the cli args
+            let finder = Finder::new(".", &query)?;
             for path in finder {
                 let path = path?;
-                println!("{}", path.to_string_lossy()); // FIXME: Implement more appropriately, plus sorting is required.
+                println!("{}", path); // FIXME: Implement more appropriately, plus sorting is required.
             }
             Ok(())
         }
