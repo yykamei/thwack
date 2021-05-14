@@ -1,6 +1,5 @@
 use std::fs::{create_dir_all, File};
 use std::io;
-use std::path::PathBuf;
 
 use tempfile::{tempdir, TempDir};
 
