@@ -6,22 +6,22 @@ use std::path::Path;
 use crate::error::{Error, Result};
 
 pub struct Finder {
-    root: String,
+    starting_point: String,
     query: String,
     dirs: VecDeque<ReadDir>,
 }
 
 impl Finder {
     pub fn new(dir: impl AsRef<Path>, query: &str) -> Result<Self> {
-        let root = dir.as_ref().canonicalize()?;
+        let starting_point = dir.as_ref().canonicalize()?;
         let mut dirs = VecDeque::new();
-        let read_dir = root.read_dir()?;
+        let read_dir = starting_point.read_dir()?;
         dirs.push_back(read_dir);
-        let root = root.to_str().ok_or(Error::invalid_unicode(
+        let starting_point = starting_point.to_str().ok_or(Error::invalid_unicode(
             "The passed directory does not seem to valid unicode.",
         ))?;
         Ok(Self {
-            root: root.to_string(),
+            starting_point: starting_point.to_string(),
             query: query.to_string(),
             dirs,
         })
@@ -60,12 +60,12 @@ impl Iterator for Finder {
                 Some(path) => path,
                 None => {
                     return Some(Err(Error::invalid_unicode(&format!(
-                        "The path `{:?}` does not seem to valid unicode.",
+                        "The path `{:?}` does not seem to be valid unicode.",
                         path
                     ))))
                 }
             };
-            match MatchedPath::new(&self.query, &self.root, absolute) {
+            match MatchedPath::new(&self.query, &self.starting_point, absolute) {
                 Some(matched) => Some(Ok(matched)),
                 None => self.next(),
             }
@@ -87,10 +87,10 @@ impl Display for MatchedPath {
 }
 
 impl MatchedPath {
-    pub(super) fn new(query: &str, root: &str, absolute: &str) -> Option<Self> {
+    pub(super) fn new(query: &str, starting_point: &str, absolute: &str) -> Option<Self> {
         let relative = absolute
-            .strip_prefix(root)
-            .expect("The passed root must be prefix of the path.");
+            .strip_prefix(starting_point)
+            .expect("The passed starting_point must be prefix of the path.");
         let relative = &relative[1..]; // NOTE: Delete the prefix of slash
         let mut positions: Vec<usize> = vec![];
         for char in normalize_query(query).chars() {

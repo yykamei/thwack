@@ -9,7 +9,8 @@ pub type Result<T> = StdResult<T, Error>;
 
 #[derive(Debug)]
 pub enum ErrorKind {
-    InsufficientQuery,
+    Args,
+    InsufficientQuery, // TODO: Delete
     InvalidUnicode,
     IO,
 }
@@ -35,6 +36,16 @@ impl error::Error for Error {
 }
 
 impl Error {
+    pub fn args(message: &str) -> Self {
+        // TODO: Maybe, more information is required?
+        Self {
+            message: message.to_string(),
+            kind: ErrorKind::Args,
+            source: None,
+            exit_code: FAILURE,
+        }
+    }
+
     pub fn insufficient_query(message: &str) -> Self {
         Self {
             message: message.to_string(),
