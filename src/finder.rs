@@ -92,7 +92,7 @@ impl MatchedPath {
             .expect("The passed starting_point must be prefix of the path.");
         let relative = &relative[1..]; // NOTE: Delete the prefix of slash
         let mut positions: Vec<usize> = vec![];
-        for char in normalize_query(query).chars() {
+        for char in Self::normalize_query(query).chars() {
             let begin = if let Some(pos) = positions.last() {
                 pos + 1
             } else {
@@ -110,16 +110,16 @@ impl MatchedPath {
         })
     }
     // TODO: Present with colorized value with emphasized positions.
-}
 
-// Forward slashes are not allowed in a filename, so this is supposed to work.
-// See https://docs.microsoft.com/en-us/windows/win32/fileio/naming-a-file#naming-conventions
-#[cfg(target_os = "windows")]
-fn normalize_query(query: &str) -> String {
-    query.replace('/', "\\")
-}
+    #[cfg(target_os = "windows")]
+    fn normalize_query(query: &str) -> String {
+        // NOTE: Forward slashes are not allowed in a filename, so this replacing is supposed to work.
+        //       See https://docs.microsoft.com/en-us/windows/win32/fileio/naming-a-file#naming-conventions
+        query.replace('/', "\\")
+    }
 
-#[cfg(not(target_os = "windows"))]
-fn normalize_query(query: &str) -> &str {
-    query
+    #[cfg(not(target_os = "windows"))]
+    fn normalize_query(query: &str) -> &str {
+        query
+    }
 }
