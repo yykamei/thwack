@@ -1,5 +1,4 @@
 use std::env::ArgsOs;
-use std::path::PathBuf;
 
 use crate::error::{Error, Result};
 
@@ -64,31 +63,27 @@ impl Parser {
             self.parsed_args.query = q;
         }
 
-        self.canonicalize_starting_point()?;
         Ok(self.parsed_args)
     }
 
-    #[inline]
     fn next(&mut self) -> Option<Result<String>> {
         let arg = self.args.next()?;
         let error = Error::args(&format!(
-            "{}\n\nThe specified string {:?} does not seem to be valid unicode.",
+            "{}\n\nThe specified argument {:?} does not seem to be valid unicode.",
             HELP, arg,
         ));
         Some(arg.to_str().map(|s| s.to_string()).ok_or(error))
     }
 
-    #[inline]
     fn set_help(&mut self, value: bool) {
         self.parsed_args.help = value;
     }
 
-    #[inline]
     fn set_starting_point(&mut self, value: Option<&str>) -> Result<()> {
         if let Some(val) = value {
-            self.parsed_args.starting_point = PathBuf::from(val);
+            self.parsed_args.starting_point = val.to_string();
         } else if let Some(val) = self.next() {
-            self.parsed_args.starting_point = PathBuf::from(val?);
+            self.parsed_args.starting_point = val?;
         } else {
             return Err(Error::args(&format!(
                 "{}\n\n\"--starting-point\" needs a value",
@@ -97,22 +92,11 @@ impl Parser {
         }
         Ok(())
     }
-
-    #[inline]
-    fn canonicalize_starting_point(&mut self) -> Result<()> {
-        self.parsed_args.starting_point = self.parsed_args.starting_point.canonicalize().map_err(|_e|
-            Error::args(&format!(
-                "{}\n\nThe specified starting point {:?} cannot be normalized. Perhaps, {:?} might not exist.",
-                HELP, self.parsed_args.starting_point, self.parsed_args.starting_point,
-            ))
-        )?;
-        Ok(())
-    }
 }
 
 pub(crate) struct ParsedArgs {
     pub(crate) help: bool,
-    pub(crate) starting_point: PathBuf,
+    pub(crate) starting_point: String,
     pub(crate) query: String,
 }
 
@@ -120,7 +104,7 @@ impl Default for ParsedArgs {
     fn default() -> Self {
         Self {
             help: false,
-            starting_point: PathBuf::from("."),
+            starting_point: String::from("."),
             query: String::from(""),
         }
     }

@@ -7,7 +7,7 @@ mod helper;
 #[test]
 fn returns_all_paths() {
     let dir = create_tree().unwrap();
-    let finder = Finder::new(dir.path(), "").unwrap();
+    let finder = Finder::new(dir.path().to_str().unwrap(), "").unwrap();
     let size = finder.collect::<Vec<Result<MatchedPath>>>().len();
     assert_eq!(size, 29);
 }
@@ -15,7 +15,11 @@ fn returns_all_paths() {
 #[test]
 fn returns_empty() {
     let dir = create_tree().unwrap();
-    let finder = Finder::new(dir.path(), "the word should be not found with 🎂").unwrap();
+    let finder = Finder::new(
+        dir.path().to_str().unwrap(),
+        "the word should be not found with 🎂",
+    )
+    .unwrap();
     let size = finder.collect::<Vec<Result<MatchedPath>>>().len();
     assert_eq!(size, 0);
 }
@@ -23,7 +27,7 @@ fn returns_empty() {
 #[test]
 fn returns_filtered_paths_with_only_separator() {
     let dir = create_tree().unwrap();
-    let finder = Finder::new(dir.path(), "/").unwrap();
+    let finder = Finder::new(dir.path().to_str().unwrap(), "/").unwrap();
     let size = finder.collect::<Vec<Result<MatchedPath>>>().len();
     assert_eq!(size, 15);
 }
@@ -31,7 +35,7 @@ fn returns_filtered_paths_with_only_separator() {
 #[test]
 fn returns_filtered_paths_with_emoji_coffee() {
     let dir = create_tree().unwrap();
-    let finder = Finder::new(dir.path(), "☕").unwrap();
+    let finder = Finder::new(dir.path().to_str().unwrap(), "☕").unwrap();
     let mut paths = vec![];
     for matched in finder {
         let path = matched.unwrap();

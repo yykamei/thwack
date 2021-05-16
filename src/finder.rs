@@ -1,7 +1,7 @@
 use std::collections::VecDeque;
 use std::fmt::{self, Debug, Display, Formatter};
 use std::fs::ReadDir;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 use crate::error::{Error, Result};
 
@@ -12,18 +12,29 @@ pub struct Finder {
 }
 
 impl Finder {
-    pub fn new(starting_point: &Path, query: &str) -> Result<Self> {
+    pub fn new(starting_point: &str, query: &str) -> Result<Self> {
         let mut dirs = VecDeque::new();
+        let starting_point: &Path = starting_point.as_ref();
+        let starting_point = Self::canonicalize_starting_point(starting_point)?;
         let read_dir = starting_point.read_dir()?;
         dirs.push_back(read_dir);
-        let starting_point = starting_point.to_str().ok_or_else(|| {
-            Error::invalid_unicode("The passed directory does not seem to be valid unicode.")
-        })?;
         Ok(Self {
-            starting_point: starting_point.to_string(),
+            starting_point: starting_point
+                .to_str()
+                .expect("This function has already received \"starting_point\" as &str, so this is supposed to be valid unicode.")
+                .to_string(),
             query: query.to_string(),
             dirs,
         })
+    }
+
+    fn canonicalize_starting_point(path: &Path) -> Result<PathBuf> {
+        path.canonicalize().map_err(|_e|
+            Error::args(&format!(
+                "The specified starting point {:?} cannot be normalized. Perhaps, it might not exist or cannot be read.",
+                path,
+            ))
+        )
     }
 }
 
