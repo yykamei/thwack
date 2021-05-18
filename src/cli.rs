@@ -28,11 +28,11 @@ pub fn entrypoint(args: ArgsOs, mut stdout: impl Write) -> Result<()> {
         return Ok(());
     }
 
-    // let (columns, rows) = terminal::size()?;
+    let (_, rows) = terminal::size()?;
     // println!("columns={:?}, rows={:?}", columns, rows); // TODO: Use rows to limit the results
 
     let mut query = args.query;
-    let mut paths = find_paths(&args.starting_point, &query)?;
+    let mut paths = find_paths(&args.starting_point, &query, rows - 1)?;
     let mut state = State::QueryChanged;
     initialize_terminal(&mut stdout)?;
 
@@ -72,7 +72,7 @@ pub fn entrypoint(args: ArgsOs, mut stdout: impl Write) -> Result<()> {
         } else {
             match state {
                 State::QueryChanged => {
-                    paths = find_paths(&args.starting_point, &query)?;
+                    paths = find_paths(&args.starting_point, &query, rows - 1)?;
                     state = State::PathsChanged;
                 }
                 _ => (),
@@ -126,9 +126,10 @@ fn output_on_terminal(stdout: &mut impl Write, query: &str, paths: &[MatchedPath
     Ok(())
 }
 
-fn find_paths(starting_point: &str, query: &str) -> Result<Vec<MatchedPath>> {
+fn find_paths(starting_point: &str, query: &str, limit: u16) -> Result<Vec<MatchedPath>> {
     let mut paths = vec![];
-    for path in Finder::new(starting_point, query)? {
+    // TODO: Sort
+    for path in Finder::new(starting_point, query)?.take(limit.into()) {
         let path = path?;
         paths.push(path);
     }
