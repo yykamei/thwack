@@ -29,8 +29,6 @@ pub fn entrypoint(args: ArgsOs, mut stdout: impl Write) -> Result<()> {
     }
 
     let (_, rows) = terminal::size()?;
-    // println!("columns={:?}, rows={:?}", columns, rows); // TODO: Use rows to limit the results
-
     let mut query = args.query;
     let mut paths = find_paths(&args.starting_point, &query, rows - 1)?;
     let mut state = State::QueryChanged;
