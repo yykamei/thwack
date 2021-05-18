@@ -58,6 +58,14 @@ pub fn entrypoint(args: ArgsOs, mut stdout: impl Write) -> Result<()> {
             } else if ev == Event::Key(KeyCode::Backspace.into()) {
                 query.pop();
                 state = State::QueryChanged;
+            } else if ev
+                == Event::Key(KeyEvent {
+                    code: KeyCode::Char('c'),
+                    modifiers: KeyModifiers::CONTROL,
+                })
+            {
+                // CTRL-C does not send SIGINT even on UNIX/Linux because it's in Raw mode.
+                break;
             } else if ev == Event::Key(KeyCode::Esc.into()) {
                 break;
             }
