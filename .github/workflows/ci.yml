@@ -21,6 +21,11 @@ jobs:
           toolchain: ${{ matrix.rust }}
           profile: minimal
           override: true
+          components: rustfmt, clippy
+
+      - run: cargo fmt -- --check
+
+      - run: cargo clippy
 
       - run: cargo test
 
@@ -35,3 +40,4 @@ jobs:
         env:
           DEFAULT_BRANCH: main
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VALIDATE_RUST_CLIPPY: false
