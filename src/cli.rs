@@ -28,7 +28,7 @@ pub fn entrypoint(args: ArgsOs, mut stdout: impl Write) -> Result<()> {
         return Ok(());
     }
 
-    let (_, rows) = terminal::size()?;
+    let (_, mut rows) = terminal::size()?;
     let mut query = args.query;
     let mut paths = find_paths(&args.starting_point, &query, rows - 1)?;
     let mut state = State::QueryChanged;
@@ -66,6 +66,9 @@ pub fn entrypoint(args: ArgsOs, mut stdout: impl Write) -> Result<()> {
                 break;
             } else if ev == Event::Key(KeyCode::Esc.into()) {
                 break;
+            } else if let Event::Resize(_, r) = ev {
+                rows = r;
+                state = State::PathsChanged;
             }
         } else {
             match state {
