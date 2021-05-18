@@ -31,15 +31,20 @@ pub fn entrypoint(args: ArgsOs, mut stdout: impl Write) -> Result<()> {
     let (_, mut rows) = terminal::size()?;
     let mut query = args.query;
     let mut paths = find_paths(&args.starting_point, &query, rows - 1)?;
+    let mut selection: u16 = 0;
     let mut state = State::QueryChanged;
     initialize_terminal(&mut stdout)?;
 
     loop {
         match state {
             State::Ready => (),
-            State::QueryChanged => output_on_terminal(&mut stdout, &query, &paths[..])?,
+            State::QueryChanged => output_on_terminal(&mut stdout, &query, &paths[..], selection)?,
             State::PathsChanged => {
-                output_on_terminal(&mut stdout, &query, &paths[..])?;
+                output_on_terminal(&mut stdout, &query, &paths[..], selection)?;
+                state = State::Ready;
+            }
+            State::SelectionChanged => {
+                output_on_terminal(&mut stdout, &query, &paths[..], selection)?;
                 state = State::Ready;
             }
         }
@@ -56,6 +61,16 @@ pub fn entrypoint(args: ArgsOs, mut stdout: impl Write) -> Result<()> {
             } else if ev == Event::Key(KeyCode::Backspace.into()) {
                 query.pop();
                 state = State::QueryChanged;
+            } else if ev == Event::Key(KeyCode::Up.into()) {
+                if selection > 0 {
+                    selection -= 1;
+                }
+                state = State::SelectionChanged;
+            } else if ev == Event::Key(KeyCode::Down.into()) {
+                if selection < (rows - 1) {
+                    selection += 1;
+                }
+                state = State::SelectionChanged;
             } else if ev
                 == Event::Key(KeyEvent {
                     code: KeyCode::Char('c'),
@@ -75,6 +90,7 @@ pub fn entrypoint(args: ArgsOs, mut stdout: impl Write) -> Result<()> {
                 State::QueryChanged => {
                     paths = find_paths(&args.starting_point, &query, rows - 1)?;
                     state = State::PathsChanged;
+                    selection = 0;
                 }
                 _ => (),
             }
@@ -90,6 +106,7 @@ enum State {
     Ready,
     QueryChanged,
     PathsChanged,
+    SelectionChanged,
 }
 
 fn print_help(buffer: &mut impl Write) -> io::Result<()> {
@@ -104,7 +121,12 @@ fn initialize_terminal(stdout: &mut impl Write) -> Result<()> {
     Ok(())
 }
 
-fn output_on_terminal(stdout: &mut impl Write, query: &str, paths: &[MatchedPath]) -> Result<()> {
+fn output_on_terminal(
+    stdout: &mut impl Write,
+    query: &str,
+    paths: &[MatchedPath],
+    selection: u16,
+) -> Result<()> {
     queue!(
         stdout,
         cursor::MoveTo(0, 0),
@@ -115,10 +137,12 @@ fn output_on_terminal(stdout: &mut impl Write, query: &str, paths: &[MatchedPath
         cursor::MoveToNextLine(1),
     )?;
     std::fs::File::create("/tmp/ok.txt")?.write_all(format!("{:?}", paths).as_bytes())?;
-    for path in paths {
+    for (idx, path) in paths.iter().enumerate() {
+        let idx = idx as u16;
+        let prefix = if idx == selection { "> " } else { "  " };
         queue!(
             stdout,
-            style::Print(format!("{}", path)),
+            style::Print(format!("{}{}", prefix, path)),
             cursor::MoveToNextLine(1),
         )?;
     }
