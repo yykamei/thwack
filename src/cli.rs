@@ -76,24 +76,19 @@ pub fn entrypoint(args: ArgsOs, mut stdout: impl Write) -> Result<()> {
                     code: KeyCode::Char('c'),
                     modifiers: KeyModifiers::CONTROL,
                 })
+                || ev == Event::Key(KeyCode::Esc.into())
             {
                 // CTRL-C does not send SIGINT even on UNIX/Linux because it's in Raw mode.
-                break;
-            } else if ev == Event::Key(KeyCode::Esc.into()) {
+                // Also, we handle Esc as the same.
                 break;
             } else if let Event::Resize(_, r) = ev {
                 rows = r;
                 state = State::PathsChanged;
             }
-        } else {
-            match state {
-                State::QueryChanged => {
-                    paths = find_paths(&args.starting_point, &query, rows - 1)?;
-                    state = State::PathsChanged;
-                    selection = 0;
-                }
-                _ => (),
-            }
+        } else if let State::QueryChanged = state {
+            paths = find_paths(&args.starting_point, &query, rows - 1)?;
+            state = State::PathsChanged;
+            selection = 0;
         }
     }
 
