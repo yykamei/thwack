@@ -98,9 +98,12 @@ impl Display for MatchedPath {
 
 impl MatchedPath {
     pub(super) fn new(query: &str, starting_point: &str, absolute: &str) -> Option<Self> {
-        let relative = absolute
+        let relative: Vec<char> = absolute
             .strip_prefix(starting_point)
-            .expect("The passed starting_point must be prefix of the path.");
+            .expect("The passed starting_point must be prefix of the path.")
+            .to_lowercase()
+            .chars()
+            .collect();
         let relative = &relative[1..]; // NOTE: Delete the prefix of slash
         let mut positions: Vec<usize> = vec![];
         for char in Self::normalize_query(query).chars() {
@@ -110,13 +113,13 @@ impl MatchedPath {
                 0
             };
             // TODO: Explain this line later.
-            let target = &relative[begin..].to_lowercase();
-            let pos = target.find(char)?;
+            let target = &relative[begin..];
+            let pos = target.iter().position(|t| *t == char)?;
             positions.push(begin + pos);
         }
         Some(Self {
             absolute: absolute.to_string(),
-            relative: relative.to_string(),
+            relative: relative.iter().collect(),
             positions,
         })
     }
