@@ -33,6 +33,24 @@ fn returns_filtered_paths_with_only_separator() {
 }
 
 #[test]
+fn returns_filtered_paths_with_uppercase() {
+    let dir = create_tree().unwrap();
+    let finder = Finder::new(dir.path().to_str().unwrap(), "licenSE").unwrap();
+    let mut paths = vec![];
+    for matched in finder {
+        let path = matched.unwrap();
+        paths.push(path);
+    }
+    let mut paths: Vec<String> = paths
+        .iter()
+        .map(|m| m.relative.replace('\\', "/"))
+        .collect();
+    paths.sort();
+    assert_eq!(paths.len(), 1);
+    assert_eq!(paths, vec!["LICENSE"]);
+}
+
+#[test]
 fn returns_filtered_paths_with_emoji_coffee() {
     let dir = create_tree().unwrap();
     let finder = Finder::new(dir.path().to_str().unwrap(), "☕").unwrap();
