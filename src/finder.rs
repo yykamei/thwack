@@ -101,7 +101,6 @@ impl MatchedPath {
         let relative: Vec<char> = absolute
             .strip_prefix(starting_point)
             .expect("The passed starting_point must be prefix of the path.")
-            .to_lowercase()
             .chars()
             .collect();
         let relative = &relative[1..]; // NOTE: Delete the prefix of slash
@@ -114,7 +113,7 @@ impl MatchedPath {
             };
             // TODO: Explain this line later.
             let target = &relative[begin..];
-            let pos = target.iter().position(|t| *t == char)?;
+            let pos = target.iter().position(|t| char.eq_ignore_ascii_case(t))?;
             positions.push(begin + pos);
         }
         Some(Self {
