@@ -12,6 +12,9 @@ ARGS:
     <query>                   The name of the file you'd like to find
 
 OPTIONS:
+    --exec <COMMAND>          Change the execution command from the default.
+                              This is run when you hit the Enter on a path
+                              The default command is \"type\" on Windows, or \"cat\" on other platforms.
     --starting-point <PATH>   Change the starting point from the default (\".\")
     -h, --help                Prints help information";
 
@@ -42,9 +45,15 @@ impl Parser {
                 "-h" => self.set_help(true),
                 "--help" => self.set_help(true),
                 "--starting-point" => self.set_starting_point(None)?,
+                "--exec" => self.set_exec(None)?,
                 x if x.starts_with("--starting-point=") => {
                     if let Some((_, val)) = x.split_once('=') {
                         self.set_starting_point(Some(val))?;
+                    }
+                }
+                x if x.starts_with("--exec=") => {
+                    if let Some((_, val)) = x.split_once('=') {
+                        self.set_exec(Some(val))?;
                     }
                 }
                 x => {
@@ -79,6 +88,8 @@ impl Parser {
         self.parsed_args.help = value;
     }
 
+    // TODO: set_* could be written as the same way. Maybe, macros are useful.
+
     fn set_starting_point(&mut self, value: Option<&str>) -> Result<()> {
         if let Some(val) = value {
             self.parsed_args.starting_point = val.to_string();
@@ -92,12 +103,27 @@ impl Parser {
         }
         Ok(())
     }
+
+    fn set_exec(&mut self, value: Option<&str>) -> Result<()> {
+        if let Some(val) = value {
+            self.parsed_args.exec = val.to_string();
+        } else if let Some(val) = self.next() {
+            self.parsed_args.exec = val?;
+        } else {
+            return Err(Error::args(&format!(
+                "{}\n\n\"--exec\" needs a value",
+                HELP
+            )));
+        }
+        Ok(())
+    }
 }
 
 pub(crate) struct ParsedArgs {
     pub(crate) help: bool,
     pub(crate) starting_point: String,
     pub(crate) query: String,
+    pub(crate) exec: String,
 }
 
 impl Default for ParsedArgs {
@@ -106,6 +132,11 @@ impl Default for ParsedArgs {
             help: false,
             starting_point: String::from("."),
             query: String::from(""),
+            exec: if cfg!(windows) {
+                String::from("type")
+            } else {
+                String::from("cat")
+            },
         }
     }
 }
