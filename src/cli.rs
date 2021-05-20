@@ -131,7 +131,6 @@ fn output_on_terminal(
         cursor::SavePosition,
         cursor::MoveToNextLine(1),
     )?;
-    std::fs::File::create("/tmp/ok.txt")?.write_all(format!("{:?}", paths).as_bytes())?;
     for (idx, path) in paths.iter().enumerate() {
         let idx = idx as u16;
         let prefix = if idx == selection { "> " } else { "  " };
@@ -147,7 +146,8 @@ fn output_on_terminal(
 }
 
 fn find_paths(starting_point: &str, query: &str, limit: u16) -> Result<Vec<MatchedPath>> {
-    let mut paths = vec![];
+    let mut paths = Vec::with_capacity(100); // TODO: Tune this capacity later.
+
     // TODO: Sort
     for path in Finder::new(starting_point, query)?.take(limit.into()) {
         let path = path?;
