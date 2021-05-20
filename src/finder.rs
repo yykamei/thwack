@@ -42,42 +42,44 @@ impl Iterator for Finder {
     type Item = Result<MatchedPath>;
 
     fn next(&mut self) -> Option<Self::Item> {
-        let dir = self.dirs.front_mut()?;
-        let path = match dir.next() {
-            Some(d) => d.map(|d| d.path()),
-            None => {
-                self.dirs
-                    .pop_front()
-                    .expect("\"dirs\" should have at least one item.");
-                return self.next();
-            }
-        };
-        let path = match path {
-            Ok(path) => path,
-            Err(e) => return Some(Err(Error::from(e))),
-        };
-        if path.is_dir() {
-            match path.read_dir() {
-                Ok(dir) => {
-                    self.dirs.push_back(dir);
-                    self.next()
-                }
-                Err(e) => Some(Err(Error::from(e))),
-            }
-        } else {
-            assert!(path.is_absolute()); // TODO: Remove later
-            let absolute = match path.to_str() {
-                Some(path) => path,
+        loop {
+            let dir = self.dirs.front_mut()?;
+            let path = match dir.next() {
+                Some(d) => d.map(|d| d.path()),
                 None => {
-                    return Some(Err(Error::invalid_unicode(&format!(
-                        "The path {:?} does not seem to be valid unicode.",
-                        path
-                    ))))
+                    self.dirs
+                        .pop_front()
+                        .expect("\"dirs\" should have at least one item.");
+                    continue;
                 }
             };
-            match MatchedPath::new(&self.query, &self.starting_point, absolute) {
-                Some(matched) => Some(Ok(matched)),
-                None => self.next(),
+            let path = match path {
+                Ok(path) => path,
+                Err(e) => return Some(Err(Error::from(e))),
+            };
+            if path.is_dir() {
+                match path.read_dir() {
+                    Ok(dir) => {
+                        self.dirs.push_back(dir);
+                        continue;
+                    }
+                    Err(e) => return Some(Err(Error::from(e))),
+                }
+            } else {
+                assert!(path.is_absolute()); // TODO: Remove later
+                let absolute = match path.to_str() {
+                    Some(path) => path,
+                    None => {
+                        return Some(Err(Error::invalid_unicode(&format!(
+                            "The path {:?} does not seem to be valid unicode.",
+                            path
+                        ))))
+                    }
+                };
+                match MatchedPath::new(&self.query, &self.starting_point, absolute) {
+                    Some(matched) => return Some(Ok(matched)),
+                    None => continue,
+                }
             }
         }
     }
