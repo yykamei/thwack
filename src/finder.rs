@@ -1,6 +1,5 @@
 use std::collections::VecDeque;
 use std::fmt::{self, Debug, Display, Formatter};
-use std::fs::ReadDir;
 use std::path::{Path, PathBuf};
 
 use crate::error::{Error, Result};
@@ -8,33 +7,20 @@ use crate::error::{Error, Result};
 pub struct Finder {
     starting_point: String,
     query: String,
-    dirs: VecDeque<ReadDir>,
+    dirs: VecDeque<ConsumedDir>,
 }
 
 impl Finder {
     pub fn new(starting_point: &str, query: &str) -> Result<Self> {
-        let mut dirs = VecDeque::new();
-        let starting_point: &Path = starting_point.as_ref();
-        let starting_point = Self::canonicalize_starting_point(starting_point)?;
-        let read_dir = starting_point.read_dir()?;
-        dirs.push_back(read_dir);
+        let mut dirs = VecDeque::with_capacity(100);
+        let consumed_dir = ConsumedDir::new(starting_point)?;
+        let starting_point = consumed_dir.root.clone();
+        dirs.push_back(consumed_dir);
         Ok(Self {
-            starting_point: starting_point
-                .to_str()
-                .expect("This function has already received \"starting_point\" as &str, so this is supposed to be valid unicode.")
-                .to_string(),
+            starting_point,
             query: query.to_string(),
             dirs,
         })
-    }
-
-    fn canonicalize_starting_point(path: &Path) -> Result<PathBuf> {
-        path.canonicalize().map_err(|_e|
-            Error::args(&format!(
-                "The specified starting point {:?} cannot be normalized. Perhaps, it might not exist or cannot be read.",
-                path,
-            ))
-        )
     }
 }
 
@@ -44,8 +30,15 @@ impl Iterator for Finder {
     fn next(&mut self) -> Option<Self::Item> {
         loop {
             let dir = self.dirs.front_mut()?;
-            let path = match dir.next() {
-                Some(d) => d.map(|d| d.path()),
+            let absolute = match dir.next() {
+                Some(Entry::File(path)) => path,
+                Some(Entry::Dir(path)) => match ConsumedDir::new(&path) {
+                    Ok(c) => {
+                        self.dirs.push_back(c);
+                        continue;
+                    }
+                    Err(error) => return Some(Err(error)),
+                },
                 None => {
                     self.dirs
                         .pop_front()
@@ -53,35 +46,59 @@ impl Iterator for Finder {
                     continue;
                 }
             };
-            let path = match path {
-                Ok(path) => path,
-                Err(e) => return Some(Err(Error::from(e))),
-            };
-            if path.is_dir() {
-                match path.read_dir() {
-                    Ok(dir) => {
-                        self.dirs.push_back(dir);
-                        continue;
-                    }
-                    Err(e) => return Some(Err(Error::from(e))),
-                }
-            } else {
-                assert!(path.is_absolute()); // TODO: Remove later
-                let absolute = match path.to_str() {
-                    Some(path) => path,
-                    None => {
-                        return Some(Err(Error::invalid_unicode(&format!(
-                            "The path {:?} does not seem to be valid unicode.",
-                            path
-                        ))))
-                    }
-                };
-                match MatchedPath::new(&self.query, &self.starting_point, absolute) {
-                    Some(matched) => return Some(Ok(matched)),
-                    None => continue,
-                }
+            match MatchedPath::new(&self.query, &self.starting_point, &absolute) {
+                Some(matched) => return Some(Ok(matched)),
+                None => continue,
             }
         }
+    }
+}
+
+enum Entry {
+    File(String),
+    Dir(String),
+}
+
+struct ConsumedDir {
+    root: String,
+    entries: VecDeque<Entry>,
+}
+
+impl ConsumedDir {
+    fn new(dir: impl AsRef<Path>) -> Result<Self> {
+        let mut entries = VecDeque::with_capacity(50);
+        let dir = canonicalize_starting_point(dir.as_ref())?;
+        for de in dir.read_dir()? {
+            let path = de?.path();
+            let path_string = match path.to_str() {
+                Some(path) => path.to_string(),
+                None => {
+                    return Err(Error::invalid_unicode(&format!(
+                        "The path {:?} does not seem to be valid unicode.",
+                        path
+                    )))
+                }
+            };
+            // TODO: Symbolic link?
+            if path.is_dir() {
+                entries.push_back(Entry::Dir(path_string));
+            } else {
+                entries.push_back(Entry::File(path_string));
+            }
+        }
+        let root = dir
+            .to_str()
+            .expect("This function has already received \"dir\" as &str, so this is supposed to be valid unicode.")
+            .to_string();
+        Ok(Self { root, entries })
+    }
+}
+
+impl Iterator for ConsumedDir {
+    type Item = Entry;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.entries.pop_front()
     }
 }
 
@@ -107,7 +124,7 @@ impl MatchedPath {
             .collect();
         let relative = &relative[1..]; // NOTE: Delete the prefix of slash
         let mut positions: Vec<usize> = vec![];
-        for char in Self::normalize_query(query).chars() {
+        for char in normalize_query(query).chars() {
             let begin = if let Some(pos) = positions.last() {
                 pos + 1
             } else {
@@ -125,16 +142,25 @@ impl MatchedPath {
         })
     }
     // TODO: Present with colorized value with emphasized positions.
+}
 
-    #[cfg(target_os = "windows")]
-    fn normalize_query(query: &str) -> String {
-        // NOTE: Forward slashes are not allowed in a filename, so this replacing is supposed to work.
-        //       See https://docs.microsoft.com/en-us/windows/win32/fileio/naming-a-file#naming-conventions
-        query.replace('/', "\\")
-    }
+fn canonicalize_starting_point(path: &Path) -> Result<PathBuf> {
+    path.canonicalize().map_err(|_e|
+        Error::args(&format!(
+            "The specified starting point {:?} cannot be normalized. Perhaps, it might not exist or cannot be read.",
+            path,
+        ))
+    )
+}
 
-    #[cfg(not(target_os = "windows"))]
-    fn normalize_query(query: &str) -> &str {
-        query
-    }
+#[cfg(target_os = "windows")]
+fn normalize_query(query: &str) -> String {
+    // NOTE: Forward slashes are not allowed in a filename, so this replacing is supposed to work.
+    //       See https://docs.microsoft.com/en-us/windows/win32/fileio/naming-a-file#naming-conventions
+    query.replace('/', "\\")
+}
+
+#[cfg(not(target_os = "windows"))]
+fn normalize_query(query: &str) -> &str {
+    query
 }
