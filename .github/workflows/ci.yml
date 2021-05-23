@@ -10,8 +10,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # TODO: os: [ubuntu-latest, macOS-latest, windows-latest]
-        os: [ubuntu-latest, windows-latest]
+        os: [ubuntu-latest, macOS-latest, windows-latest]
         rust: [stable, nightly]
     steps:
       - uses: actions/checkout@v2
