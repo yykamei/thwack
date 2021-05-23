@@ -1,4 +1,4 @@
-use pinpoint::Finder;
+use thwack::Finder;
 
 use crate::helper::create_tree;
 

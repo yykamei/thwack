@@ -1,5 +1,5 @@
 [package]
-name = "pinpoint"
+name = "thwack"
 version = "0.1.0"
 authors = ["Yutaka Kamei <kamei@yykamei.me>"]
 edition = "2018"
