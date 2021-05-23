@@ -1,14 +1,16 @@
 use std::env;
+use std::io::{stderr, stdout};
 
 use pinpoint::{entrypoint, safe_exit};
-use std::io::stdout;
 
 fn main() {
-    match entrypoint(env::args_os(), stdout()) {
-        Ok(_) => safe_exit(0),
+    let mut out = stdout();
+    let mut err = stderr();
+    match entrypoint(env::args_os(), &mut out, &mut err) {
+        Ok(_) => safe_exit(0, out, err),
         Err(e) => {
             eprintln!("{}", e); // TODO: Write a more readable error message.
-            safe_exit(e.exit_code);
+            safe_exit(e.exit_code, out, err);
         }
     }
 }
