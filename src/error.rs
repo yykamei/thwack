@@ -14,6 +14,7 @@ pub enum ErrorKind {
     InvalidUnicode,
     IO,
     Terminal,
+    Exec,
 }
 
 #[derive(Debug)]
@@ -60,6 +61,15 @@ impl Error {
         Self {
             message: message.to_string(),
             kind: ErrorKind::InvalidUnicode,
+            source: None,
+            exit_code: FAILURE,
+        }
+    }
+
+    pub fn exec(message: &str) -> Self {
+        Self {
+            message: message.to_string(),
+            kind: ErrorKind::Exec,
             source: None,
             exit_code: FAILURE,
         }

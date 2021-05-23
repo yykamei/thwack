@@ -2,6 +2,7 @@ use std::env::ArgsOs;
 
 use crate::error::{Error, Result};
 
+// TODO: --no-exec? might be required; users sometimes want to execute the file itself.
 pub(crate) const HELP: &str = "pinpoint
 Find a file and open it with an arbitrary command.
 
@@ -112,6 +113,12 @@ impl Parser {
         } else {
             return Err(Error::args(&format!(
                 "{}\n\n\"--exec\" needs a value",
+                HELP
+            )));
+        }
+        if self.parsed_args.exec.is_empty() {
+            return Err(Error::args(&format!(
+                "{}\n\n\"--exec\" needs a value. Empty string cannot be processed.",
                 HELP
             )));
         }

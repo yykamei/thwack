@@ -1,5 +1,5 @@
 use std::env::ArgsOs;
-use std::io::{self, Write};
+use std::io::{self, Stderr, Stdout, Write};
 use std::process::exit;
 use std::time::Duration;
 
@@ -13,18 +13,18 @@ use crossterm::{
 use crate::args::{Parser, HELP};
 use crate::error::Result;
 use crate::finder::Finder;
-use crate::MatchedPath;
+use crate::{Error, MatchedPath};
 
-pub fn safe_exit(code: i32) {
-    let _ = std::io::stdout().lock().flush();
-    let _ = std::io::stderr().lock().flush();
+pub fn safe_exit(code: i32, stdout: Stdout, stderr: Stderr) {
+    let _ = stdout.lock().flush();
+    let _ = stderr.lock().flush();
     exit(code)
 }
 
-pub fn entrypoint(args: ArgsOs, mut stdout: impl Write) -> Result<()> {
+pub fn entrypoint(args: ArgsOs, stdout: &mut impl Write, stderr: &mut impl Write) -> Result<()> {
     let args = Parser::new(args).parse()?;
     if args.help {
-        print_help(&mut stdout)?;
+        print_help(stdout)?;
         return Ok(());
     }
 
@@ -33,24 +33,25 @@ pub fn entrypoint(args: ArgsOs, mut stdout: impl Write) -> Result<()> {
     let mut paths = find_paths(&args.starting_point, &query, rows - 1)?;
     let mut selection: u16 = 0;
     let mut state = State::QueryChanged;
-    initialize_terminal(&mut stdout)?;
+    initialize_terminal(stdout)?;
 
     loop {
         match state {
-            State::Ready => (),
-            State::QueryChanged => output_on_terminal(&mut stdout, &query, &paths[..], selection)?,
+            State::QueryChanged => output_on_terminal(stdout, &query, &paths[..], selection)?,
             State::PathsChanged => {
-                output_on_terminal(&mut stdout, &query, &paths[..], selection)?;
+                output_on_terminal(stdout, &query, &paths[..], selection)?;
                 state = State::Ready;
             }
             State::SelectionChanged => {
-                output_on_terminal(&mut stdout, &query, &paths[..], selection)?;
+                output_on_terminal(stdout, &query, &paths[..], selection)?;
                 state = State::Ready;
             }
+            _ => (),
         }
 
         if event::poll(Duration::from_millis(300))? {
             let ev = event::read()?;
+            // TODO: Support uppercase
             if let Event::Key(KeyEvent {
                 code: KeyCode::Char(c),
                 modifiers: KeyModifiers::NONE,
@@ -71,6 +72,10 @@ pub fn entrypoint(args: ArgsOs, mut stdout: impl Write) -> Result<()> {
                     selection += 1;
                 }
                 state = State::SelectionChanged;
+            } else if ev == Event::Key(KeyCode::Enter.into()) {
+                let path: &MatchedPath = paths.get(selection as usize).unwrap(); // TODO: Do not use unwrap()
+                state = State::Invoke(&path);
+                break;
             } else if ev
                 == Event::Key(KeyEvent {
                     code: KeyCode::Char('c'),
@@ -94,14 +99,29 @@ pub fn entrypoint(args: ArgsOs, mut stdout: impl Write) -> Result<()> {
 
     execute!(stdout, terminal::LeaveAlternateScreen)?;
     terminal::disable_raw_mode()?;
+
+    if let State::Invoke(path) = state {
+        // TODO: Decide which we should pass: relative or absolute.
+        let path = &path.relative;
+        let output = invoke(&args.exec, &path)?;
+        stdout.write_all(&output.stdout)?;
+        stderr.write_all(&output.stderr)?;
+        if !output.status.success() {
+            return Err(Error::exec(&format!(
+                "Failed to execute command `{} {}`",
+                args.exec, path,
+            )));
+        }
+    }
     Ok(())
 }
 
-enum State {
+enum State<'a> {
     Ready,
     QueryChanged,
     PathsChanged,
     SelectionChanged,
+    Invoke(&'a MatchedPath),
 }
 
 fn print_help(buffer: &mut impl Write) -> io::Result<()> {
@@ -154,4 +174,18 @@ fn find_paths(starting_point: &str, query: &str, limit: u16) -> Result<Vec<Match
         paths.push(path);
     }
     Ok(paths)
+}
+
+fn invoke(exec: &str, path: &str) -> Result<std::process::Output> {
+    let mut exec = exec.split_whitespace();
+    let program = exec
+        .next()
+        .ok_or_else(|| Error::args("\"exec\" cannot be processed with empty string"))?;
+    let mut command = std::process::Command::new(program);
+    for arg in exec {
+        command.arg(arg);
+    }
+    command.arg(path);
+    let output = command.output()?;
+    Ok(output)
 }
