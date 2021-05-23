@@ -3,11 +3,11 @@ use std::env::ArgsOs;
 use crate::error::{Error, Result};
 
 // TODO: --no-exec? might be required; users sometimes want to execute the file itself.
-pub(crate) const HELP: &str = "pinpoint
+pub(crate) const HELP: &str = "thwack
 Find a file and open it with an arbitrary command.
 
 USAGE:
-    pinpoint [OPTIONS] [query]
+    thwack [OPTIONS] [query]
 
 ARGS:
     <query>                   The name of the file you'd like to find

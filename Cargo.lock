@@ -144,14 +144,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "pinpoint"
-version = "0.1.0"
-dependencies = [
- "crossterm",
- "tempfile",
-]
-
-[[package]]
 name = "ppv-lite86"
 version = "0.2.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -259,6 +251,14 @@ dependencies = [
  "redox_syscall",
  "remove_dir_all",
  "winapi",
+]
+
+[[package]]
+name = "thwack"
+version = "0.1.0"
+dependencies = [
+ "crossterm",
+ "tempfile",
 ]
 
 [[package]]

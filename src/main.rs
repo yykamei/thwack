@@ -1,7 +1,7 @@
 use std::env;
 use std::io::{stderr, stdout};
 
-use pinpoint::{entrypoint, safe_exit};
+use thwack::{entrypoint, safe_exit};
 
 fn main() {
     let mut out = stdout();
