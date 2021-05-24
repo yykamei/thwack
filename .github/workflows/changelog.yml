@@ -22,6 +22,8 @@ jobs:
           if [[ -z "$changes" ]]; then
             exit 0
           fi
+          git config user.email "noreply@github.com"
+          git config user.name "GitHub"
           git checkout -b "update-changelog/$(date +%s)"
           git add -A
           git commit -m 'Update CHANGELOG.md'
