@@ -19,7 +19,7 @@ jobs:
           CHANGELOG_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - run: |
           changes=$(git status --short | wc -l)
-          if [[ "$changes" -z ]]; then
+          if [[ -z "$changes" ]]; then
             exit 0
           fi
           git checkout -b "update-changelog/$(date +%s)"
