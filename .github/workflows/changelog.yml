@@ -31,7 +31,7 @@ jobs:
           cat <<BODY > body.txt
           *This pull request was automatically created to make CHANGELOG.md the latest*.
 
-          Check the files changes, and merge if the changes make sense.
+          Check the files changes and merge if the changes make sense.
           BODY
           gh pr create --head "$branch" --title 'Update CHANGELOG.md' --body-file body.txt --label chore
         env:
