@@ -12,3 +12,6 @@ updates:
       interval: daily
       time: "12:20"
       timezone: Asia/Tokyo
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-minor", "version-update:semver-patch"]
