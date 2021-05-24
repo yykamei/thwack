@@ -22,9 +22,10 @@ jobs:
           if [[ -z "$changes" ]]; then
             exit 0
           fi
+          branch="update-changelog/$(date +%s)"
           git config user.email "noreply@github.com"
           git config user.name "GitHub"
-          git checkout -b "update-changelog/$(date +%s)"
+          git checkout -b "$branch"
           git add -A
           git commit -m 'Update CHANGELOG.md'
           cat <<BODY > body.txt
@@ -32,6 +33,6 @@ jobs:
 
           Check the files changes, and merge if the changes make sense.
           BODY
-          gh pr create --title 'Update CHANGELOG.md' --body-file body.txt --label chore
+          gh pr create --head "$branch" --title 'Update CHANGELOG.md' --body-file body.txt --label chore
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
