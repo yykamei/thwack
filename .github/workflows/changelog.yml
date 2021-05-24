@@ -10,11 +10,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - id: get_project
-        run: echo "::set-output name=${GITHUB_REPOSITORY#*/}"
+        run: echo "::set-output name=project::${GITHUB_REPOSITORY#*/}"
       - uses: actions/checkout@v2
       - uses: docker://githubchangeloggenerator/github-changelog-generator:1.16.2
         with:
-          args: '--user ${{ github.repository_owner }} --project ${{ steps.get_project.outputs.name }} --exclude-labels chore,duplicate,question,invalid,wontfix'
+          args: '--user ${{ github.repository_owner }} --project ${{ steps.get_project.outputs.project }} --exclude-labels chore,duplicate,question,invalid,wontfix'
         env:
           CHANGELOG_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - run: |
