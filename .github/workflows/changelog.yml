@@ -28,6 +28,7 @@ jobs:
           git checkout -b "$branch"
           git add -A
           git commit -m 'Update CHANGELOG.md'
+          git push origin "$branch"
           cat <<BODY > body.txt
           *This pull request was automatically created to make CHANGELOG.md the latest*.
 
