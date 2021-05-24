@@ -18,7 +18,7 @@ jobs:
           CHANGELOG_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - run: |
           changes=$(git status --short | wc -l)
-          if [[ -z "$changes" ]]; then
+          if [[ "$changes" == "0" ]]; then
             exit 0
           fi
           branch="update-changelog/$(date +%s)"
