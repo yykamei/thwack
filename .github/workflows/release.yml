@@ -1,9 +1,0 @@
-name: Release
-on:
-  workflow_dispatch:
-    inputs:
-      release_note:
-        description: Release Note
-        required: false
-jobs:
-  release:
