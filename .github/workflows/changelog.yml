@@ -1,0 +1,38 @@
+name: Changelog
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+jobs:
+  changelog:
+    runs-on: ubuntu-latest
+    steps:
+      - id: get_project
+        run: echo "::set-output name=project::${GITHUB_REPOSITORY#*/}"
+      - uses: actions/checkout@v2
+      - uses: docker://githubchangeloggenerator/github-changelog-generator:1.16.2
+        with:
+          args: '--user ${{ github.repository_owner }} --project ${{ steps.get_project.outputs.project }} --exclude-labels chore,duplicate,question,invalid,wontfix'
+        env:
+          CHANGELOG_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - run: |
+          changes=$(git status --short | wc -l)
+          if [[ -z "$changes" ]]; then
+            exit 0
+          fi
+          branch="update-changelog/$(date +%s)"
+          git config user.email "noreply@github.com"
+          git config user.name "GitHub"
+          git checkout -b "$branch"
+          git add -A
+          git commit -m 'Update CHANGELOG.md'
+          git push origin "$branch"
+          cat <<BODY > body.txt
+          *This pull request was automatically created to make CHANGELOG.md the latest*.
+
+          Check the files changes and merge if the changes make sense.
+          BODY
+          gh pr create --head "$branch" --title 'Update CHANGELOG.md' --body-file body.txt --label chore
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
