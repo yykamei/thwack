@@ -4,19 +4,39 @@ on:
     branches:
       - main
   workflow_dispatch:
+    inputs:
+      future_release:
+        description: Specify the value for `--future-release` to make it ready to be released
+        required: false
+        default: ''
 jobs:
   changelog:
     runs-on: ubuntu-latest
     steps:
-      - id: get_project
+      - name: Get --project <VALUE>
+        id: get_project
         run: echo "::set-output name=project::${GITHUB_REPOSITORY#*/}"
+      - name: Get --feature-release <VALUE>
+        id: get_future_release
+        run: |
+          set -xeuo pipefail
+
+          if [[ -z '${{ github.event.inputs.future_release }}' ]]; then
+            args=''
+          else
+            args='--future-release ${{ github.event.inputs.future_release }}'
+          fi
+          echo "::set-output name=args::#{args}"
       - uses: actions/checkout@v2
       - uses: docker://githubchangeloggenerator/github-changelog-generator:1.16.2
         with:
-          args: '--user ${{ github.repository_owner }} --project ${{ steps.get_project.outputs.project }} --exclude-labels chore,duplicate,question,invalid,wontfix'
+          args: '--user ${{ github.repository_owner }} --project ${{ steps.get_project.outputs.project }} --exclude-labels chore,duplicate,question,invalid,wontfix ${{ steps.get_future_release.outputs.args }}'
         env:
           CHANGELOG_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - run: |
+      - name: Update CHANGELOG.md and open a pull request
+        run: |
+          set -xeuo pipefail
+
           changes=$(git status --short | wc -l)
           if [[ "$changes" == "0" ]]; then
             exit 0
