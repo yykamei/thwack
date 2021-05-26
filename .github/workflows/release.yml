@@ -1,0 +1,67 @@
+name: Release
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: The next release version
+        required: true
+      apply:
+        description: Specify whether the atcual release should be performed or not
+        default: 'false'
+        required: true
+      title:
+        description: The release title
+        required: false
+        default: ''
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          profile: minimal
+          override: true
+
+      - run: |
+          set -xeuo pipefail
+
+          version='${{ github.event.inputs.version }}'
+          tag="v${version}"
+          apply='${{ github.event.inputs.apply }}'
+          title='${{ github.event.inputs.title }}'
+          if [[ -z "$title" ]]; then
+            title="Release ${tag}"
+          fi
+
+          # Check whether the version is described in the source code.
+          grep "$version" Cargo.toml
+          grep -F "## [${tag}]" CHANGELOG.md
+          grep -F '## [Unreleased]' CHANGELOG.md && exit 1
+
+          # Extract the latest changelog entries to put them into GitHub release notes.
+          hit=0
+          while IFS="" read -r line; do
+            if [[ "$line" == "## ["*"]("*")" ]]; then
+              hit=$((hit + 1))
+              continue
+            fi
+            if [[ "$hit" == "1" ]]; then
+              echo "$line" >> notes.txt
+            fi
+          done < CHANGELOG.md
+
+          cargo publish --dry-run
+          cargo package --list
+
+          if [[ "$apply" == "true" ]]; then
+            echo "apply!: $title"
+            cat notes.txt
+            # TODO: Remove the prefix of these comments if the dry-run feature is valid.
+            # gh release create "$tag" --title "$title" --notes-file notes.txt
+            # cargo publish
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
