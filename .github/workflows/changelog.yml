@@ -13,9 +13,11 @@ jobs:
   changelog:
     runs-on: ubuntu-latest
     steps:
-      - id: get_project
+      - name: Get --project <VALUE>
+        id: get_project
         run: echo "::set-output name=project::${GITHUB_REPOSITORY#*/}"
-      - id: get_future_release
+      - name: Get --feature-release <VALUE>
+        id: get_future_release
         run: |
           set -xeuo pipefail
 
@@ -31,7 +33,8 @@ jobs:
           args: '--user ${{ github.repository_owner }} --project ${{ steps.get_project.outputs.project }} --exclude-labels chore,duplicate,question,invalid,wontfix ${{ steps.get_future_release.outputs.args }}'
         env:
           CHANGELOG_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - run: |
+      - name: Update CHANGELOG.md and open a pull request
+        run: |
           set -xeuo pipefail
 
           changes=$(git status --short | wc -l)

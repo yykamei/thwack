@@ -25,7 +25,8 @@ jobs:
           profile: minimal
           override: true
 
-      - run: |
+      - name: Create a GitHub release and publish the crate on crates.io
+        run: |
           set -xeuo pipefail
 
           version='${{ github.event.inputs.version }}'
