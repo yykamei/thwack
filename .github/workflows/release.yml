@@ -57,11 +57,8 @@ jobs:
           cargo package --list
 
           if [[ "$apply" == "true" ]]; then
-            echo "apply!: $title"
-            cat notes.txt
-            # TODO: Remove the prefix of these comments if the dry-run feature is valid.
-            # gh release create "$tag" --title "$title" --notes-file notes.txt
-            # cargo publish
+            gh release create "$tag" --title "$title" --notes-file notes.txt
+            cargo publish
           fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
