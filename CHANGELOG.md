@@ -1,5 +1,13 @@
 # Changelog
 
+## [Unreleased](https://github.com/yykamei/thwack/tree/HEAD)
+
+[Full Changelog](https://github.com/yykamei/thwack/compare/v0.1.0...HEAD)
+
+**Implemented enhancements:**
+
+- Implement Ord for MatchedPath to make its iterator sortable [\#30](https://github.com/yykamei/thwack/issues/30)
+
 ## [v0.1.0](https://github.com/yykamei/thwack/tree/v0.1.0) (2021-05-24)
 
 [Full Changelog](https://github.com/yykamei/thwack/compare/f9958d1dd1afb82a8fe70ca24e3753bd56d43562...v0.1.0)
