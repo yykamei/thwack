@@ -13,7 +13,8 @@ use crossterm::{
 use crate::args::{Parser, HELP};
 use crate::error::Result;
 use crate::finder::Finder;
-use crate::{Error, MatchedPath};
+use crate::matched_path::MatchedPath;
+use crate::Error;
 
 pub fn safe_exit(code: i32, stdout: Stdout, stderr: Stderr) {
     let _ = stdout.lock().flush();
@@ -168,12 +169,14 @@ fn output_on_terminal(
 fn find_paths(starting_point: &str, query: &str, limit: u16) -> Result<Vec<MatchedPath>> {
     let mut paths = Vec::with_capacity(100); // TODO: Tune this capacity later.
 
-    // TODO: Sort
-    for path in Finder::new(starting_point, query)?.take(limit.into()) {
+    for path in Finder::new(starting_point, query)? {
+        // TODO: Shouldn't we stop iteration when some paths retuns Err?
         let path = path?;
         paths.push(path);
     }
-    Ok(paths)
+
+    paths.sort();
+    Ok(paths.into_iter().take(limit.into()).collect())
 }
 
 fn invoke(exec: &str, path: &str) -> Result<std::process::Output> {
