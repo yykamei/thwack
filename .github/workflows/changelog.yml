@@ -30,7 +30,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: docker://githubchangeloggenerator/github-changelog-generator:1.16.2
         with:
-          args: '--user ${{ github.repository_owner }} --project ${{ steps.get_project.outputs.project }} --exclude-labels chore,duplicate,question,invalid,wontfix ${{ steps.get_future_release.outputs.args }}'
+          args: '--user ${{ github.repository_owner }} --project ${{ steps.get_project.outputs.project }} --exclude-labels chore,no-changelog,duplicate,question,invalid,wontfix ${{ steps.get_future_release.outputs.args }}'
         env:
           CHANGELOG_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Update CHANGELOG.md and open a pull request
