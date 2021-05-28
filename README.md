@@ -8,4 +8,12 @@ In many cases, we know the name of a file when we want to open it, but we may no
 
 thwack is the solution! You can find and open a file quickly with it 🚀
 
+## How to install?
 
+If you have a Rust environment set up, you can use the `cargo install` command:
+
+```console
+$ cargo install thwack
+```
+
+Note we consider providing easier ways to install thwack. This should be used without the knowledge of Rust.
