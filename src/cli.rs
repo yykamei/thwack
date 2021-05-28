@@ -103,8 +103,8 @@ pub fn entrypoint(args: ArgsOs, stdout: &mut impl Write, stderr: &mut impl Write
 
     if let State::Invoke(path) = state {
         // TODO: Decide which we should pass: relative or absolute.
-        let path = &path.relative;
-        let output = invoke(&args.exec, &path)?;
+        let path = path.relative();
+        let output = invoke(&args.exec, path)?;
         stdout.write_all(&output.stdout)?;
         stderr.write_all(&output.stderr)?;
         if !output.status.success() {

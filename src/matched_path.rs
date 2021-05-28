@@ -2,17 +2,11 @@ use std::cmp::Ordering;
 use std::fmt::{self, Display, Formatter};
 
 #[derive(Debug, Eq, PartialEq)]
-pub struct MatchedPath {
-    pub absolute: String,
-    pub relative: String,
-    pub positions: Vec<usize>,
-    pub depth: usize,
-}
-
-impl Display for MatchedPath {
-    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        Display::fmt(&self.relative, f)
-    }
+pub(crate) struct MatchedPath {
+    absolute: String,
+    relative: String,
+    positions: Vec<usize>,
+    depth: usize,
 }
 
 impl MatchedPath {
@@ -47,6 +41,11 @@ impl MatchedPath {
         })
     }
 
+    /// Returns the relative path
+    pub(crate) fn relative(&self) -> &str {
+        &self.relative
+    }
+
     /// Calculate the total distance between each position.
     /// For example, if the `positions` is `vec![1, 2, 3]`, then the distance will be `2`.
     /// If the `positions` is `vec![1, 4, 5]`, then the distance will be `4`.
@@ -62,6 +61,12 @@ impl MatchedPath {
         total
     }
     // TODO: Present with colorized value with emphasized positions.
+}
+
+impl Display for MatchedPath {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        Display::fmt(&self.relative, f)
+    }
 }
 
 impl Ord for MatchedPath {
@@ -99,70 +104,61 @@ fn normalize_query(query: &str) -> &str {
 mod tests {
     use super::*;
 
+    fn new(query: &str, starting_point: &str, absolute: &str) -> MatchedPath {
+        MatchedPath::new(query, starting_point, absolute).unwrap()
+    }
+
+    #[test]
+    fn returns_new_instance() {
+        // TODO: Add more tests here about MatchedPath::new()
+    }
+
+    #[test]
+    fn returns_fields() {
+        let path = new("abc", "/home", "/home/abc.txt");
+        assert_eq!(path.relative(), "abc.txt");
+    }
+
+
     #[test]
     fn distance() {
-        assert_eq!(
-            MatchedPath::new("abc", "/home", "/home/abc.txt")
-                .unwrap()
-                .distance(),
-            2
-        );
-        assert_eq!(
-            MatchedPath::new("abc", "/home", "/home/a123bc.txt")
-                .unwrap()
-                .distance(),
-            5
-        );
-        assert_eq!(
-            MatchedPath::new("foo.txt", "/home", "/home/ok/foo.txt")
-                .unwrap()
-                .distance(),
-            6
-        );
-        assert_eq!(
-            MatchedPath::new("foo.txt", "/home", "/home/ok/f1o1o/ok.txt")
-                .unwrap()
-                .distance(),
-            11
-        );
-        assert_eq!(
-            MatchedPath::new("foo.txt", "/home", "/home/ok/foo/ok.txt")
-                .unwrap()
-                .distance(),
-            9
-        );
+        assert_eq!(new("abc", "/home", "/home/abc.txt").distance(), 2);
+        assert_eq!(new("abc", "/home", "/home/a123bc.txt").distance(), 5);
+        assert_eq!(new("foo.txt", "/home", "/home/ok/foo.txt").distance(), 6);
+        assert_eq!(new("foo.txt", "/home", "/home/ok/f1o1o/ok.txt").distance(), 11);
+        assert_eq!(new("foo.txt", "/home", "/home/ok/foo/ok.txt").distance(), 9);
     }
 
     #[test]
     fn sort() {
         let mut given = vec![
-            MatchedPath::new("abc.txt", "/home", "/home/abc.txt").unwrap(),
-            MatchedPath::new("abc.txt", "/home", "/home/a12bc.txt").unwrap(),
-            MatchedPath::new("abc.txt", "/home", "/home/a123bc.txt").unwrap(),
-            MatchedPath::new("abc.txt", "/home", "/home/abc/cat.txt").unwrap(),
-            MatchedPath::new("abc.txt", "/home", "/home/abc/src/abc.txt").unwrap(),
-            MatchedPath::new("abc.txt", "/home", "/home/src/abc.txt").unwrap(),
-            MatchedPath::new("abc.txt", "/home", "/home/src/n1/n2/aXbc.txt").unwrap(),
-            MatchedPath::new("abc.txt", "/home", "/home/src/n1/n2/Foo-aXbc.txt").unwrap(),
-            MatchedPath::new("abc.txt", "/home", "/home/src/n1/n2/Foo-aXbXc.txt").unwrap(),
-            MatchedPath::new("abc.txt", "/home", "/home/src/n1/n2/abc.txt").unwrap(),
-            MatchedPath::new("abc.txt", "/home", "/home/lib/abc!.txt").unwrap(),
+            new("abc.txt", "/home", "/home/abc.txt"),
+            new("abc.txt", "/home", "/home/a12bc.txt"),
+            new("abc.txt", "/home", "/home/a123bc.txt"),
+            new("abc.txt", "/home", "/home/abc/cat.txt"),
+            new("abc.txt", "/home", "/home/abc/src/abc.txt"),
+            new("abc.txt", "/home", "/home/src/abc.txt"),
+            new("abc.txt", "/home", "/home/src/n1/n2/aXbc.txt"),
+            new("abc.txt", "/home", "/home/src/n1/n2/Foo-aXbc.txt"),
+            new("abc.txt", "/home", "/home/src/n1/n2/Foo-aXbXc.txt"),
+            new("abc.txt", "/home", "/home/src/n1/n2/abc.txt"),
+            new("abc.txt", "/home", "/home/lib/abc!.txt"),
         ];
         given.sort();
         assert_eq!(
             given,
             vec![
-                MatchedPath::new("abc.txt", "/home", "/home/abc.txt").unwrap(),
-                MatchedPath::new("abc.txt", "/home", "/home/src/abc.txt").unwrap(),
-                MatchedPath::new("abc.txt", "/home", "/home/src/n1/n2/abc.txt").unwrap(),
-                MatchedPath::new("abc.txt", "/home", "/home/lib/abc!.txt").unwrap(),
-                MatchedPath::new("abc.txt", "/home", "/home/src/n1/n2/Foo-aXbc.txt").unwrap(),
-                MatchedPath::new("abc.txt", "/home", "/home/src/n1/n2/aXbc.txt").unwrap(),
-                MatchedPath::new("abc.txt", "/home", "/home/a12bc.txt").unwrap(),
-                MatchedPath::new("abc.txt", "/home", "/home/src/n1/n2/Foo-aXbXc.txt").unwrap(),
-                MatchedPath::new("abc.txt", "/home", "/home/a123bc.txt").unwrap(),
-                MatchedPath::new("abc.txt", "/home", "/home/abc/cat.txt").unwrap(),
-                MatchedPath::new("abc.txt", "/home", "/home/abc/src/abc.txt").unwrap(), // TODO: This should precede others. positions should be updated within ::new
+                new("abc.txt", "/home", "/home/abc.txt"),
+                new("abc.txt", "/home", "/home/src/abc.txt"),
+                new("abc.txt", "/home", "/home/src/n1/n2/abc.txt"),
+                new("abc.txt", "/home", "/home/lib/abc!.txt"),
+                new("abc.txt", "/home", "/home/src/n1/n2/Foo-aXbc.txt"),
+                new("abc.txt", "/home", "/home/src/n1/n2/aXbc.txt"),
+                new("abc.txt", "/home", "/home/a12bc.txt"),
+                new("abc.txt", "/home", "/home/src/n1/n2/Foo-aXbXc.txt"),
+                new("abc.txt", "/home", "/home/a123bc.txt"),
+                new("abc.txt", "/home", "/home/abc/cat.txt"),
+                new("abc.txt", "/home", "/home/abc/src/abc.txt"), // TODO: This should precede others. positions should be updated within ::new
             ],
         );
     }
