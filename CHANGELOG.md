@@ -4,6 +4,10 @@
 
 [Full Changelog](https://github.com/yykamei/thwack/compare/v0.1.0...HEAD)
 
+**Breaking changes:**
+
+- Make `MatchedPath` and `Finder` private [\#38](https://github.com/yykamei/thwack/issues/38)
+
 **Implemented enhancements:**
 
 - Implement Ord for MatchedPath to make its iterator sortable [\#30](https://github.com/yykamei/thwack/issues/30)
