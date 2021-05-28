@@ -1,5 +1,7 @@
 # thwack
 
+![CI](https://github.com/yykamei/thwack/actions/workflows/ci.yml/badge.svg)
+
 thwack is the Command-line utility similar to "Go To File" on GitHub. You can search for a file in a directory and invoke an arbitrary command on it.
 
 ## Why is this useful?
@@ -13,7 +15,7 @@ thwack is the solution! You can find and open a file quickly with it 🚀
 If you have a Rust environment set up, you can use the `cargo install` command:
 
 ```console
-$ cargo install thwack
+cargo install thwack
 ```
 
 Note we consider providing easier ways to install thwack. This should be used without the knowledge of Rust.
