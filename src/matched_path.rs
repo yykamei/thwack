@@ -119,13 +119,15 @@ mod tests {
         assert_eq!(path.relative(), "abc.txt");
     }
 
-
     #[test]
     fn distance() {
         assert_eq!(new("abc", "/home", "/home/abc.txt").distance(), 2);
         assert_eq!(new("abc", "/home", "/home/a123bc.txt").distance(), 5);
         assert_eq!(new("foo.txt", "/home", "/home/ok/foo.txt").distance(), 6);
-        assert_eq!(new("foo.txt", "/home", "/home/ok/f1o1o/ok.txt").distance(), 11);
+        assert_eq!(
+            new("foo.txt", "/home", "/home/ok/f1o1o/ok.txt").distance(),
+            11
+        );
         assert_eq!(new("foo.txt", "/home", "/home/ok/foo/ok.txt").distance(), 9);
     }
 

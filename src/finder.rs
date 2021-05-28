@@ -185,7 +185,7 @@ mod tests {
             dir.path().to_str().unwrap(),
             "the word should be not found with 🎂",
         )
-            .len();
+        .len();
         assert_eq!(size, 0);
     }
 
