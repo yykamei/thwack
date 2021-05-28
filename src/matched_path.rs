@@ -1,38 +1,21 @@
 use std::cmp::Ordering;
+use std::collections::VecDeque;
 use std::fmt::{self, Display, Formatter};
 
 #[derive(Debug, Eq, PartialEq)]
 pub(crate) struct MatchedPath {
     absolute: String,
     relative: String,
-    positions: Vec<usize>,
+    positions: VecDeque<usize>,
     depth: usize,
 }
 
 impl MatchedPath {
+    /// Creates an instance of `MatchedPath`.
     pub(crate) fn new(query: &str, starting_point: &str, absolute: &str) -> Option<Self> {
-        let mut depth = 0;
-        let relative: Vec<char> = absolute
-            .strip_prefix(starting_point)
-            .expect("The passed starting_point must be prefix of the path.")
-            .chars()
-            .collect();
-        let relative = &relative[1..]; // NOTE: Delete the prefix of slash
-        let mut positions: Vec<usize> = vec![];
-        for char in normalize_query(query).chars() {
-            if char == '/' {
-                depth += 1;
-            }
-            let begin = if let Some(pos) = positions.last() {
-                pos + 1
-            } else {
-                0
-            };
-            // TODO: Explain this line later.
-            let target = &relative[begin..];
-            let pos = target.iter().position(|t| char.eq_ignore_ascii_case(t))?;
-            positions.push(begin + pos);
-        }
+        let relative = relative_chars(starting_point, absolute);
+        let depth = depth_from(relative.iter());
+        let positions = positions_from(query, &relative[..])?;
         Some(Self {
             absolute: absolute.to_string(),
             relative: relative.iter().collect(),
@@ -88,6 +71,51 @@ impl PartialOrd for MatchedPath {
     }
 }
 
+/// Generates relative from the `starting_point` and `absolute`.
+/// This returns `Vec<char>` instead of other types, such as `String` in order to make it useful for manipulating later.
+fn relative_chars(starting_point: &str, absolute: &str) -> Vec<char> {
+    let mut relative: VecDeque<char> = absolute
+        .strip_prefix(starting_point)
+        .expect("The passed starting_point must be prefix of the path.")
+        .chars()
+        .collect();
+    match relative.get(0) {
+        Some(c) if *c == '/' || *c == '\\' => {
+            relative.pop_front();
+        }
+        _ => (),
+    };
+    relative.into()
+}
+
+/// Calculates depth of the `relative` by counting `'/'` or `'\\'`.
+fn depth_from<'a>(relative: impl Iterator<Item = &'a char>) -> usize {
+    relative.fold(0, |acc, c| {
+        if *c == '/' || *c == '\\' {
+            acc + 1
+        } else {
+            acc
+        }
+    })
+}
+
+/// Calculates matched positions of `relative` with `query`.
+/// This searches for characters of `query` in `relative` from the right one by one.
+fn positions_from(query: &str, relative: &[char]) -> Option<VecDeque<usize>> {
+    let mut positions: VecDeque<usize> = VecDeque::with_capacity(query.len());
+    for char in normalize_query(query).chars().rev() {
+        let end = if let Some(pos) = positions.front() {
+            *pos
+        } else {
+            relative.len()
+        };
+        let target = &relative[..end];
+        let pos = target.iter().rposition(|t| char.eq_ignore_ascii_case(t))?;
+        positions.push_front(pos);
+    }
+    Some(positions)
+}
+
 #[cfg(target_os = "windows")]
 fn normalize_query(query: &str) -> String {
     // NOTE: Forward slashes are not allowed in a filename, so this replacing is supposed to work.
@@ -110,7 +138,46 @@ mod tests {
 
     #[test]
     fn returns_new_instance() {
-        // TODO: Add more tests here about MatchedPath::new()
+        assert_eq!(
+            new("abc.txt", "/", "/abc/abc/abc.txt"),
+            MatchedPath {
+                absolute: String::from("/abc/abc/abc.txt"),
+                relative: String::from("abc/abc/abc.txt"),
+                positions: VecDeque::from(vec![8, 9, 10, 11, 12, 13, 14]),
+                depth: 2,
+            },
+        );
+        assert_eq!(
+            new("abc", "/", "/abc/abc/abc.txt"),
+            MatchedPath {
+                absolute: String::from("/abc/abc/abc.txt"),
+                relative: String::from("abc/abc/abc.txt"),
+                positions: VecDeque::from(vec![8, 9, 10]),
+                depth: 2,
+            },
+        );
+        assert_eq!(
+            new(
+                "tem",
+                "C:\\Documents",
+                "C:\\Documents\\Newsletters\\Summer2018.pdf"
+            ),
+            MatchedPath {
+                absolute: String::from("C:\\Documents\\Newsletters\\Summer2018.pdf"),
+                relative: String::from("Newsletters\\Summer2018.pdf"),
+                positions: VecDeque::from(vec![7, 8, 15]),
+                depth: 1,
+            },
+        );
+        assert_eq!(
+            new("foo☕t", "\\Folder\\", "\\Folder\\foo\\bar\\☕.txt"),
+            MatchedPath {
+                absolute: String::from("\\Folder\\foo\\bar\\☕.txt"),
+                relative: String::from("foo\\bar\\☕.txt"),
+                positions: VecDeque::from(vec![0, 1, 2, 8, 12]),
+                depth: 2,
+            },
+        );
     }
 
     #[test]
@@ -152,6 +219,7 @@ mod tests {
             vec![
                 new("abc.txt", "/home", "/home/abc.txt"),
                 new("abc.txt", "/home", "/home/src/abc.txt"),
+                new("abc.txt", "/home", "/home/abc/src/abc.txt"),
                 new("abc.txt", "/home", "/home/src/n1/n2/abc.txt"),
                 new("abc.txt", "/home", "/home/lib/abc!.txt"),
                 new("abc.txt", "/home", "/home/src/n1/n2/Foo-aXbc.txt"),
@@ -160,7 +228,6 @@ mod tests {
                 new("abc.txt", "/home", "/home/src/n1/n2/Foo-aXbXc.txt"),
                 new("abc.txt", "/home", "/home/a123bc.txt"),
                 new("abc.txt", "/home", "/home/abc/cat.txt"),
-                new("abc.txt", "/home", "/home/abc/src/abc.txt"), // TODO: This should precede others. positions should be updated within ::new
             ],
         );
     }
