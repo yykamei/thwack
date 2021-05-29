@@ -20,6 +20,11 @@
 
 - Update README.md to describe more information [\#34](https://github.com/yykamei/thwack/issues/34)
 
+**Merged pull requests:**
+
+- Revert "Change the type of `positions` and add `positions()`" [\#49](https://github.com/yykamei/thwack/pull/49) ([yykamei](https://github.com/yykamei))
+- Change the type of `positions` and add `positions()` [\#47](https://github.com/yykamei/thwack/pull/47) ([yykamei](https://github.com/yykamei))
+
 ## [v0.1.0](https://github.com/yykamei/thwack/tree/v0.1.0) (2021-05-24)
 
 [Full Changelog](https://github.com/yykamei/thwack/compare/f9958d1dd1afb82a8fe70ca24e3753bd56d43562...v0.1.0)
