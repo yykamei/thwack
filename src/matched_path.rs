@@ -6,7 +6,7 @@ use std::fmt::{self, Display, Formatter};
 pub(crate) struct MatchedPath {
     absolute: String,
     relative: String,
-    positions: VecDeque<usize>,
+    positions: Vec<usize>,
     depth: usize,
 }
 
@@ -27,6 +27,11 @@ impl MatchedPath {
     /// Returns the relative path
     pub(crate) fn relative(&self) -> &str {
         &self.relative
+    }
+
+    #[allow(dead_code)] // TODO: Use it later
+    pub(crate) fn positions(&self) -> &[usize] {
+        self.positions.as_slice()
     }
 
     /// Calculate the total distance between each position.
@@ -101,7 +106,7 @@ fn depth_from<'a>(relative: impl Iterator<Item = &'a char>) -> usize {
 
 /// Calculates matched positions of `relative` with `query`.
 /// This searches for characters of `query` in `relative` from the right one by one.
-fn positions_from(query: &str, relative: &[char]) -> Option<VecDeque<usize>> {
+fn positions_from(query: &str, relative: &[char]) -> Option<Vec<usize>> {
     let mut positions: VecDeque<usize> = VecDeque::with_capacity(query.len());
     for char in normalize_query(query).chars().rev() {
         let end = if let Some(pos) = positions.front() {
@@ -113,7 +118,7 @@ fn positions_from(query: &str, relative: &[char]) -> Option<VecDeque<usize>> {
         let pos = target.iter().rposition(|t| char.eq_ignore_ascii_case(t))?;
         positions.push_front(pos);
     }
-    Some(positions)
+    Some(Vec::from(positions))
 }
 
 #[cfg(target_os = "windows")]
@@ -143,7 +148,7 @@ mod tests {
             MatchedPath {
                 absolute: String::from("/abc/abc/abc.txt"),
                 relative: String::from("abc/abc/abc.txt"),
-                positions: VecDeque::from(vec![8, 9, 10, 11, 12, 13, 14]),
+                positions: vec![8, 9, 10, 11, 12, 13, 14],
                 depth: 2,
             },
         );
@@ -152,7 +157,7 @@ mod tests {
             MatchedPath {
                 absolute: String::from("/abc/abc/abc.txt"),
                 relative: String::from("abc/abc/abc.txt"),
-                positions: VecDeque::from(vec![8, 9, 10]),
+                positions: vec![8, 9, 10],
                 depth: 2,
             },
         );
@@ -165,7 +170,7 @@ mod tests {
             MatchedPath {
                 absolute: String::from("C:\\Documents\\Newsletters\\Summer2018.pdf"),
                 relative: String::from("Newsletters\\Summer2018.pdf"),
-                positions: VecDeque::from(vec![7, 8, 15]),
+                positions: vec![7, 8, 15],
                 depth: 1,
             },
         );
@@ -174,7 +179,7 @@ mod tests {
             MatchedPath {
                 absolute: String::from("\\Folder\\foo\\bar\\☕.txt"),
                 relative: String::from("foo\\bar\\☕.txt"),
-                positions: VecDeque::from(vec![0, 1, 2, 8, 12]),
+                positions: vec![0, 1, 2, 8, 12],
                 depth: 2,
             },
         );
@@ -184,6 +189,7 @@ mod tests {
     fn returns_fields() {
         let path = new("abc", "/home", "/home/abc.txt");
         assert_eq!(path.relative(), "abc.txt");
+        assert_eq!(path.positions(), vec![0, 1, 2]);
     }
 
     #[test]
