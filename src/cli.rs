@@ -6,7 +6,8 @@ use std::time::Duration;
 use crossterm::{
     cursor,
     event::{self, Event, KeyCode, KeyEvent, KeyModifiers},
-    execute, queue, style,
+    execute, queue,
+    style::{self, Attribute},
     terminal::{self, ClearType},
 };
 
@@ -155,11 +156,20 @@ fn output_on_terminal(
     for (idx, path) in paths.iter().enumerate() {
         let idx = idx as u16;
         let prefix = if idx == selection { "> " } else { "  " };
-        queue!(
-            stdout,
-            style::Print(format!("{}{}", prefix, path)),
-            cursor::MoveToNextLine(1),
-        )?;
+        queue!(stdout, style::Print(format!("{}", prefix)))?;
+        for chunk in path.chunks() {
+            if chunk.matched() {
+                queue!(
+                    stdout,
+                    style::SetAttribute(Attribute::Bold),
+                    style::Print(format!("{}", chunk)),
+                    style::SetAttribute(Attribute::Reset),
+                )?;
+            } else {
+                queue!(stdout, style::Print(format!("{}", chunk)))?;
+            }
+        }
+        queue!(stdout, cursor::MoveToNextLine(1))?;
     }
     queue!(stdout, cursor::RestorePosition)?;
     stdout.flush()?;

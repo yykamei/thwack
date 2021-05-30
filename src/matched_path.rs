@@ -1,13 +1,22 @@
 use std::cmp::Ordering;
 use std::collections::VecDeque;
 use std::fmt::{self, Display, Formatter};
+use std::ops::Range;
 
 #[derive(Debug, Eq, PartialEq)]
 pub(crate) struct MatchedPath {
     absolute: String,
     relative: String,
-    positions: VecDeque<usize>,
     depth: usize,
+    positions: Vec<usize>,
+    chunks: Vec<Chunk>,
+}
+
+#[derive(Debug, Eq, PartialEq)]
+pub(crate) struct Chunk {
+    value: String,
+    range: Range<usize>,
+    matched: bool,
 }
 
 impl MatchedPath {
@@ -16,17 +25,24 @@ impl MatchedPath {
         let relative = relative_chars(starting_point, absolute);
         let depth = depth_from(relative.iter());
         let positions = positions_from(query, &relative[..])?;
+        let chunks = chunks_from(&relative[..], &positions[..]);
         Some(Self {
             absolute: absolute.to_string(),
             relative: relative.iter().collect(),
-            positions,
             depth,
+            positions,
+            chunks,
         })
     }
 
     /// Returns the relative path
     pub(crate) fn relative(&self) -> &str {
         &self.relative
+    }
+
+    /// Returns the slice of Chunks
+    pub(crate) fn chunks(&self) -> &[Chunk] {
+        &self.chunks[..]
     }
 
     /// Calculate the total distance between each position.
@@ -43,7 +59,6 @@ impl MatchedPath {
         }
         total
     }
-    // TODO: Present with colorized value with emphasized positions.
 }
 
 impl Display for MatchedPath {
@@ -68,6 +83,18 @@ impl Ord for MatchedPath {
 impl PartialOrd for MatchedPath {
     fn partial_cmp(&self, other: &MatchedPath) -> Option<Ordering> {
         Some(self.cmp(other))
+    }
+}
+
+impl Chunk {
+    pub(crate) fn matched(&self) -> bool {
+        self.matched
+    }
+}
+
+impl Display for Chunk {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        Display::fmt(&self.value, f)
     }
 }
 
@@ -99,9 +126,11 @@ fn depth_from<'a>(relative: impl Iterator<Item = &'a char>) -> usize {
     })
 }
 
+// TODO: This should change the algorithm of calculation by `query`.
+//       For example, the `query` is `"src/"` (suffixed with `'/'`), a user is expecting items that start with `"src/"`.
 /// Calculates matched positions of `relative` with `query`.
 /// This searches for characters of `query` in `relative` from the right one by one.
-fn positions_from(query: &str, relative: &[char]) -> Option<VecDeque<usize>> {
+fn positions_from(query: &str, relative: &[char]) -> Option<Vec<usize>> {
     let mut positions: VecDeque<usize> = VecDeque::with_capacity(query.len());
     for char in normalize_query(query).chars().rev() {
         let end = if let Some(pos) = positions.front() {
@@ -113,7 +142,31 @@ fn positions_from(query: &str, relative: &[char]) -> Option<VecDeque<usize>> {
         let pos = target.iter().rposition(|t| char.eq_ignore_ascii_case(t))?;
         positions.push_front(pos);
     }
-    Some(positions)
+    Some(positions.into())
+}
+
+fn chunks_from(relative: &[char], positions: &[usize]) -> Vec<Chunk> {
+    let mut chunks: Vec<Chunk> = Vec::with_capacity(relative.len()); // TODO
+    for (idx, char) in relative.iter().enumerate() {
+        let matched = positions.contains(&idx);
+        match chunks.last_mut() {
+            Some(chunk) if chunk.matched == matched => {
+                chunk.value.push(*char);
+                chunk.range.end = idx + 1;
+            }
+            Some(_) => chunks.push(Chunk {
+                value: char.to_string(),
+                matched,
+                range: (idx..idx + 1),
+            }),
+            None => chunks.push(Chunk {
+                value: char.to_string(),
+                matched,
+                range: (idx..idx + 1),
+            }),
+        }
+    }
+    chunks
 }
 
 #[cfg(target_os = "windows")]
@@ -136,6 +189,16 @@ mod tests {
         MatchedPath::new(query, starting_point, absolute).unwrap()
     }
 
+    fn assert_chunks_eq_relative(path: MatchedPath) {
+        let chunks: String = path
+            .chunks
+            .iter()
+            .map(|c| c.value.clone())
+            .collect::<Vec<String>>()
+            .join("");
+        assert_eq!(chunks, path.relative)
+    }
+
     #[test]
     fn returns_new_instance() {
         assert_eq!(
@@ -143,7 +206,19 @@ mod tests {
             MatchedPath {
                 absolute: String::from("/abc/abc/abc.txt"),
                 relative: String::from("abc/abc/abc.txt"),
-                positions: VecDeque::from(vec![8, 9, 10, 11, 12, 13, 14]),
+                positions: vec![8, 9, 10, 11, 12, 13, 14],
+                chunks: vec![
+                    Chunk {
+                        value: String::from("abc/abc/"),
+                        matched: false,
+                        range: (0..8),
+                    },
+                    Chunk {
+                        value: String::from("abc.txt"),
+                        matched: true,
+                        range: (8..15),
+                    },
+                ],
                 depth: 2,
             },
         );
@@ -152,7 +227,24 @@ mod tests {
             MatchedPath {
                 absolute: String::from("/abc/abc/abc.txt"),
                 relative: String::from("abc/abc/abc.txt"),
-                positions: VecDeque::from(vec![8, 9, 10]),
+                positions: vec![8, 9, 10],
+                chunks: vec![
+                    Chunk {
+                        value: String::from("abc/abc/"),
+                        matched: false,
+                        range: (0..8),
+                    },
+                    Chunk {
+                        value: String::from("abc"),
+                        matched: true,
+                        range: (8..11),
+                    },
+                    Chunk {
+                        value: String::from(".txt"),
+                        matched: false,
+                        range: (11..15),
+                    },
+                ],
                 depth: 2,
             },
         );
@@ -165,7 +257,34 @@ mod tests {
             MatchedPath {
                 absolute: String::from("C:\\Documents\\Newsletters\\Summer2018.pdf"),
                 relative: String::from("Newsletters\\Summer2018.pdf"),
-                positions: VecDeque::from(vec![7, 8, 15]),
+                positions: vec![7, 8, 15],
+                chunks: vec![
+                    Chunk {
+                        value: String::from("Newslet"),
+                        matched: false,
+                        range: (0..7),
+                    },
+                    Chunk {
+                        value: String::from("te"),
+                        matched: true,
+                        range: (7..9),
+                    },
+                    Chunk {
+                        value: String::from("rs\\Sum"),
+                        matched: false,
+                        range: (9..15),
+                    },
+                    Chunk {
+                        value: String::from("m"),
+                        matched: true,
+                        range: (15..16),
+                    },
+                    Chunk {
+                        value: String::from("er2018.pdf"),
+                        matched: false,
+                        range: (16..26),
+                    },
+                ],
                 depth: 1,
             },
         );
@@ -174,10 +293,45 @@ mod tests {
             MatchedPath {
                 absolute: String::from("\\Folder\\foo\\bar\\☕.txt"),
                 relative: String::from("foo\\bar\\☕.txt"),
-                positions: VecDeque::from(vec![0, 1, 2, 8, 12]),
+                positions: vec![0, 1, 2, 8, 12],
+                chunks: vec![
+                    Chunk {
+                        value: String::from("foo"),
+                        matched: true,
+                        range: (0..3),
+                    },
+                    Chunk {
+                        value: String::from("\\bar\\"),
+                        matched: false,
+                        range: (3..8),
+                    },
+                    Chunk {
+                        value: String::from("☕"),
+                        matched: true,
+                        range: (8..9),
+                    },
+                    Chunk {
+                        value: String::from(".tx"),
+                        matched: false,
+                        range: (9..12),
+                    },
+                    Chunk {
+                        value: String::from("t"),
+                        matched: true,
+                        range: (12..13),
+                    },
+                ],
                 depth: 2,
             },
         );
+    }
+
+    #[test]
+    fn joined_chunks_are_equal_to_relative() {
+        assert_chunks_eq_relative(new("abc", "/home", "/home/abc.txt"));
+        assert_chunks_eq_relative(new("sbc", "/", "/home/src/abc.txt"));
+        assert_chunks_eq_relative(new("☕lover", "/", "/Docs/☕/level/oh/version.txt"));
+        assert_chunks_eq_relative(new("passwd", "/etc", "/etc/passwd"));
     }
 
     #[test]
