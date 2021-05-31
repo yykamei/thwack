@@ -10,6 +10,7 @@
 
 **Implemented enhancements:**
 
+- Emphasize the matched characters of `MatchedPath`s [\#32](https://github.com/yykamei/thwack/issues/32)
 - Implement Ord for MatchedPath to make its iterator sortable [\#30](https://github.com/yykamei/thwack/issues/30)
 
 **Fixed bugs:**
@@ -22,6 +23,7 @@
 
 **Merged pull requests:**
 
+- Emphasize matched characters by styling with bold [\#51](https://github.com/yykamei/thwack/pull/51) ([yykamei](https://github.com/yykamei))
 - Revert "Change the type of `positions` and add `positions()`" [\#49](https://github.com/yykamei/thwack/pull/49) ([yykamei](https://github.com/yykamei))
 - Change the type of `positions` and add `positions()` [\#47](https://github.com/yykamei/thwack/pull/47) ([yykamei](https://github.com/yykamei))
 
