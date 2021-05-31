@@ -10,6 +10,7 @@
 
 **Implemented enhancements:**
 
+- Emphasize the matched characters of `MatchedPath`s [\#32](https://github.com/yykamei/thwack/issues/32)
 - Implement Ord for MatchedPath to make its iterator sortable [\#30](https://github.com/yykamei/thwack/issues/30)
 
 **Fixed bugs:**
