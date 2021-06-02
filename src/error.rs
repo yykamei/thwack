@@ -1,4 +1,5 @@
 use std::error;
+use std::ffi::NulError;
 use std::fmt::{self, Display, Formatter};
 use std::io;
 use std::result::Result as StdResult;
@@ -15,6 +16,7 @@ pub enum ErrorKind {
     IO,
     Terminal,
     Exec,
+    NulError,
 }
 
 #[derive(Debug)]
@@ -98,6 +100,20 @@ impl From<crossterm::ErrorKind> for Error {
                 error
             ),
             kind: ErrorKind::Terminal,
+            source: Some(Box::new(error)),
+            exit_code: FAILURE,
+        }
+    }
+}
+
+impl From<NulError> for Error {
+    fn from(error: NulError) -> Self {
+        Self {
+            message: format!(
+                "The string contains nul bytes. See the details from .source: {}",
+                error
+            ),
+            kind: ErrorKind::NulError,
             source: Some(Box::new(error)),
             exit_code: FAILURE,
         }

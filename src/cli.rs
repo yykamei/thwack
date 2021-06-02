@@ -1,6 +1,9 @@
 use std::env::ArgsOs;
+use std::ffi::CString;
 use std::io::{self, Stderr, Stdout, Write};
+use std::os::raw::c_char;
 use std::process::exit;
+use std::ptr;
 use std::time::Duration;
 
 use crossterm::{
@@ -23,7 +26,7 @@ pub fn safe_exit(code: i32, stdout: Stdout, stderr: Stderr) {
     exit(code)
 }
 
-pub fn entrypoint(args: ArgsOs, stdout: &mut impl Write, stderr: &mut impl Write) -> Result<()> {
+pub fn entrypoint(args: ArgsOs, stdout: &mut impl Write) -> Result<()> {
     let args = Parser::new(args).parse()?;
     if args.help {
         print_help(stdout)?;
@@ -105,15 +108,7 @@ pub fn entrypoint(args: ArgsOs, stdout: &mut impl Write, stderr: &mut impl Write
     if let State::Invoke(path) = state {
         // TODO: Decide which we should pass: relative or absolute.
         let path = path.relative();
-        let output = invoke(&args.exec, path)?;
-        stdout.write_all(&output.stdout)?;
-        stderr.write_all(&output.stderr)?;
-        if !output.status.success() {
-            return Err(Error::exec(&format!(
-                "Failed to execute command `{} {}`",
-                args.exec, path,
-            )));
-        }
+        invoke(&args.exec, path)?;
     }
     Ok(())
 }
@@ -156,7 +151,7 @@ fn output_on_terminal(
     for (idx, path) in paths.iter().enumerate() {
         let idx = idx as u16;
         let prefix = if idx == selection { "> " } else { "  " };
-        queue!(stdout, style::Print(format!("{}", prefix)))?;
+        queue!(stdout, style::Print(prefix))?;
         for chunk in path.chunks() {
             if chunk.matched() {
                 queue!(
@@ -189,16 +184,23 @@ fn find_paths(starting_point: &str, query: &str, limit: u16) -> Result<Vec<Match
     Ok(paths.into_iter().take(limit.into()).collect())
 }
 
-fn invoke(exec: &str, path: &str) -> Result<std::process::Output> {
-    let mut exec = exec.split_whitespace();
-    let program = exec
-        .next()
-        .ok_or_else(|| Error::args("\"exec\" cannot be processed with empty string"))?;
-    let mut command = std::process::Command::new(program);
-    for arg in exec {
-        command.arg(arg);
+/// Invoke the specified command with the selected path.
+fn invoke(exec: &str, path: &str) -> Result<()> {
+    let mut cstrings: Vec<CString> = Vec::with_capacity(10); // TODO: Why is it 10?
+    for arg in exec.split_whitespace() {
+        cstrings.push(CString::new(arg)?);
     }
-    command.arg(path);
-    let output = command.output()?;
-    Ok(output)
+    cstrings.push(CString::new(path)?);
+    let argv: Vec<*const c_char> = cstrings
+        .iter()
+        .map(|c| c.as_ptr())
+        .chain(std::iter::once(ptr::null()))
+        .collect();
+
+    let errno = unsafe { libc::execvp(cstrings[0].as_ptr(), argv.as_ptr()) };
+
+    Err(Error::exec(&format!(
+        "`{} {}` failed and returned {}",
+        exec, path, errno
+    )))
 }
