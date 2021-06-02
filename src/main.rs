@@ -6,7 +6,7 @@ use thwack::{entrypoint, safe_exit};
 fn main() {
     let mut out = stdout();
     let mut err = stderr();
-    match entrypoint(env::args_os(), &mut out, &mut err) {
+    match entrypoint(env::args_os(), &mut out) {
         Ok(_) => safe_exit(0, out, err),
         Err(e) => {
             eprintln!("{}", e); // TODO: Write a more readable error message.

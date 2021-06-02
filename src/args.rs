@@ -15,7 +15,7 @@ ARGS:
 OPTIONS:
     --exec <COMMAND>          Change the execution command from the default.
                               This is run when you hit the Enter on a path
-                              The default command is \"type\" on Windows, or \"cat\" on other platforms.
+                              The default command is \"notepad\" on Windows, or \"cat\" on other platforms.
     --starting-point <PATH>   Change the starting point from the default (\".\")
     -h, --help                Prints help information";
 
@@ -140,7 +140,7 @@ impl Default for ParsedArgs {
             starting_point: String::from("."),
             query: String::from(""),
             exec: if cfg!(windows) {
-                String::from("type")
+                String::from("notepad")
             } else {
                 String::from("cat")
             },
