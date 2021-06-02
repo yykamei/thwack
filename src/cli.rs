@@ -184,7 +184,7 @@ fn find_paths(starting_point: &str, query: &str, limit: u16) -> Result<Vec<Match
     Ok(paths.into_iter().take(limit.into()).collect())
 }
 
-/// Invoke the specific command and replace this
+/// Invoke the specified command with the selected path.
 fn invoke(exec: &str, path: &str) -> Result<()> {
     let mut cstrings: Vec<CString> = Vec::with_capacity(10); // TODO: Why is it 10?
     for arg in exec.split_whitespace() {
