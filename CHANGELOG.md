@@ -12,6 +12,7 @@
 
 - Emphasize the matched characters of `MatchedPath`s [\#32](https://github.com/yykamei/thwack/issues/32)
 - Implement Ord for MatchedPath to make its iterator sortable [\#30](https://github.com/yykamei/thwack/issues/30)
+- Replace `Command` with `libc::execvp` [\#55](https://github.com/yykamei/thwack/pull/55) ([yykamei](https://github.com/yykamei))
 
 **Fixed bugs:**
 
