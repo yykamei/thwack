@@ -151,7 +151,7 @@ fn output_on_terminal(
     for (idx, path) in paths.iter().enumerate() {
         let idx = idx as u16;
         let prefix = if idx == selection { "> " } else { "  " };
-        queue!(stdout, style::Print(format!("{}", prefix)))?;
+        queue!(stdout, style::Print(prefix))?;
         for chunk in path.chunks() {
             if chunk.matched() {
                 queue!(
