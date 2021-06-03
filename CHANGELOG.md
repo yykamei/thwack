@@ -16,6 +16,7 @@
 
 **Fixed bugs:**
 
+- Add `--version` option [\#44](https://github.com/yykamei/thwack/issues/44)
 - Fix the calculation of `positions` [\#41](https://github.com/yykamei/thwack/pull/41) ([yykamei](https://github.com/yykamei))
 
 **Closed issues:**
