@@ -7,7 +7,7 @@ pub(crate) const HELP: &str = "thwack
 Find a file and open it with an arbitrary command.
 
 USAGE:
-    thwack [OPTIONS] [query]
+    thwack [OPTIONS] [--] [query]
 
 ARGS:
     <query>                   The name of the file you'd like to find
@@ -44,6 +44,7 @@ impl<A: Iterator<Item = OsString>> Parser<A> {
         while let Some(arg) = self.next() {
             let arg = arg?;
             match arg.as_ref() {
+                "--" => self.consume_rest_as_arg()?,
                 "-h" => self.set_help(true),
                 "--help" => self.set_help(true),
                 "-v" => self.set_version(true),
@@ -88,6 +89,16 @@ impl<A: Iterator<Item = OsString>> Parser<A> {
         Some(arg.to_str().map(|s| s.to_string()).ok_or(error))
     }
 
+    fn consume_rest_as_arg(&mut self) -> Result<()> {
+        let mut rest: Vec<String> = Vec::with_capacity(16);
+        while let Some(val) = self.next() {
+            let val = val?;
+            rest.push(val);
+        }
+        self.parsed_args.query = rest.join(" ");
+        Ok(())
+    }
+
     fn set_help(&mut self, value: bool) {
         self.parsed_args.help = value;
     }
@@ -110,7 +121,14 @@ impl<A: Iterator<Item = OsString>> Parser<A> {
         let val = if let Some(val) = value {
             String::from(val)
         } else if let Some(val) = self.next() {
-            val?
+            let val = val?;
+            if val.starts_with('-') {
+                return Err(Error::args(&format!(
+                    "{}\n\n\"{}\" needs a value.",
+                    HELP, option
+                )));
+            }
+            val
         } else {
             return Err(Error::args(&format!(
                 "{}\n\n\"{}\" needs a value.",
@@ -166,6 +184,39 @@ mod tests {
         () => {
             ParsedArgs::default()
         };
+    }
+
+    #[test]
+    fn parser_with_double_hyphen() {
+        assert_eq!(
+            Parser::new(args!["program", "-h", "--", "abc", "def", "ok!"])
+                .parse()
+                .unwrap(),
+            ParsedArgs {
+                help: true,
+                query: String::from("abc def ok!"),
+                ..default!()
+            }
+        );
+        assert_eq!(
+            Parser::new(args!["program", "--starting-point=/tmp", "--", "hey"])
+                .parse()
+                .unwrap(),
+            ParsedArgs {
+                starting_point: String::from("/tmp"),
+                query: String::from("hey"),
+                ..default!()
+            }
+        );
+        assert_eq!(
+            Parser::new(args!["program", "--", "--abc", "--version", "-h=ok!"])
+                .parse()
+                .unwrap(),
+            ParsedArgs {
+                query: String::from("--abc --version -h=ok!"),
+                ..default!()
+            }
+        );
     }
 
     #[test]
@@ -247,15 +298,6 @@ mod tests {
             }
         );
         assert_eq!(
-            Parser::new(args!["program", "--starting-point=--option-like-value"])
-                .parse()
-                .unwrap(),
-            ParsedArgs {
-                starting_point: String::from("--option-like-value"),
-                ..default!()
-            }
-        );
-        assert_eq!(
             Parser::new(args!["program", "--starting-point==ok="])
                 .parse()
                 .unwrap(),
@@ -288,21 +330,13 @@ mod tests {
                 .message,
             format!("{}\n\n\"--starting-point\" needs a value.", HELP),
         );
-        // TODO: Enable this assertion later
-        // assert_eq!(
-        //     Parser::new(args!["program", "--starting-point", "--option-like-value"])
-        //         .parse()
-        //         .unwrap_err().message,
-        //     format!("{}\n\n\"--starting-point\" needs a value.", HELP),
-        //);
-        // TODO: Enable this assertion later
-        // assert_eq!(
-        //     Parser::new(args!["program", "--starting-point", "--df"])
-        //         .parse()
-        //         .unwrap_err()
-        //         .message,
-        //     format!("{}\n\n\"--starting-point\" needs a value.", HELP),
-        // );
+        assert_eq!(
+            Parser::new(args!["program", "--starting-point", "--"])
+                .parse()
+                .unwrap_err()
+                .message,
+            format!("{}\n\n\"--starting-point\" needs a value.", HELP),
+        );
         assert_eq!(
             Parser::new(args!["program", "--starting-point="])
                 .parse()
@@ -312,6 +346,30 @@ mod tests {
                 "{}\n\n\"--starting-point\" needs a value. Empty string cannot be processed.",
                 HELP
             ),
+        );
+    }
+
+    #[test]
+    fn parser_with_starting_point_disallow_option_like_value() {
+        assert_eq!(
+            Parser::new(args!["program", "--starting-point", "--option-like-value"])
+                .parse()
+                .unwrap_err()
+                .message,
+            format!("{}\n\n\"--starting-point\" needs a value.", HELP),
+        );
+    }
+
+    #[test]
+    fn parser_with_starting_point_allow_option_like_value() {
+        assert_eq!(
+            Parser::new(args!["program", "--starting-point=--option-like-value"])
+                .parse()
+                .unwrap(),
+            ParsedArgs {
+                starting_point: String::from("--option-like-value"),
+                ..default!()
+            }
         );
     }
 
@@ -330,15 +388,6 @@ mod tests {
                 .unwrap(),
             ParsedArgs {
                 exec: String::from("open"),
-                ..default!()
-            }
-        );
-        assert_eq!(
-            Parser::new(args!["program", "--exec=--special--"])
-                .parse()
-                .unwrap(),
-            ParsedArgs {
-                exec: String::from("--special--"),
                 ..default!()
             }
         );
@@ -377,21 +426,13 @@ mod tests {
                 .message,
             format!("{}\n\n\"--exec\" needs a value.", HELP),
         );
-        // TODO: Enable this assertion later
-        // assert_eq!(
-        //     Parser::new(args!["program", "--exec", "--option-like-value"])
-        //         .parse()
-        //         .unwrap_err().message,
-        //     format!("{}\n\n\"--exec\" needs a value.", HELP),
-        //);
-        // TODO: Enable this assertion later
-        // assert_eq!(
-        //     Parser::new(args!["program", "--exec", "--df"])
-        //         .parse()
-        //         .unwrap_err()
-        //         .message,
-        //     format!("{}\n\n\"--exec\" needs a value.", HELP),
-        // );
+        assert_eq!(
+            Parser::new(args!["program", "--exec", "--"])
+                .parse()
+                .unwrap_err()
+                .message,
+            format!("{}\n\n\"--exec\" needs a value.", HELP),
+        );
         assert_eq!(
             Parser::new(args!["program", "--exec="])
                 .parse()
@@ -401,6 +442,30 @@ mod tests {
                 "{}\n\n\"--exec\" needs a value. Empty string cannot be processed.",
                 HELP
             ),
+        );
+    }
+
+    #[test]
+    fn parser_with_exec_allow_option_like_value() {
+        assert_eq!(
+            Parser::new(args!["program", "--exec=--special--"])
+                .parse()
+                .unwrap(),
+            ParsedArgs {
+                exec: String::from("--special--"),
+                ..default!()
+            }
+        );
+    }
+
+    #[test]
+    fn parser_with_exec_disallow_option_like_value() {
+        assert_eq!(
+            Parser::new(args!["program", "--exec", "--option-like-value"])
+                .parse()
+                .unwrap_err()
+                .message,
+            format!("{}\n\n\"--exec\" needs a value.", HELP),
         );
     }
 
