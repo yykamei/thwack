@@ -1,4 +1,4 @@
-use std::env::ArgsOs;
+use std::ffi::OsString;
 
 use crate::error::{Error, Result};
 
@@ -17,17 +17,18 @@ OPTIONS:
                               This is run when you hit the Enter on a path
                               The default command is \"notepad\" on Windows, or \"cat\" on other platforms.
     --starting-point <PATH>   Change the starting point from the default (\".\")
-    -h, --help                Prints help information";
+    -h, --help                Prints help information
+    -v, --version             Prints version info and exit
+";
 
 // TODO: Config might be required: e.g. impl From<Args> for Config.
-// TODO: Test for Parser and ParsedArgs
-pub(crate) struct Parser {
-    args: ArgsOs,
+pub(crate) struct Parser<A: Iterator<Item = OsString>> {
+    args: A,
     parsed_args: ParsedArgs,
 }
 
-impl Parser {
-    pub(crate) fn new(args: ArgsOs) -> Self {
+impl<A: Iterator<Item = OsString>> Parser<A> {
+    pub(crate) fn new(args: A) -> Self {
         Self {
             args,
             parsed_args: ParsedArgs::default(),
@@ -45,6 +46,8 @@ impl Parser {
             match arg.as_ref() {
                 "-h" => self.set_help(true),
                 "--help" => self.set_help(true),
+                "-v" => self.set_version(true),
+                "--version" => self.set_version(true),
                 "--starting-point" => self.set_starting_point(None)?,
                 "--exec" => self.set_exec(None)?,
                 x if x.starts_with("--starting-point=") => {
@@ -89,45 +92,45 @@ impl Parser {
         self.parsed_args.help = value;
     }
 
-    // TODO: set_* could be written as the same way. Maybe, macros are useful.
+    fn set_version(&mut self, value: bool) {
+        self.parsed_args.version = value;
+    }
 
     fn set_starting_point(&mut self, value: Option<&str>) -> Result<()> {
-        if let Some(val) = value {
-            self.parsed_args.starting_point = val.to_string();
-        } else if let Some(val) = self.next() {
-            self.parsed_args.starting_point = val?;
-        } else {
-            return Err(Error::args(&format!(
-                "{}\n\n\"--starting-point\" needs a value",
-                HELP
-            )));
-        }
+        self.parsed_args.starting_point = self.arg_value("--starting-point", value)?;
         Ok(())
     }
 
     fn set_exec(&mut self, value: Option<&str>) -> Result<()> {
-        if let Some(val) = value {
-            self.parsed_args.exec = val.to_string();
+        self.parsed_args.exec = self.arg_value("--exec", value)?;
+        Ok(())
+    }
+
+    fn arg_value(&mut self, option: &str, value: Option<&str>) -> Result<String> {
+        let val = if let Some(val) = value {
+            String::from(val)
         } else if let Some(val) = self.next() {
-            self.parsed_args.exec = val?;
+            val?
         } else {
             return Err(Error::args(&format!(
-                "{}\n\n\"--exec\" needs a value",
-                HELP
+                "{}\n\n\"{}\" needs a value.",
+                HELP, option
             )));
-        }
-        if self.parsed_args.exec.is_empty() {
+        };
+        if val.is_empty() {
             return Err(Error::args(&format!(
-                "{}\n\n\"--exec\" needs a value. Empty string cannot be processed.",
-                HELP
+                "{}\n\n\"{}\" needs a value. Empty string cannot be processed.",
+                HELP, option
             )));
         }
-        Ok(())
+        Ok(val)
     }
 }
 
+#[derive(Debug, PartialEq)]
 pub(crate) struct ParsedArgs {
     pub(crate) help: bool,
+    pub(crate) version: bool,
     pub(crate) starting_point: String,
     pub(crate) query: String,
     pub(crate) exec: String,
@@ -137,6 +140,7 @@ impl Default for ParsedArgs {
     fn default() -> Self {
         Self {
             help: false,
+            version: false,
             starting_point: String::from("."),
             query: String::from(""),
             exec: if cfg!(windows) {
@@ -145,5 +149,277 @@ impl Default for ParsedArgs {
                 String::from("cat")
             },
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    macro_rules! args {
+        ($($x:expr),+ $(,)?) => {
+            vec![$(OsString::from($x)),+].into_iter()
+        };
+    }
+
+    macro_rules! default {
+        () => {
+            ParsedArgs::default()
+        };
+    }
+
+    #[test]
+    fn parser_with_help() {
+        assert_eq!(
+            Parser::new(args!["program", "-h"]).parse().unwrap(),
+            ParsedArgs {
+                help: true,
+                ..default!()
+            }
+        );
+        assert_eq!(
+            Parser::new(args!["program", "--help"]).parse().unwrap(),
+            ParsedArgs {
+                help: true,
+                ..default!()
+            }
+        );
+        assert_eq!(
+            Parser::new(args!["program", "-h", "--help"])
+                .parse()
+                .unwrap(),
+            ParsedArgs {
+                help: true,
+                ..default!()
+            }
+        );
+    }
+
+    #[test]
+    fn parser_with_version() {
+        assert_eq!(
+            Parser::new(args!["program", "-v"]).parse().unwrap(),
+            ParsedArgs {
+                version: true,
+                ..default!()
+            }
+        );
+        assert_eq!(
+            Parser::new(args!["program", "-h", "--version"])
+                .parse()
+                .unwrap(),
+            ParsedArgs {
+                help: true,
+                version: true,
+                ..default!()
+            }
+        );
+        assert_eq!(
+            Parser::new(args!["program", "-v", "--help"])
+                .parse()
+                .unwrap(),
+            ParsedArgs {
+                help: true,
+                version: true,
+                ..default!()
+            }
+        );
+    }
+
+    #[test]
+    fn parser_with_starting_point() {
+        assert_eq!(
+            Parser::new(args!["program", "--starting-point=./abc"])
+                .parse()
+                .unwrap(),
+            ParsedArgs {
+                starting_point: String::from("./abc"),
+                ..default!()
+            }
+        );
+        assert_eq!(
+            Parser::new(args!["program", "--starting-point", "./abc"])
+                .parse()
+                .unwrap(),
+            ParsedArgs {
+                starting_point: String::from("./abc"),
+                ..default!()
+            }
+        );
+        assert_eq!(
+            Parser::new(args!["program", "--starting-point=--option-like-value"])
+                .parse()
+                .unwrap(),
+            ParsedArgs {
+                starting_point: String::from("--option-like-value"),
+                ..default!()
+            }
+        );
+        assert_eq!(
+            Parser::new(args!["program", "--starting-point==ok="])
+                .parse()
+                .unwrap(),
+            ParsedArgs {
+                starting_point: String::from("=ok="),
+                ..default!()
+            }
+        );
+        assert_eq!(
+            Parser::new(args![
+                "program",
+                "--starting-point",
+                "xyz",
+                "--help",
+                "query"
+            ])
+            .parse()
+            .unwrap(),
+            ParsedArgs {
+                help: true,
+                query: String::from("query"),
+                starting_point: String::from("xyz"),
+                ..default!()
+            }
+        );
+        assert_eq!(
+            Parser::new(args!["program", "--starting-point"])
+                .parse()
+                .unwrap_err()
+                .message,
+            format!("{}\n\n\"--starting-point\" needs a value.", HELP),
+        );
+        // TODO: Enable this assertion later
+        // assert_eq!(
+        //     Parser::new(args!["program", "--starting-point", "--option-like-value"])
+        //         .parse()
+        //         .unwrap_err().message,
+        //     format!("{}\n\n\"--starting-point\" needs a value.", HELP),
+        //);
+        // TODO: Enable this assertion later
+        // assert_eq!(
+        //     Parser::new(args!["program", "--starting-point", "--df"])
+        //         .parse()
+        //         .unwrap_err()
+        //         .message,
+        //     format!("{}\n\n\"--starting-point\" needs a value.", HELP),
+        // );
+        assert_eq!(
+            Parser::new(args!["program", "--starting-point="])
+                .parse()
+                .unwrap_err()
+                .message,
+            format!(
+                "{}\n\n\"--starting-point\" needs a value. Empty string cannot be processed.",
+                HELP
+            ),
+        );
+    }
+
+    #[test]
+    fn parser_with_exec() {
+        assert_eq!(
+            Parser::new(args!["program", "--exec=bat"]).parse().unwrap(),
+            ParsedArgs {
+                exec: String::from("bat"),
+                ..default!()
+            }
+        );
+        assert_eq!(
+            Parser::new(args!["program", "--exec", "open"])
+                .parse()
+                .unwrap(),
+            ParsedArgs {
+                exec: String::from("open"),
+                ..default!()
+            }
+        );
+        assert_eq!(
+            Parser::new(args!["program", "--exec=--special--"])
+                .parse()
+                .unwrap(),
+            ParsedArgs {
+                exec: String::from("--special--"),
+                ..default!()
+            }
+        );
+        assert_eq!(
+            Parser::new(args!["program", "--exec==ok="])
+                .parse()
+                .unwrap(),
+            ParsedArgs {
+                exec: String::from("=ok="),
+                ..default!()
+            }
+        );
+        assert_eq!(
+            Parser::new(args![
+                "program",
+                "--starting-point",
+                "xyz",
+                "--exec=fire",
+                "-v",
+                "query"
+            ])
+            .parse()
+            .unwrap(),
+            ParsedArgs {
+                version: true,
+                query: String::from("query"),
+                exec: String::from("fire"),
+                starting_point: String::from("xyz"),
+                ..default!()
+            }
+        );
+        assert_eq!(
+            Parser::new(args!["program", "--exec"])
+                .parse()
+                .unwrap_err()
+                .message,
+            format!("{}\n\n\"--exec\" needs a value.", HELP),
+        );
+        // TODO: Enable this assertion later
+        // assert_eq!(
+        //     Parser::new(args!["program", "--exec", "--option-like-value"])
+        //         .parse()
+        //         .unwrap_err().message,
+        //     format!("{}\n\n\"--exec\" needs a value.", HELP),
+        //);
+        // TODO: Enable this assertion later
+        // assert_eq!(
+        //     Parser::new(args!["program", "--exec", "--df"])
+        //         .parse()
+        //         .unwrap_err()
+        //         .message,
+        //     format!("{}\n\n\"--exec\" needs a value.", HELP),
+        // );
+        assert_eq!(
+            Parser::new(args!["program", "--exec="])
+                .parse()
+                .unwrap_err()
+                .message,
+            format!(
+                "{}\n\n\"--exec\" needs a value. Empty string cannot be processed.",
+                HELP
+            ),
+        );
+    }
+
+    #[test]
+    fn parsed_args_returns_default() {
+        let exec = if cfg!(windows) {
+            String::from("notepad")
+        } else {
+            String::from("cat")
+        };
+        assert_eq!(
+            ParsedArgs::default(),
+            ParsedArgs {
+                help: false,
+                version: false,
+                starting_point: String::from("."),
+                query: String::from(""),
+                exec,
+            }
+        );
     }
 }

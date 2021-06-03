@@ -29,7 +29,23 @@ pub fn safe_exit(code: i32, stdout: Stdout, stderr: Stderr) {
 pub fn entrypoint(args: ArgsOs, stdout: &mut impl Write) -> Result<()> {
     let args = Parser::new(args).parse()?;
     if args.help {
-        print_help(stdout)?;
+        print_and_flush(stdout, HELP)?;
+        return Ok(());
+    }
+    if args.version {
+        let suffix = match (option_env!("COMMIT_SHORT"), option_env!("DATE")) {
+            (Some(sha), Some(date)) => format!(" ({} {})", sha, date),
+            _ => String::new(),
+        };
+        print_and_flush(
+            stdout,
+            &format!(
+                "{} {}{}\n",
+                env!("CARGO_PKG_NAME"),
+                env!("CARGO_PKG_VERSION"),
+                suffix
+            ),
+        )?;
         return Ok(());
     }
 
@@ -121,8 +137,8 @@ enum State<'a> {
     Invoke(&'a MatchedPath),
 }
 
-fn print_help(buffer: &mut impl Write) -> io::Result<()> {
-    buffer.write_all(format!("{}\n", HELP).as_bytes())?;
+fn print_and_flush(buffer: &mut impl Write, content: &str) -> io::Result<()> {
+    buffer.write_all(content.as_bytes())?;
     buffer.flush()
 }
 
