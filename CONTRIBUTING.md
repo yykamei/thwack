@@ -15,7 +15,7 @@ cargo run
 
 Note thwack is compiled with a non-optimized level if you run above the code, so its behavior might be sluggish.
 
-If you find something wrong, fork this repository and push changed to your forked repository.
+If you find something wrong, fork this repository and push changes to your forked repository.
 You can open a pull request after your changes are uploaded on GitHub.
 See [Working with forks](https://docs.github.com/en/github/collaborating-with-pull-requests/working-with-forks) for more details.
 
