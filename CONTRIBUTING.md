@@ -22,4 +22,4 @@ See [Working with forks](https://docs.github.com/en/github/collaborating-with-pu
 ## Contribution with issue
 
 If you are not familiar with Rust or not confident how to change, why not opening an issue?
-Some issues might be labeld as _duplicat_ and closed soon, but don't worry. I appreciate you use thwack and the issue itself is great.
+Some issues might be labeled as _duplicat_ or _wontfix_, and closed soon, unfortunately, but I appreciate your contribution. Don't hesitate to open issues. Questions are welcome.
