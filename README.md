@@ -42,6 +42,8 @@ Open issues if you want to comment or ask something.
 Open pull requests directly if you have any ideas.
 There are many chances to improve this project, so don't hesitate to do something here 😄
 
+Take a look at the [CONTRIBUTING.md](https://github.com/yykamei/thwack/blob/main/CONTRIBUTING.md), too.
+
 ## License
 
 Copyright © 2021, Yutaka Kamei.
