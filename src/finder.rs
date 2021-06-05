@@ -4,27 +4,27 @@ use std::path::{Path, PathBuf};
 use crate::error::{Error, Result};
 use crate::matched_path::MatchedPath;
 
-pub(crate) struct Finder {
+pub(crate) struct Finder<'a> {
     starting_point: String,
-    query: String,
+    query: &'a str,
     dirs: VecDeque<ConsumedDir>,
 }
 
-impl Finder {
-    pub(crate) fn new(starting_point: &str, query: &str) -> Result<Self> {
+impl<'a> Finder<'a> {
+    pub(crate) fn new(starting_point: &str, query: &'a str) -> Result<Self> {
         let mut dirs = VecDeque::with_capacity(100);
         let consumed_dir = ConsumedDir::new(starting_point)?;
         let starting_point = consumed_dir.root.clone();
         dirs.push_back(consumed_dir);
         Ok(Self {
             starting_point,
-            query: query.to_string(),
+            query,
             dirs,
         })
     }
 }
 
-impl Iterator for Finder {
+impl<'a> Iterator for Finder<'a> {
     type Item = Result<MatchedPath>;
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -46,7 +46,7 @@ impl Iterator for Finder {
                     continue;
                 }
             };
-            match MatchedPath::new(&self.query, &self.starting_point, &absolute) {
+            match MatchedPath::new(self.query, &self.starting_point, &absolute) {
                 Some(matched) => return Some(Ok(matched)),
                 None => continue,
             }
