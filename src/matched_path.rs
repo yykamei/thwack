@@ -3,6 +3,8 @@ use std::collections::VecDeque;
 use std::fmt::{self, Display, Formatter};
 use std::ops::Range;
 
+use unicode_segmentation::UnicodeSegmentation;
+
 #[derive(Debug, Eq, PartialEq)]
 pub(crate) struct MatchedPath {
     absolute: String,
@@ -22,13 +24,13 @@ pub(crate) struct Chunk {
 impl MatchedPath {
     /// Creates an instance of `MatchedPath`.
     pub(crate) fn new(query: &str, starting_point: &str, absolute: &str) -> Option<Self> {
-        let relative = relative_chars(starting_point, absolute);
-        let depth = depth_from(relative.iter());
-        let positions = positions_from(query, &relative[..])?;
-        let chunks = chunks_from(&relative[..], &positions[..]);
+        let relative = relative(starting_point, absolute);
+        let depth = depth_from(relative);
+        let positions = positions_from(query, relative)?;
+        let chunks = chunks_from(relative, &positions[..]);
         Some(Self {
             absolute: absolute.to_string(),
-            relative: relative.iter().collect(),
+            relative: relative.to_string(),
             depth,
             positions,
             chunks,
@@ -99,70 +101,77 @@ impl Display for Chunk {
 }
 
 /// Generates relative from the `starting_point` and `absolute`.
-/// This returns `Vec<char>` instead of other types, such as `String` in order to make it useful for manipulating later.
-fn relative_chars(starting_point: &str, absolute: &str) -> Vec<char> {
-    let mut relative: VecDeque<char> = absolute
+fn relative<'a>(starting_point: &'a str, absolute: &'a str) -> &'a str {
+    let relative = absolute
         .strip_prefix(starting_point)
-        .expect("The passed starting_point must be prefix of the path.")
-        .chars()
-        .collect();
-    match relative.get(0) {
-        Some(c) if *c == '/' || *c == '\\' => {
-            relative.pop_front();
-        }
-        _ => (),
-    };
-    relative.into()
+        .expect("The passed starting_point must be prefix of the path.");
+    if relative.starts_with(&['/', '\\'][..]) {
+        &relative[1..]
+    } else {
+        relative
+    }
 }
 
 /// Calculates depth of the `relative` by counting `'/'` or `'\\'`.
-fn depth_from<'a>(relative: impl Iterator<Item = &'a char>) -> usize {
-    relative.fold(0, |acc, c| {
-        if *c == '/' || *c == '\\' {
-            acc + 1
-        } else {
-            acc
-        }
-    })
+fn depth_from<'a>(relative: &str) -> usize {
+    relative.graphemes(true).fold(
+        0,
+        |acc, c| {
+            if c == "/" || c == "\\" {
+                acc + 1
+            } else {
+                acc
+            }
+        },
+    )
 }
 
 // TODO: This should change the algorithm of calculation by `query`.
 //       For example, the `query` is `"src/"` (suffixed with `'/'`), a user is expecting items that start with `"src/"`.
 /// Calculates matched positions of `relative` with `query`.
 /// This searches for characters of `query` in `relative` from the right one by one.
-fn positions_from(query: &str, relative: &[char]) -> Option<Vec<usize>> {
+fn positions_from(query: &str, relative: &str) -> Option<Vec<usize>> {
     let mut positions: VecDeque<usize> = VecDeque::with_capacity(query.len());
-    for char in normalize_query(query).chars().rev() {
+    for q in normalize_query(query).graphemes(true).rev() {
         let end = if let Some(pos) = positions.front() {
             *pos
         } else {
             relative.len()
         };
         let target = &relative[..end];
-        let pos = target.iter().rposition(|t| char.eq_ignore_ascii_case(t))?;
+        let pos = target
+            .grapheme_indices(true)
+            .rfind(|(_idx, s)| q.eq_ignore_ascii_case(s))
+            .map(|(idx, _)| idx)?;
         positions.push_front(pos);
     }
     Some(positions.into())
 }
 
-fn chunks_from(relative: &[char], positions: &[usize]) -> Vec<Chunk> {
-    let mut chunks: Vec<Chunk> = Vec::with_capacity(relative.len()); // TODO
-    for (idx, char) in relative.iter().enumerate() {
+fn chunks_from(relative: &str, positions: &[usize]) -> Vec<Chunk> {
+    // NOTE: Allocate more capacity than the actual number of chunks.
+    let mut chunks: Vec<Chunk> = Vec::with_capacity(relative.len() / 2);
+    let mut grapheme_indices = relative.grapheme_indices(true).peekable();
+    while let Some((idx, s)) = grapheme_indices.next() {
+        let next_idx = grapheme_indices
+            .peek()
+            .map(|(i, _)| *i)
+            .unwrap_or_else(|| relative.len());
         let matched = positions.contains(&idx);
         match chunks.last_mut() {
             Some(chunk) if chunk.matched == matched => {
-                chunk.value.push(*char);
-                chunk.range.end = idx + 1;
+                chunk.value.push_str(s);
+                chunk.range.end = next_idx;
             }
             Some(_) => chunks.push(Chunk {
-                value: char.to_string(),
+                value: s.to_string(),
                 matched,
-                range: (idx..idx + 1),
+                range: (idx..next_idx),
             }),
             None => chunks.push(Chunk {
-                value: char.to_string(),
+                value: s.to_string(),
                 matched,
-                range: (idx..idx + 1),
+                range: (idx..next_idx),
             }),
         }
     }
@@ -293,7 +302,7 @@ mod tests {
             MatchedPath {
                 absolute: String::from("\\Folder\\foo\\bar\\☕.txt"),
                 relative: String::from("foo\\bar\\☕.txt"),
-                positions: vec![0, 1, 2, 8, 12],
+                positions: vec![0, 1, 2, 8, 14],
                 chunks: vec![
                     Chunk {
                         value: String::from("foo"),
@@ -308,20 +317,56 @@ mod tests {
                     Chunk {
                         value: String::from("☕"),
                         matched: true,
-                        range: (8..9),
+                        range: (8..11),
                     },
                     Chunk {
                         value: String::from(".tx"),
                         matched: false,
-                        range: (9..12),
+                        range: (11..14),
                     },
                     Chunk {
                         value: String::from("t"),
                         matched: true,
-                        range: (12..13),
+                        range: (14..15),
                     },
                 ],
                 depth: 2,
+            },
+        );
+        assert_eq!(
+            new("a̐éö̲", "/", "/abc/Aa̐Béö̲.txt"),
+            MatchedPath {
+                absolute: String::from("/abc/Aa̐Béö̲.txt"),
+                relative: String::from("abc/Aa̐Béö̲.txt"),
+                positions: vec![5, 9, 12],
+                chunks: vec![
+                    Chunk {
+                        value: String::from("abc/A"),
+                        matched: false,
+                        range: (0..5),
+                    },
+                    Chunk {
+                        value: String::from("a̐"),
+                        matched: true,
+                        range: (5..8),
+                    },
+                    Chunk {
+                        value: String::from("B"),
+                        matched: false,
+                        range: (8..9),
+                    },
+                    Chunk {
+                        value: String::from("éö̲"),
+                        matched: true,
+                        range: (9..17),
+                    },
+                    Chunk {
+                        value: String::from(".txt"),
+                        matched: false,
+                        range: (17..21),
+                    },
+                ],
+                depth: 1,
             },
         );
     }

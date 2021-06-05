@@ -187,7 +187,7 @@ fn output_on_terminal(
     Ok(())
 }
 
-fn find_paths(starting_point: &str, query: &str, limit: u16) -> Result<Vec<MatchedPath>> {
+fn find_paths<'a>(starting_point: &'a str, query: &'a str, limit: u16) -> Result<Vec<MatchedPath>> {
     let mut paths = Vec::with_capacity(100); // TODO: Tune this capacity later.
 
     for path in Finder::new(starting_point, query)? {
