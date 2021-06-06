@@ -27,6 +27,7 @@
 
 **Merged pull requests:**
 
+- Add a new struct: StartingPoint [\#68](https://github.com/yykamei/thwack/pull/68) ([yykamei](https://github.com/yykamei))
 - Revert "Change the type of `positions` and add `positions()`" [\#49](https://github.com/yykamei/thwack/pull/49) ([yykamei](https://github.com/yykamei))
 - Change the type of `positions` and add `positions()` [\#47](https://github.com/yykamei/thwack/pull/47) ([yykamei](https://github.com/yykamei))
 
