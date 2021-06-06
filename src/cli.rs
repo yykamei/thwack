@@ -18,6 +18,7 @@ use crate::args::{Parser, HELP};
 use crate::error::Result;
 use crate::finder::Finder;
 use crate::matched_path::MatchedPath;
+use crate::starting_point::StartingPoint;
 use crate::Error;
 
 pub fn safe_exit(code: i32, stdout: Stdout, stderr: Stderr) {
@@ -50,8 +51,9 @@ pub fn entrypoint(args: ArgsOs, stdout: &mut impl Write) -> Result<()> {
     }
 
     let (_, mut rows) = terminal::size()?;
+    let starting_point = StartingPoint::new(args.starting_point)?;
     let mut query = args.query;
-    let mut paths = find_paths(&args.starting_point, &query, rows - 1)?;
+    let mut paths = find_paths(&starting_point, &query, rows - 1)?;
     let mut selection: u16 = 0;
     let mut state = State::QueryChanged;
     initialize_terminal(stdout)?;
@@ -112,7 +114,7 @@ pub fn entrypoint(args: ArgsOs, stdout: &mut impl Write) -> Result<()> {
                 state = State::PathsChanged;
             }
         } else if let State::QueryChanged = state {
-            paths = find_paths(&args.starting_point, &query, rows - 1)?;
+            paths = find_paths(&starting_point, &query, rows - 1)?;
             state = State::PathsChanged;
             selection = 0;
         }
@@ -187,7 +189,7 @@ fn output_on_terminal(
     Ok(())
 }
 
-fn find_paths<'a>(starting_point: &'a str, query: &'a str, limit: u16) -> Result<Vec<MatchedPath>> {
+fn find_paths(starting_point: &StartingPoint, query: &str, limit: u16) -> Result<Vec<MatchedPath>> {
     let mut paths = Vec::with_capacity(100); // TODO: Tune this capacity later.
 
     for path in Finder::new(starting_point, query)? {
