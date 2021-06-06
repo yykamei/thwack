@@ -6,3 +6,4 @@ mod cli;
 mod error;
 mod finder;
 mod matched_path;
+mod starting_point;

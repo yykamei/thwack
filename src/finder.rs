@@ -1,20 +1,20 @@
 use std::collections::VecDeque;
-use std::path::{Path, PathBuf};
+use std::path::Path;
 
 use crate::error::{Error, Result};
 use crate::matched_path::MatchedPath;
+use crate::starting_point::StartingPoint;
 
 pub(crate) struct Finder<'a> {
-    starting_point: String,
+    starting_point: &'a StartingPoint,
     query: &'a str,
     dirs: VecDeque<ConsumedDir>,
 }
 
 impl<'a> Finder<'a> {
-    pub(crate) fn new(starting_point: &str, query: &'a str) -> Result<Self> {
+    pub(crate) fn new(starting_point: &'a StartingPoint, query: &'a str) -> Result<Self> {
         let mut dirs = VecDeque::with_capacity(100);
-        let consumed_dir = ConsumedDir::new(starting_point)?;
-        let starting_point = consumed_dir.root.clone();
+        let consumed_dir = ConsumedDir::new(starting_point.as_ref())?;
         dirs.push_back(consumed_dir);
         Ok(Self {
             starting_point,
@@ -46,7 +46,7 @@ impl<'a> Iterator for Finder<'a> {
                     continue;
                 }
             };
-            match MatchedPath::new(self.query, &self.starting_point, &absolute) {
+            match MatchedPath::new(self.query, self.starting_point.as_ref(), &absolute) {
                 Some(matched) => return Some(Ok(matched)),
                 None => continue,
             }
@@ -60,14 +60,14 @@ enum Entry {
 }
 
 struct ConsumedDir {
-    root: String,
     entries: VecDeque<Entry>,
 }
 
 impl ConsumedDir {
-    fn new(dir: impl AsRef<Path>) -> Result<Self> {
+    /// `ConsumedDir::new` assumes the passed `root` has already been canonicalized.
+    fn new(root: &str) -> Result<Self> {
         let mut entries = VecDeque::with_capacity(50);
-        let dir = canonicalize_starting_point(dir.as_ref())?;
+        let dir: &Path = root.as_ref();
         for de in dir.read_dir()? {
             let path = de?.path();
             let path_string = match path.to_str() {
@@ -86,11 +86,7 @@ impl ConsumedDir {
                 entries.push_back(Entry::File(path_string));
             }
         }
-        let root = dir
-            .to_str()
-            .expect("This function has already received \"dir\" as &str, so this is supposed to be valid unicode.")
-            .to_string();
-        Ok(Self { root, entries })
+        Ok(Self { entries })
     }
 }
 
@@ -102,15 +98,6 @@ impl Iterator for ConsumedDir {
     }
 }
 
-fn canonicalize_starting_point(path: &Path) -> Result<PathBuf> {
-    path.canonicalize().map_err(|_e|
-        Error::args(&format!(
-            "The specified starting point {:?} cannot be normalized. Perhaps, it might not exist or cannot be read.",
-            path,
-        ))
-    )
-}
-
 #[cfg(test)]
 mod tests {
     use std::fs::{create_dir_all, File};
@@ -120,7 +107,7 @@ mod tests {
 
     use super::*;
 
-    pub fn create_tree() -> io::Result<TempDir> {
+    fn create_tree() -> io::Result<TempDir> {
         let tmp = tempdir()?;
         create_dir_all(tmp.path().join("src/a/b/c"))?;
         create_dir_all(tmp.path().join("lib/a/b/c"))?;
@@ -158,8 +145,9 @@ mod tests {
     }
 
     fn find_paths(starting_point: &str, query: &str) -> Vec<String> {
+        let starting_point = StartingPoint::new(starting_point).unwrap();
         let mut paths = vec![];
-        for matched in Finder::new(starting_point, query).unwrap() {
+        for matched in Finder::new(&starting_point, query).unwrap() {
             let path = matched.unwrap();
             paths.push(path);
         }
