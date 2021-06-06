@@ -17,6 +17,7 @@
 **Fixed bugs:**
 
 - Add `--version` option [\#44](https://github.com/yykamei/thwack/issues/44)
+- Use grapheme cluster to detect correct indices [\#66](https://github.com/yykamei/thwack/pull/66) ([yykamei](https://github.com/yykamei))
 - Handle option like value as option [\#61](https://github.com/yykamei/thwack/pull/61) ([yykamei](https://github.com/yykamei))
 - Fix the calculation of `positions` [\#41](https://github.com/yykamei/thwack/pull/41) ([yykamei](https://github.com/yykamei))
 
