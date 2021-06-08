@@ -18,6 +18,7 @@
 
 - Handle wrapped paths when a terminal size is narrow [\#57](https://github.com/yykamei/thwack/issues/57)
 - Add `--version` option [\#44](https://github.com/yykamei/thwack/issues/44)
+- Let a user input uppercase characters on Search query [\#31](https://github.com/yykamei/thwack/issues/31)
 - Use grapheme cluster to detect correct indices [\#66](https://github.com/yykamei/thwack/pull/66) ([yykamei](https://github.com/yykamei))
 - Handle option like value as option [\#61](https://github.com/yykamei/thwack/pull/61) ([yykamei](https://github.com/yykamei))
 - Fix the calculation of `positions` [\#41](https://github.com/yykamei/thwack/pull/41) ([yykamei](https://github.com/yykamei))
