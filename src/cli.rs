@@ -76,10 +76,19 @@ pub fn entrypoint(args: ArgsOs, stdout: &mut impl Write) -> Result<()> {
 
         if event::poll(Duration::from_millis(300))? {
             let ev = event::read()?;
-            // TODO: Support uppercase
-            if let Event::Key(KeyEvent {
+            if ev
+                == Event::Key(KeyEvent {
+                    code: KeyCode::Char('c'),
+                    modifiers: KeyModifiers::CONTROL,
+                })
+                || ev == Event::Key(KeyCode::Esc.into())
+            {
+                // CTRL-C does not send SIGINT even on UNIX/Linux because it's in Raw mode.
+                // Also, we handle Esc as the same.
+                break;
+            } else if let Event::Key(KeyEvent {
                 code: KeyCode::Char(c),
-                modifiers: KeyModifiers::NONE,
+                modifiers: _,
             }) = ev
             {
                 query.push(c);
@@ -100,16 +109,6 @@ pub fn entrypoint(args: ArgsOs, stdout: &mut impl Write) -> Result<()> {
             } else if ev == Event::Key(KeyCode::Enter.into()) {
                 let path: &MatchedPath = paths.get(selection as usize).unwrap(); // TODO: Do not use unwrap()
                 state = State::Invoke(&path);
-                break;
-            } else if ev
-                == Event::Key(KeyEvent {
-                    code: KeyCode::Char('c'),
-                    modifiers: KeyModifiers::CONTROL,
-                })
-                || ev == Event::Key(KeyCode::Esc.into())
-            {
-                // CTRL-C does not send SIGINT even on UNIX/Linux because it's in Raw mode.
-                // Also, we handle Esc as the same.
                 break;
             } else if let Event::Resize(c, r) = ev {
                 columns = c;
