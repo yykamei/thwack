@@ -16,6 +16,7 @@
 
 **Fixed bugs:**
 
+- Handle wrapped paths when a terminal size is narrow [\#57](https://github.com/yykamei/thwack/issues/57)
 - Add `--version` option [\#44](https://github.com/yykamei/thwack/issues/44)
 - Use grapheme cluster to detect correct indices [\#66](https://github.com/yykamei/thwack/pull/66) ([yykamei](https://github.com/yykamei))
 - Handle option like value as option [\#61](https://github.com/yykamei/thwack/pull/61) ([yykamei](https://github.com/yykamei))
