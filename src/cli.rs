@@ -50,7 +50,7 @@ pub fn entrypoint(args: ArgsOs, stdout: &mut impl Write) -> Result<()> {
         return Ok(());
     }
 
-    let (_, mut rows) = terminal::size()?;
+    let (mut columns, mut rows) = terminal::size()?;
     let starting_point = StartingPoint::new(args.starting_point)?;
     let mut query = args.query;
     let mut paths = find_paths(&starting_point, &query, rows - 1)?;
@@ -60,13 +60,15 @@ pub fn entrypoint(args: ArgsOs, stdout: &mut impl Write) -> Result<()> {
 
     loop {
         match state {
-            State::QueryChanged => output_on_terminal(stdout, &query, &paths[..], selection)?,
+            State::QueryChanged => {
+                output_on_terminal(stdout, &query, &paths[..], selection, columns)?
+            }
             State::PathsChanged => {
-                output_on_terminal(stdout, &query, &paths[..], selection)?;
+                output_on_terminal(stdout, &query, &paths[..], selection, columns)?;
                 state = State::Ready;
             }
             State::SelectionChanged => {
-                output_on_terminal(stdout, &query, &paths[..], selection)?;
+                output_on_terminal(stdout, &query, &paths[..], selection, columns)?;
                 state = State::Ready;
             }
             _ => (),
@@ -109,7 +111,8 @@ pub fn entrypoint(args: ArgsOs, stdout: &mut impl Write) -> Result<()> {
                 // CTRL-C does not send SIGINT even on UNIX/Linux because it's in Raw mode.
                 // Also, we handle Esc as the same.
                 break;
-            } else if let Event::Resize(_, r) = ev {
+            } else if let Event::Resize(c, r) = ev {
+                columns = c;
                 rows = r;
                 state = State::PathsChanged;
             }
@@ -156,6 +159,7 @@ fn output_on_terminal(
     query: &str,
     paths: &[MatchedPath],
     selection: u16,
+    max_columns: u16,
 ) -> Result<()> {
     queue!(
         stdout,
@@ -170,7 +174,9 @@ fn output_on_terminal(
         let idx = idx as u16;
         let prefix = if idx == selection { "> " } else { "  " };
         queue!(stdout, style::Print(prefix))?;
-        for chunk in path.chunks() {
+
+        let max_columns: usize = max_columns as usize - 2; // The prefix "> " requires 2 columns.
+        for chunk in path.chunks(max_columns) {
             if chunk.matched() {
                 queue!(
                     stdout,
