@@ -30,6 +30,7 @@ jobs:
         run: |
           echo "::set-output name=commit_short::$(git rev-parse --short HEAD)"
           echo "::set-output name=date::$(date --utc +%Y-%m-%d)"
+
       - name: Create a GitHub release and publish the crate on crates.io
         run: |
           set -xeuo pipefail
