@@ -55,7 +55,7 @@ jobs:
               continue
             fi
             if [[ "$hit" == "1" ]]; then
-              echo "$line" >> notes.txt
+              echo "$line" >> tmp/notes.txt
             fi
           done < CHANGELOG.md
 
@@ -63,7 +63,7 @@ jobs:
           cargo package --list
 
           if [[ "$apply" == "true" ]]; then
-            gh release create "$tag" --title "$title" --notes-file notes.txt
+            gh release create "$tag" --title "$title" --notes-file tmp/notes.txt
             cargo publish
           fi
         env:
