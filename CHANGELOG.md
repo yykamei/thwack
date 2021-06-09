@@ -4,6 +4,25 @@
 
 [Full Changelog](https://github.com/yykamei/thwack/compare/v0.1.0...HEAD)
 
+We're happy to release the new version of thwack 🎉 
+
+`v0.2.0` includes significant changes and improvements, but I want to summarize notable changes:
+
+**Breaking changes**:
+
+* Make MatchedPath and Finder private #38
+
+**Enhancements**:
+
+* Emphasize the matched characters #32
+* Make the matched paths sorted #30
+
+thwack is a command-line utility to let terminal users find a specific file just like ["Go to file" utility on GitHub](https://docs.github.com/en/github/searching-for-information-on-github/searching-on-github/finding-files-on-github). Here is a demo of this tool.
+
+<img width="480" src="https://user-images.githubusercontent.com/13130705/121429451-e6974600-c9b1-11eb-8aa1-3842745f9262.gif" alt="thwack on iTerm2">
+
+Enjoy hacking with thwack on your terminal!
+
 **Breaking changes:**
 
 - Make `MatchedPath` and `Finder` private [\#38](https://github.com/yykamei/thwack/issues/38)
