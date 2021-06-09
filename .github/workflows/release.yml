@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: The next release version
+        description: The next release version (without prefix v)
         required: true
       apply:
         description: Specify whether the atcual release should be performed or not
