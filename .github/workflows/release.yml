@@ -70,3 +70,4 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           COMMIT_SHORT: ${{ steps.set_metadata.outputs.commit_short  }}
           DATE: ${{ steps.set_metadata.outputs.date  }}
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
