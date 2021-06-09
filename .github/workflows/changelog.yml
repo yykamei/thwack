@@ -28,7 +28,7 @@ jobs:
           fi
           echo "::set-output name=args::#{args}"
       - uses: actions/checkout@v2
-      - uses: docker://githubchangeloggenerator/github-changelog-generator:1.16.2
+      - uses: docker://githubchangeloggenerator/github-changelog-generator:1.16.4
         with:
           args: '--user ${{ github.repository_owner }} --project ${{ steps.get_project.outputs.project }} --exclude-labels chore,no-changelog,duplicate,question,invalid,wontfix ${{ steps.get_future_release.outputs.args }}'
         env:
