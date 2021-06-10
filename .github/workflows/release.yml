@@ -93,9 +93,6 @@ jobs:
           - target: aarch64-apple-darwin
             os: macOS-latest
             suffix: .tar.gz
-          - target: x86_64-unknown-freebsd
-            os: ubuntu-latest
-            suffix: .tar.gz
           - target: x86_64-pc-windows-msvc
             os: windows-latest
             suffix: .zip
@@ -122,11 +119,8 @@ jobs:
         env:
           COMMIT_SHORT: ${{ steps.set_metadata.outputs.commit_short  }}
           DATE: ${{ steps.set_metadata.outputs.date  }}
-
-      - uses: actions/upload-artifact@v2
-        with:
-          name: thwack
-          path: target/${{ matrix.target }}/release/thwack
+          # TODO: SDKROOT can be removed once it's the default. See https://github.com/starship/starship/pull/2300
+          SDKROOT: /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk
 
       - run: 7z a thwack-${{ matrix.target }}${{ matrix.suffix }} thwack.exe
         if: matrix.os == 'windows-latest'
@@ -135,6 +129,11 @@ jobs:
       - run: tar cf thwack-${{ matrix.target }}${{ matrix.suffix }} thwack
         if: matrix.os != 'windows-latest'
         working-directory: target/${{ matrix.target }}/release
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: thwack-${{ matrix.target }}${{ matrix.suffix }}
+          path: target/${{ matrix.target }}/release/thwack-${{ matrix.target }}${{ matrix.suffix }}
 
       - name: Upload assets to the release
         if: github.event.inputs.apply == 'true'
