@@ -68,6 +68,64 @@ jobs:
           fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+  build:
+    strategy:
+      matrix:
+        include:
+          - target: x86_64-unknown-linux-gnu
+            os: ubuntu-latest
+            suffix: .tar.gz
+          - target: x86_64-unknown-linux-musl
+            os: ubuntu-latest
+            suffix: .tar.gz
+          - target: aarch64-unknown-linux-musl
+            os: ubuntu-latest
+            suffix: .tar.gz
+          - target: arm-unknown-linux-musleabihf
+            os: ubuntu-latest
+            suffix: .tar.gz
+          - target: x86_64-apple-darwin
+            os: macOS-latest
+            suffix: .tar.gz
+          - target: aarch64-apple-darwin
+            os: macOS-latest
+            suffix: .tar.gz
+          - target: x86_64-unknown-freebsd
+            os: ubuntu-latest
+            suffix: .tar.gz
+          - target: x86_64-pc-windows-msvc
+            os: windows-latest
+            suffix: .zip
+          - target: aarch64-pc-windows-msvc
+            os: windows-latest
+            suffix: .zip
+
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          profile: minimal
+          override: true
+          target: ${{ matrix.target }}
+
+      - run: cargo build --release --locked --target ${{ matrix.target }}
+        env:
           COMMIT_SHORT: ${{ steps.set_metadata.outputs.commit_short  }}
           DATE: ${{ steps.set_metadata.outputs.date  }}
-          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+
+      - run: 7z a thwack-${{ matrix.target }}${{ matrix.suffix }} thwack.exe
+        if: matrix.os == 'windows-latest'
+        working-directory: target/${{ matrix.target }}/release
+
+      - run: tar cf thwack-${{ matrix.target }}${{ matrix.suffix }} thwack
+        if: matrix.os != 'windows-latest'
+        working-directory: target/${{ matrix.target }}/release
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: thwack-${{ matrix.target }}${{ matrix.suffix }}
+          path: target/${{ matrix.target }}/release/thwack-${{ matrix.target }}${{ matrix.suffix }}
