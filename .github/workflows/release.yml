@@ -136,7 +136,7 @@ jobs:
           path: target/${{ matrix.target }}/release/thwack-${{ matrix.target }}${{ matrix.suffix }}
 
       - name: Upload assets to the release
-        #if: github.event.inputs.apply == 'true'
+        if: github.event.inputs.apply == 'true'
         run: |
           set -xeuo pipefail
 
