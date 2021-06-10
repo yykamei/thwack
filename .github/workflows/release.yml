@@ -69,6 +69,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+
   build:
     strategy:
       matrix:
@@ -121,6 +122,11 @@ jobs:
           COMMIT_SHORT: ${{ steps.set_metadata.outputs.commit_short  }}
           DATE: ${{ steps.set_metadata.outputs.date  }}
 
+      - uses: actions/upload-artifact@v2
+        with:
+          name: thwack
+          path: target/${{ matrix.target }}/release/thwack
+
       - run: 7z a thwack-${{ matrix.target }}${{ matrix.suffix }} thwack.exe
         if: matrix.os == 'windows-latest'
         working-directory: target/${{ matrix.target }}/release
@@ -129,7 +135,14 @@ jobs:
         if: matrix.os != 'windows-latest'
         working-directory: target/${{ matrix.target }}/release
 
-      - uses: actions/upload-artifact@v2
-        with:
-          name: thwack-${{ matrix.target }}${{ matrix.suffix }}
-          path: target/${{ matrix.target }}/release/thwack-${{ matrix.target }}${{ matrix.suffix }}
+      - name: Upload assets to the release
+        if: github.event.inputs.apply == 'true'
+        run: |
+          set -xeuo pipefail
+
+          version='${{ github.event.inputs.version }}'
+          tag="v${version}"
+          gh release upload "${tag}" thwack-${{ matrix.target }}${{ matrix.suffix }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        working-directory: target/${{ matrix.target }}/release
