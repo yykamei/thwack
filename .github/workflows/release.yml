@@ -112,7 +112,11 @@ jobs:
           override: true
           target: ${{ matrix.target }}
 
-      - run: cargo build --release --locked --target ${{ matrix.target }}
+      - uses: actions-rs/cargo@v1
+        with:
+          command: build
+          args: --release --locked --target ${{ matrix.target }}
+          use-cross: ${{ matrix.os == 'ubuntu-latest' }}
         env:
           COMMIT_SHORT: ${{ steps.set_metadata.outputs.commit_short  }}
           DATE: ${{ steps.set_metadata.outputs.date  }}
