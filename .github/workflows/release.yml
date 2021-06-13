@@ -122,11 +122,17 @@ jobs:
           # TODO: SDKROOT can be removed once it's the default. See https://github.com/starship/starship/pull/2300
           SDKROOT: /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk
 
-      - run: 7z a thwack-${{ matrix.target }}${{ matrix.suffix }} thwack.exe
+      - name: Bundle on Windows
+        run: |
+          7z a thwack-${{ matrix.target }}${{ matrix.suffix }} thwack.exe
+          sha256sum thwack-${{ matrix.target }}${{ matrix.suffix }} | awk '{print $1}' | tee thwack-${{ matrix.target }}${{ matrix.suffix }}.sha256
         if: matrix.os == 'windows-latest'
         working-directory: target/${{ matrix.target }}/release
 
-      - run: tar cf thwack-${{ matrix.target }}${{ matrix.suffix }} thwack
+      - name: Bundle on -nix
+        run: |
+          tar cf thwack-${{ matrix.target }}${{ matrix.suffix }} thwack
+          sha256sum thwack-${{ matrix.target }}${{ matrix.suffix }} | awk '{print $1}' | tee thwack-${{ matrix.target }}${{ matrix.suffix }}.sha256
         if: matrix.os != 'windows-latest'
         working-directory: target/${{ matrix.target }}/release
 
