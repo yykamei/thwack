@@ -144,11 +144,9 @@ jobs:
       - name: Upload assets to the release
         #if: github.event.inputs.apply == 'true'
         run: |
-          set -xeuo pipefail
-
           version='${{ github.event.inputs.version }}'
           tag="v${version}"
-          gh release upload "${tag}" thwack-${{ matrix.target }}${{ matrix.suffix }}
+          gh release upload "${tag}" thwack-${{ matrix.target }}${{ matrix.suffix }} thwack-${{ matrix.target }}${{ matrix.suffix }}.sha256
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         working-directory: target/${{ matrix.target }}/release
