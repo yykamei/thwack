@@ -146,7 +146,7 @@ jobs:
         run: |
           version='${{ github.event.inputs.version }}'
           tag="v${version}"
-          gh release upload --clobber "${tag}" thwack-${{ matrix.target }}${{ matrix.suffix }} thwack-${{ matrix.target }}${{ matrix.suffix }}.sha256
+          gh release upload "${tag}" thwack-${{ matrix.target }}${{ matrix.suffix }} thwack-${{ matrix.target }}${{ matrix.suffix }}.sha256
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         working-directory: target/${{ matrix.target }}/release
