@@ -61,8 +61,6 @@ jobs:
           args: --release --locked --target ${{ matrix.target }}
           use-cross: ${{ matrix.os == 'ubuntu-latest' }}
         env:
-          COMMIT_SHORT: ${{ steps.set_metadata.outputs.commit_short  }}
-          DATE: ${{ steps.set_metadata.outputs.date  }}
           # TODO: SDKROOT can be removed once it's the default. See https://github.com/starship/starship/pull/2300
           SDKROOT: /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk
 
