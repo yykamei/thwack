@@ -69,6 +69,7 @@ jobs:
             cargo publish
           fi
         env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
 
   build:
@@ -146,3 +147,5 @@ jobs:
         #if: github.event.inputs.apply == 'true'
         run: gh release upload --clobber "v${{ github.event.inputs.version }}" thwack-${{ matrix.target }}${{ matrix.suffix }} thwack-${{ matrix.target }}${{ matrix.suffix }}.sha256
         working-directory: target/${{ matrix.target }}/release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
