@@ -62,6 +62,8 @@ jobs:
           cargo publish --dry-run
           cargo package --list
 
+          gh release list
+
           if [[ "$apply" == "true" ]]; then
             gh release create "$tag" --title "$title" --notes-file tmp/notes.txt
             cargo publish
