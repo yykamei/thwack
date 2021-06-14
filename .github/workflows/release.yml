@@ -67,16 +67,12 @@ jobs:
           SDKROOT: /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk
 
       - name: Bundle on Windows
-        run: |
-          7z a ../../../thwack-${{ matrix.target }}${{ matrix.suffix }} thwack.exe
-          sha256sum thwack-${{ matrix.target }}${{ matrix.suffix }} | awk '{print $1}' | tee thwack-${{ matrix.target }}${{ matrix.suffix }}.sha256
+        run: 7z a ../../../thwack-${{ matrix.target }}${{ matrix.suffix }} thwack.exe
         if: matrix.os == 'windows-latest'
         working-directory: target/${{ matrix.target }}/release
 
       - name: Bundle on -nix
-        run: |
-          tar cf ../../../thwack-${{ matrix.target }}${{ matrix.suffix }} thwack
-          sha256sum thwack-${{ matrix.target }}${{ matrix.suffix }} | awk '{print $1}' | tee thwack-${{ matrix.target }}${{ matrix.suffix }}.sha256
+        run: tar cf ../../../thwack-${{ matrix.target }}${{ matrix.suffix }} thwack
         if: matrix.os != 'windows-latest'
         working-directory: target/${{ matrix.target }}/release
 
@@ -147,7 +143,10 @@ jobs:
       - uses: actions/download-artifact@v2
 
       - name: Calculate checksums
-        run: for f in thwack-*; do sha256sum $f | awk '{print $1}' > $f.sha256; done
+        run: |
+          for f in thwack-*; do sha256sum $f | awk '{print $1}' > $f.sha256; done
+          ls -l *.sha256
+          cat *.sha256
 
       - name: Upload assets to the release
         #if: github.event.inputs.apply == 'true'
