@@ -14,64 +14,6 @@ on:
         required: false
         default: ''
 jobs:
-  release:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          profile: minimal
-          override: true
-
-      - name: Set metadata
-        id: set_metadata
-        run: |
-          echo "::set-output name=commit_short::$(git rev-parse --short HEAD)"
-          echo "::set-output name=date::$(date --utc +%Y-%m-%d)"
-      - name: Create a GitHub release and publish the crate on crates.io
-        run: |
-          set -xeuo pipefail
-
-          version='${{ github.event.inputs.version }}'
-          tag="v${version}"
-          apply='${{ github.event.inputs.apply }}'
-          title='${{ github.event.inputs.title }}'
-          if [[ -z "$title" ]]; then
-            title="Release ${tag}"
-          fi
-
-          # Check whether the version is described in the source code.
-          grep "$version" Cargo.toml
-          grep -F "## [${tag}]" CHANGELOG.md
-          grep -F '## [Unreleased]' CHANGELOG.md && exit 1
-
-          # Extract the latest changelog entries to put them into GitHub release notes.
-          hit=0
-          while IFS="" read -r line; do
-            if [[ "$line" == "## ["*"]("*")" ]]; then
-              hit=$((hit + 1))
-              continue
-            fi
-            if [[ "$hit" == "1" ]]; then
-              echo "$line" >> tmp/notes.txt
-            fi
-          done < CHANGELOG.md
-
-          cargo publish --dry-run
-          cargo package --list
-
-          gh release list
-
-          if [[ "$apply" == "true" ]]; then
-            gh release create "$tag" --title "$title" --notes-file tmp/notes.txt
-            cargo publish
-          fi
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
-
   build:
     strategy:
       fail-fast: false
@@ -126,14 +68,14 @@ jobs:
 
       - name: Bundle on Windows
         run: |
-          7z a thwack-${{ matrix.target }}${{ matrix.suffix }} thwack.exe
+          7z a ../../../thwack-${{ matrix.target }}${{ matrix.suffix }} thwack.exe
           sha256sum thwack-${{ matrix.target }}${{ matrix.suffix }} | awk '{print $1}' | tee thwack-${{ matrix.target }}${{ matrix.suffix }}.sha256
         if: matrix.os == 'windows-latest'
         working-directory: target/${{ matrix.target }}/release
 
       - name: Bundle on -nix
         run: |
-          tar cf thwack-${{ matrix.target }}${{ matrix.suffix }} thwack
+          tar cf ../../../thwack-${{ matrix.target }}${{ matrix.suffix }} thwack
           sha256sum thwack-${{ matrix.target }}${{ matrix.suffix }} | awk '{print $1}' | tee thwack-${{ matrix.target }}${{ matrix.suffix }}.sha256
         if: matrix.os != 'windows-latest'
         working-directory: target/${{ matrix.target }}/release
@@ -141,11 +83,74 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           name: thwack-${{ matrix.target }}${{ matrix.suffix }}
-          path: target/${{ matrix.target }}/release/thwack-${{ matrix.target }}${{ matrix.suffix }}
+          path: thwack-${{ matrix.target }}${{ matrix.suffix }}
+
+  release:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          profile: minimal
+          override: true
+
+      - name: Set metadata
+        id: set_metadata
+        run: |
+          echo "::set-output name=commit_short::$(git rev-parse --short HEAD)"
+          echo "::set-output name=date::$(date --utc +%Y-%m-%d)"
+
+      - name: Create a GitHub release and publish the crate on crates.io
+        run: |
+          set -xeuo pipefail
+
+          version='${{ github.event.inputs.version }}'
+          tag="v${version}"
+          apply='${{ github.event.inputs.apply }}'
+          title='${{ github.event.inputs.title }}'
+          if [[ -z "$title" ]]; then
+            title="Release ${tag}"
+          fi
+
+          # Check whether the version is described in the source code.
+          grep "$version" Cargo.toml
+          grep -F "## [${tag}]" CHANGELOG.md
+          grep -F '## [Unreleased]' CHANGELOG.md && exit 1
+
+          # Extract the latest changelog entries to put them into GitHub release notes.
+          hit=0
+          while IFS="" read -r line; do
+            if [[ "$line" == "## ["*"]("*")" ]]; then
+              hit=$((hit + 1))
+              continue
+            fi
+            if [[ "$hit" == "1" ]]; then
+              echo "$line" >> tmp/notes.txt
+            fi
+          done < CHANGELOG.md
+
+          cargo publish --dry-run
+          cargo package --list
+          gh release list
+
+          if [[ "$apply" == "true" ]]; then
+            gh release create "$tag" --title "$title" --notes-file tmp/notes.txt
+            cargo publish
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+
+      - uses: actions/download-artifact@v2
+
+      - name: Calculate checksums
+        run: for f in thwack-*; do sha256sum $f | awk '{print $1}' > $f.sha256; done
 
       - name: Upload assets to the release
         #if: github.event.inputs.apply == 'true'
-        run: gh release upload --clobber "v${{ github.event.inputs.version }}" thwack-${{ matrix.target }}${{ matrix.suffix }} thwack-${{ matrix.target }}${{ matrix.suffix }}.sha256
-        working-directory: target/${{ matrix.target }}/release
+        run: gh release upload --clobber "v${{ github.event.inputs.version }}" thwack-*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
