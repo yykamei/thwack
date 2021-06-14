@@ -14,8 +14,74 @@ on:
         required: false
         default: ''
 jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: x86_64-unknown-linux-gnu
+            os: ubuntu-latest
+            suffix: .tar.gz
+          - target: x86_64-unknown-linux-musl
+            os: ubuntu-latest
+            suffix: .tar.gz
+          - target: aarch64-unknown-linux-musl
+            os: ubuntu-latest
+            suffix: .tar.gz
+          - target: arm-unknown-linux-musleabihf
+            os: ubuntu-latest
+            suffix: .tar.gz
+          - target: x86_64-apple-darwin
+            os: macOS-latest
+            suffix: .tar.gz
+          - target: aarch64-apple-darwin
+            os: macOS-latest
+            suffix: .tar.gz
+          - target: x86_64-pc-windows-msvc
+            os: windows-latest
+            suffix: .zip
+          - target: aarch64-pc-windows-msvc
+            os: windows-latest
+            suffix: .zip
+
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          profile: minimal
+          override: true
+          target: ${{ matrix.target }}
+
+      - uses: actions-rs/cargo@v1
+        with:
+          command: build
+          args: --release --locked --target ${{ matrix.target }}
+          use-cross: ${{ matrix.os == 'ubuntu-latest' }}
+        env:
+          # TODO: SDKROOT can be removed once it's the default. See https://github.com/starship/starship/pull/2300
+          SDKROOT: /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk
+
+      - name: Bundle on Windows
+        run: 7z a ../../../thwack-${{ matrix.target }}${{ matrix.suffix }} thwack.exe
+        if: matrix.os == 'windows-latest'
+        working-directory: target/${{ matrix.target }}/release
+
+      - name: Bundle on -nix
+        run: tar cf ../../../thwack-${{ matrix.target }}${{ matrix.suffix }} thwack
+        if: matrix.os != 'windows-latest'
+        working-directory: target/${{ matrix.target }}/release
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: Artifact-thwack-${{ matrix.target }}${{ matrix.suffix }}
+          path: thwack-${{ matrix.target }}${{ matrix.suffix }}
+
   release:
     runs-on: ubuntu-latest
+    needs: build
     steps:
       - uses: actions/checkout@v2
 
@@ -30,6 +96,7 @@ jobs:
         run: |
           echo "::set-output name=commit_short::$(git rev-parse --short HEAD)"
           echo "::set-output name=date::$(date --utc +%Y-%m-%d)"
+
       - name: Create a GitHub release and publish the crate on crates.io
         run: |
           set -xeuo pipefail
@@ -61,6 +128,7 @@ jobs:
 
           cargo publish --dry-run
           cargo package --list
+          gh release list
 
           if [[ "$apply" == "true" ]]; then
             gh release create "$tag" --title "$title" --notes-file tmp/notes.txt
@@ -68,6 +136,17 @@ jobs:
           fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          COMMIT_SHORT: ${{ steps.set_metadata.outputs.commit_short  }}
-          DATE: ${{ steps.set_metadata.outputs.date  }}
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+
+      - uses: actions/download-artifact@v2
+
+      - name: Calculate checksums
+        run: |
+          mv Artifact-thwack-*/thwack-* .
+          for f in thwack-*; do sha256sum $f | awk '{print $1}' > $f.sha256; done
+
+      - name: Upload assets to the release
+        #if: github.event.inputs.apply == 'true'
+        run: gh release upload "v${{ github.event.inputs.version }}" thwack-*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
