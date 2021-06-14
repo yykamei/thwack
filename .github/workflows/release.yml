@@ -78,7 +78,7 @@ jobs:
 
       - uses: actions/upload-artifact@v2
         with:
-          name: thwack-${{ matrix.target }}${{ matrix.suffix }}
+          name: Artifact-thwack-${{ matrix.target }}${{ matrix.suffix }}
           path: thwack-${{ matrix.target }}${{ matrix.suffix }}
 
   release:
@@ -144,9 +144,8 @@ jobs:
 
       - name: Calculate checksums
         run: |
+          mv Artifact-thwack-*/thwack-* .
           for f in thwack-*; do sha256sum $f | awk '{print $1}' > $f.sha256; done
-          ls -l *.sha256
-          cat *.sha256
 
       - name: Upload assets to the release
         #if: github.event.inputs.apply == 'true'
