@@ -2,7 +2,16 @@
 
 ## [Unreleased](https://github.com/yykamei/thwack/tree/HEAD)
 
-[Full Changelog](https://github.com/yykamei/thwack/compare/v0.1.0...HEAD)
+[Full Changelog](https://github.com/yykamei/thwack/compare/v0.2.0...HEAD)
+
+**Merged pull requests:**
+
+- Bump libc from 0.2.96 to 0.2.97 [\#98](https://github.com/yykamei/thwack/pull/98) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump libc from 0.2.95 to 0.2.96 [\#93](https://github.com/yykamei/thwack/pull/93) ([dependabot[bot]](https://github.com/apps/dependabot))
+
+## [v0.2.0](https://github.com/yykamei/thwack/tree/v0.2.0) (2021-06-09)
+
+[Full Changelog](https://github.com/yykamei/thwack/compare/v0.1.0...v0.2.0)
 
 **Breaking changes:**
 

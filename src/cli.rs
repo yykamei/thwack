@@ -34,18 +34,9 @@ pub fn entrypoint(args: ArgsOs, stdout: &mut impl Write) -> Result<()> {
         return Ok(());
     }
     if args.version {
-        let suffix = match (option_env!("COMMIT_SHORT"), option_env!("DATE")) {
-            (Some(sha), Some(date)) => format!(" ({} {})", sha, date),
-            _ => String::new(),
-        };
         print_and_flush(
             stdout,
-            &format!(
-                "{} {}{}\n",
-                env!("CARGO_PKG_NAME"),
-                env!("CARGO_PKG_VERSION"),
-                suffix
-            ),
+            &format!("{} {}\n", env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION")),
         )?;
         return Ok(());
     }

@@ -3,7 +3,9 @@
 <a href="https://github.com/yykamei/thwack/actions/workflows/ci.yml"><img alt="GitHub Actions workflow status" src="https://github.com/yykamei/thwack/actions/workflows/ci.yml/badge.svg"></a>
 <a href="https://crates.io/crates/thwack"><img alt="Crates.io" src="https://img.shields.io/crates/v/thwack"></a>
 
-thwack is the Command-line utility similar to "Go To File" on GitHub. You can search for a file in a directory and invoke an arbitrary command on it.
+thwack is the Command-line utility similar to ["Go to file" on GitHub](https://docs.github.com/en/github/searching-for-information-on-github/searching-on-github/finding-files-on-github). You can search for a file in a directory and invoke an arbitrary command on it.
+
+<img width="480" src="https://user-images.githubusercontent.com/13130705/121429451-e6974600-c9b1-11eb-8aa1-3842745f9262.gif" alt="thwack on iTerm2">
 
 ## Why is this useful?
 
