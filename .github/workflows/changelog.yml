@@ -28,7 +28,7 @@ jobs:
             suffix='--future-release ${{ github.event.inputs.future_release }}'
           fi
 
-          github-changelog-generator \
+          github_changelog_generator \
             --user ${{ github.repository_owner }} \
             --project ${GITHUB_REPOSITORY#*/} \
             --exclude-labels chore,no-changelog,duplicate,question,invalid,wontfix \
