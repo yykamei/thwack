@@ -92,20 +92,6 @@ impl From<io::Error> for Error {
     }
 }
 
-impl From<crossterm::ErrorKind> for Error {
-    fn from(error: crossterm::ErrorKind) -> Self {
-        Self {
-            message: format!(
-                "Unhandled terminal error happened. See the details from .source: {}",
-                error
-            ),
-            kind: ErrorKind::Terminal,
-            source: Some(Box::new(error)),
-            exit_code: FAILURE,
-        }
-    }
-}
-
 impl From<NulError> for Error {
     fn from(error: NulError) -> Self {
         Self {
