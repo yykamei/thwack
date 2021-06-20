@@ -13,24 +13,26 @@ jobs:
   changelog:
     runs-on: ubuntu-latest
     steps:
-      - name: Get --project <VALUE>
-        id: get_project
-        run: echo "::set-output name=project::${GITHUB_REPOSITORY#*/}"
-      - name: Get --feature-release <VALUE>
-        id: get_future_release
+      - uses: actions/checkout@v2
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3
+      - run: gem install github-changelog-generator
+      - name: Update CHANGELOG.md
         run: |
-          set -xeuo pipefail
+          set -euo pipefail
 
           if [[ -z '${{ github.event.inputs.future_release }}' ]]; then
-            args=''
+            suffix=''
           else
-            args='--future-release ${{ github.event.inputs.future_release }}'
+            suffix='--future-release ${{ github.event.inputs.future_release }}'
           fi
-          echo "::set-output name=args::${args}"
-      - uses: actions/checkout@v2
-      - uses: docker://githubchangeloggenerator/github-changelog-generator:1.16.2
-        with:
-          args: '--user ${{ github.repository_owner }} --project ${{ steps.get_project.outputs.project }} --exclude-labels chore,no-changelog,duplicate,question,invalid,wontfix ${{ steps.get_future_release.outputs.args }}'
+
+          github-changelog-generator \
+            --user ${{ github.repository_owner }} \
+            --project ${GITHUB_REPOSITORY#*/} \
+            --exclude-labels chore,no-changelog,duplicate,question,invalid,wontfix \
+            ${suffix}
         env:
           CHANGELOG_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Update CHANGELOG.md and open a pull request
