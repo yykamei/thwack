@@ -6,6 +6,7 @@
 
 **Merged pull requests:**
 
+- Bump crossterm from 0.19.0 to 0.20.0 [\#102](https://github.com/yykamei/thwack/pull/102) ([yykamei](https://github.com/yykamei))
 - Bump libc from 0.2.96 to 0.2.97 [\#98](https://github.com/yykamei/thwack/pull/98) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump libc from 0.2.95 to 0.2.96 [\#93](https://github.com/yykamei/thwack/pull/93) ([dependabot[bot]](https://github.com/apps/dependabot))
 
