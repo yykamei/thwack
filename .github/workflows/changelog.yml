@@ -24,7 +24,7 @@ jobs:
           BRANCH: update-changelog
       - name: gh-pr-create(1)
         run: |
-          cat <<BODY > ./scripts/gh_pr_create.sh
+          cat <<BODY | ./scripts/gh_pr_create.sh
           *This pull request was automatically created to make CHANGELOG.md the latest*.
 
           Check the files changes and merge if the changes make sense.
