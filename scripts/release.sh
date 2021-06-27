@@ -22,6 +22,7 @@ done < CHANGELOG.md
 cargo publish --dry-run
 cargo package --list
 gh release list
+cat tmp/notes.txt
 
 if [[ "$APPLY" == "true" ]]; then
   gh release create "$FUTURE_RELEASE" --title "$RELEASE_TITLE" --notes-file tmp/notes.txt
