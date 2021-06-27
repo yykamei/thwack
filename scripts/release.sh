@@ -10,7 +10,7 @@ grep -F '## [Unreleased]' CHANGELOG.md && exit 1
 # Extract the latest changelog entries to put them into GitHub release notes.
 hit=0
 while IFS="" read -r line; do
-  if [[ "$line" == "## ["*"]("*")" ]]; then
+  if [[ "$line" == "## ["*"]("*")"* ]]; then
     hit=$((hit + 1))
     continue
   fi
