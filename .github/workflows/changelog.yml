@@ -33,3 +33,4 @@ jobs:
           BRANCH: update-changelog
           TITLE: Update CHANGELOG.md
           LABEL: chore
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
