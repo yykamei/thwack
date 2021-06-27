@@ -21,3 +21,16 @@ jobs:
         run: ./scripts/git_push.sh
         env:
           COMMIT_MESSAGE: Update CHANGELOG.md
+          BRANCH: update-changelog
+      - name: gh-pr-create(1)
+        run: |
+          cat <<BODY | ./scripts/gh_pr_create.sh
+          *This pull request was automatically created to make CHANGELOG.md the latest*.
+
+          Check the files changes and merge if the changes make sense.
+          BODY
+        env:
+          BRANCH: update-changelog
+          TITLE: Update CHANGELOG.md
+          LABEL: chore
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
