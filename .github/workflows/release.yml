@@ -108,7 +108,7 @@ jobs:
           COMMIT_MESSAGE: Bump to ${{ github.event.inputs.version }}
 
       - name: Create a GitHub release and publish the crate on crates.io
-        run: ./release.sh
+        run: ./scripts/release.sh
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
