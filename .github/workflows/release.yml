@@ -87,6 +87,12 @@ jobs:
           profile: minimal
           override: true
 
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3
+
+      - run: gem install github_changelog_generator
+
       - name: Update CHANGELOG.md
         run: ./scripts/update_changelog.sh
         env:

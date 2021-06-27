@@ -9,7 +9,7 @@ else
 fi
 
 github_changelog_generator \
-  --user ${GITHUB_REPOSITORY%/*} \
-  --project ${GITHUB_REPOSITORY#*/} \
+  --user "${GITHUB_REPOSITORY%/*}" \
+  --project "${GITHUB_REPOSITORY#*/}" \
   --exclude-labels chore,no-changelog,duplicate,question,invalid,wontfix \
-  ${suffix}
+  "${suffix}"
