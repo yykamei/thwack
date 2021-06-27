@@ -91,52 +91,29 @@ jobs:
           profile: minimal
           override: true
 
-      - name: Set metadata
-        id: set_metadata
-        run: |
-          echo "::set-output name=commit_short::$(git rev-parse --short HEAD)"
-          echo "::set-output name=date::$(date --utc +%Y-%m-%d)"
+      - name: Update CHANGELOG.md
+        run: ./scripts/update_changelog.sh
+        env:
+          CHANGELOG_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          FUTURE_RELEASE: v${{ github.event.inputs.version }}
+
+      - name: Bump the package version
+        run: sed -i -e "s/^version = .*$/version = \"${{ github.event.inputs.version }}\"/" Cargo.toml
+
+      - name: git-push(1)
+        run: ./scripts/git_push.sh
+        env:
+          COMMIT_MESSAGE: Bump to ${{ github.event.inputs.version }}
 
       - name: Create a GitHub release and publish the crate on crates.io
-        run: |
-          set -xeuo pipefail
-
-          version='${{ github.event.inputs.version }}'
-          tag="v${version}"
-          apply='${{ github.event.inputs.apply }}'
-          title='${{ github.event.inputs.title }}'
-          if [[ -z "$title" ]]; then
-            title="Release ${tag}"
-          fi
-
-          # Check whether the version is described in the source code.
-          grep "$version" Cargo.toml
-          grep -F "## [${tag}]" CHANGELOG.md
-          grep -F '## [Unreleased]' CHANGELOG.md && exit 1
-
-          # Extract the latest changelog entries to put them into GitHub release notes.
-          hit=0
-          while IFS="" read -r line; do
-            if [[ "$line" == "## ["*"]("*")" ]]; then
-              hit=$((hit + 1))
-              continue
-            fi
-            if [[ "$hit" == "1" ]]; then
-              echo "$line" >> tmp/notes.txt
-            fi
-          done < CHANGELOG.md
-
-          cargo publish --dry-run
-          cargo package --list
-          gh release list
-
-          if [[ "$apply" == "true" ]]; then
-            gh release create "$tag" --title "$title" --notes-file tmp/notes.txt
-            cargo publish
-          fi
+        run: ./release.sh
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+          VERSION: ${{ github.event.inputs.version }}
+          FUTURE_RELEASE: v${{ github.event.inputs.version }}
+          RELEASE_TITLE: Release v${{ github.event.inputs.version }}
+          APPLY: ${{ github.event.inputs.apply }}
 
       - uses: actions/download-artifact@v2
 
@@ -146,7 +123,7 @@ jobs:
           for f in thwack-*; do sha256sum $f | awk '{print $1}' > $f.sha256; done
 
       - name: Upload assets to the release
-        #if: github.event.inputs.apply == 'true'
+        if: github.event.inputs.apply == 'true'
         run: gh release upload "v${{ github.event.inputs.version }}" thwack-*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
