@@ -4,11 +4,6 @@ on:
     branches:
       - main
   workflow_dispatch:
-    inputs:
-      future_release:
-        description: Specify the value for `--future-release` to make it ready to be released
-        required: false
-        default: ''
 jobs:
   changelog:
     runs-on: ubuntu-latest
@@ -19,42 +14,10 @@ jobs:
           ruby-version: 3
       - run: gem install github_changelog_generator
       - name: Update CHANGELOG.md
-        run: |
-          set -euo pipefail
-
-          if [[ -z '${{ github.event.inputs.future_release }}' ]]; then
-            suffix=''
-          else
-            suffix='--future-release ${{ github.event.inputs.future_release }}'
-          fi
-
-          github_changelog_generator \
-            --user ${{ github.repository_owner }} \
-            --project ${GITHUB_REPOSITORY#*/} \
-            --exclude-labels chore,no-changelog,duplicate,question,invalid,wontfix \
-            ${suffix}
+        run: ./scripts/update_changelog.sh
         env:
           CHANGELOG_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Update CHANGELOG.md and open a pull request
-        run: |
-          set -xeuo pipefail
-
-          changes=$(git status --short | wc -l)
-          if [[ "$changes" == "0" ]]; then
-            exit 0
-          fi
-          branch="update-changelog/$(date +%s)"
-          git config user.email "noreply@github.com"
-          git config user.name "GitHub"
-          git checkout -b "$branch"
-          git add -A
-          git commit -m 'Update CHANGELOG.md'
-          git push origin "$branch"
-          cat <<BODY > body.txt
-          *This pull request was automatically created to make CHANGELOG.md the latest*.
-
-          Check the files changes and merge if the changes make sense.
-          BODY
-          gh pr create --head "$branch" --title 'Update CHANGELOG.md' --body-file body.txt --label chore
+      - name: git-push(1)
+        run: ./scripts/git_push.sh
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          COMMIT_MESSAGE: Update CHANGELOG.md
