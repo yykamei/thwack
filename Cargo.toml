@@ -7,7 +7,7 @@ repository = "https://github.com/yykamei/thwack"
 license = "MIT OR Apache-2.0"
 categories = ["command-line-utilities"]
 edition = "2018"
-version = "0.2.1"
+version = "0.2.0"
 
 [dependencies]
 crossterm = "0.20.0"
