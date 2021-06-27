@@ -100,7 +100,9 @@ jobs:
           FUTURE_RELEASE: v${{ github.event.inputs.version }}
 
       - name: Bump the package version
-        run: sed -i -e "s/^version = .*$/version = \"${{ github.event.inputs.version }}\"/" Cargo.toml
+        run: |
+          sed -i -e "s/^version = .*$/version = \"${{ github.event.inputs.version }}\"/" Cargo.toml
+          cargo build
 
       - name: git-push(1)
         run: ./scripts/git_push.sh
