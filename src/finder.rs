@@ -153,7 +153,7 @@ mod tests {
         }
         let mut paths: Vec<String> = paths
             .iter()
-            .map(|m| m.relative().replace('\\', "/"))
+            .map(|m| format!("{}", m).replace('\\', "/"))
             .collect();
         paths.sort();
         paths
