@@ -4,6 +4,10 @@
 
 [Full Changelog](https://github.com/yykamei/thwack/compare/v0.2.0...HEAD)
 
+**Fixed bugs:**
+
+- Pass absolute path to the specified command [\#110](https://github.com/yykamei/thwack/pull/110) ([yykamei](https://github.com/yykamei))
+
 **Merged pull requests:**
 
 - Run `cargo update` [\#105](https://github.com/yykamei/thwack/pull/105) ([yykamei](https://github.com/yykamei))
