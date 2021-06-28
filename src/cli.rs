@@ -117,9 +117,7 @@ pub fn entrypoint(args: ArgsOs, stdout: &mut impl Write) -> Result<()> {
     terminal::disable_raw_mode()?;
 
     if let State::Invoke(path) = state {
-        // TODO: Decide which we should pass: relative or absolute.
-        let path = path.relative();
-        invoke(&args.exec, path)?;
+        invoke(&args.exec, path.absolute())?;
     }
     Ok(())
 }
@@ -189,7 +187,7 @@ fn find_paths(starting_point: &StartingPoint, query: &str, limit: u16) -> Result
     let mut paths = Vec::with_capacity(100); // TODO: Tune this capacity later.
 
     for path in Finder::new(starting_point, query)? {
-        // TODO: Shouldn't we stop iteration when some paths retuns Err?
+        // TODO: Shouldn't we stop iteration when some paths returns Err?
         let path = path?;
         paths.push(path);
     }

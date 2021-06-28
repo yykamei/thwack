@@ -8,9 +8,20 @@ use unicode_width::UnicodeWidthStr;
 
 #[derive(Debug, Eq, PartialEq)]
 pub(crate) struct MatchedPath {
+    /// *absolute* is an absolute path/
     absolute: String,
+
+    /// *relative* is a path to `starting_point` passed as an argument of `new`.
+    ///
+    /// CAUTION: You should not pass it as a target file for command
+    ///          because `starting_point` sometimes differs from the current working directory,
+    ///          in which this program is run.
     relative: String,
+
+    /// *depth* is the number of path separator.
     depth: usize,
+
+    /// *positions* is a vector containing the matched indicies of *relative*.
     positions: Vec<usize>,
 }
 
@@ -35,9 +46,9 @@ impl MatchedPath {
         })
     }
 
-    /// Returns the relative path
-    pub(crate) fn relative(&self) -> &str {
-        &self.relative
+    /// Returns the absolute path.
+    pub(crate) fn absolute(&self) -> &str {
+        &self.absolute
     }
 
     /// Returns the slice of Chunks. This generates reduced chunks if `Self::width` exceeds the `max_width`.
@@ -293,9 +304,9 @@ mod tests {
     }
 
     #[test]
-    fn returns_relative() {
+    fn returns_absolute() {
         let path = new("abc", "/home", "/home/abc.txt");
-        assert_eq!(path.relative(), "abc.txt");
+        assert_eq!(path.absolute(), "/home/abc.txt");
     }
 
     #[test]
