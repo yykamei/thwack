@@ -80,6 +80,8 @@ jobs:
     needs: build
     steps:
       - uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.PAT_FOR_RELEASE }}
 
       - uses: actions-rs/toolchain@v1
         with:
