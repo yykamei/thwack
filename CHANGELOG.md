@@ -1,5 +1,13 @@
 # Changelog
 
+## [Unreleased](https://github.com/yykamei/thwack/tree/HEAD)
+
+[Full Changelog](https://github.com/yykamei/thwack/compare/v0.2.1...HEAD)
+
+**Merged pull requests:**
+
+- Bump unicode-segmentation from 1.7.1 to 1.8.0 [\#114](https://github.com/yykamei/thwack/pull/114) ([dependabot[bot]](https://github.com/apps/dependabot))
+
 ## [v0.2.1](https://github.com/yykamei/thwack/tree/v0.2.1) (2021-06-29)
 
 [Full Changelog](https://github.com/yykamei/thwack/compare/v0.2.0...v0.2.1)
