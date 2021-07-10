@@ -132,7 +132,7 @@ enum State<'a> {
 
 fn paths_rows(row: u16) -> u16 {
     // TODO: raise an error when the number of rows is too small.
-    row - 2
+    row - 1
 }
 
 fn print_and_flush(buffer: &mut impl Write, content: &str) -> io::Result<()> {
