@@ -44,7 +44,7 @@ pub fn entrypoint(args: ArgsOs, stdout: &mut impl Write) -> Result<()> {
     let (mut columns, mut rows) = terminal::size()?;
     let starting_point = StartingPoint::new(args.starting_point)?;
     let mut query = args.query;
-    let mut paths = find_paths(&starting_point, &query, rows - 1)?;
+    let mut paths = find_paths(&starting_point, &query, paths_rows(rows))?;
     let mut selection: u16 = 0;
     let mut state = State::QueryChanged;
     initialize_terminal(stdout)?;
@@ -93,7 +93,7 @@ pub fn entrypoint(args: ArgsOs, stdout: &mut impl Write) -> Result<()> {
                 }
                 state = State::SelectionChanged;
             } else if ev == Event::Key(KeyCode::Down.into()) {
-                if selection < (rows - 1) {
+                if selection < paths_rows(rows) - 1 {
                     selection += 1;
                 }
                 state = State::SelectionChanged;
@@ -107,7 +107,7 @@ pub fn entrypoint(args: ArgsOs, stdout: &mut impl Write) -> Result<()> {
                 state = State::PathsChanged;
             }
         } else if let State::QueryChanged = state {
-            paths = find_paths(&starting_point, &query, rows - 1)?;
+            paths = find_paths(&starting_point, &query, paths_rows(rows))?;
             state = State::PathsChanged;
             selection = 0;
         }
@@ -128,6 +128,11 @@ enum State<'a> {
     PathsChanged,
     SelectionChanged,
     Invoke(&'a MatchedPath),
+}
+
+fn paths_rows(row: u16) -> u16 {
+    // TODO: raise an error when the number of rows is too small.
+    row - 2
 }
 
 fn print_and_flush(buffer: &mut impl Write, content: &str) -> io::Result<()> {
