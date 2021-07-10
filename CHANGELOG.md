@@ -1,5 +1,13 @@
 # Changelog
 
+## [Unreleased](https://github.com/yykamei/thwack/tree/HEAD)
+
+[Full Changelog](https://github.com/yykamei/thwack/compare/v0.2.2...HEAD)
+
+**Implemented enhancements:**
+
+- Allow to move selections with Ctrl-p and Ctrl-n [\#120](https://github.com/yykamei/thwack/pull/120) ([yykamei](https://github.com/yykamei))
+
 ## [v0.2.2](https://github.com/yykamei/thwack/tree/v0.2.2) (2021-07-10)
 
 [Full Changelog](https://github.com/yykamei/thwack/compare/v0.2.1...v0.2.2)
