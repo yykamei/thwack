@@ -67,19 +67,11 @@ pub fn entrypoint(args: ArgsOs, stdout: &mut impl Write) -> Result<()> {
 
         if event::poll(Duration::from_millis(300))? {
             let ev = event::read()?;
-            if ev
-                == Event::Key(KeyEvent {
-                    code: KeyCode::Char('c'),
-                    modifiers: KeyModifiers::CONTROL,
-                })
-                || ev == Event::Key(KeyCode::Esc.into())
-            {
-                // CTRL-C does not send SIGINT even on UNIX/Linux because it's in Raw mode.
-                // Also, we handle Esc as the same.
+            if should_just_exit(&ev) {
                 break;
             } else if let Event::Key(KeyEvent {
                 code: KeyCode::Char(c),
-                modifiers: _,
+                modifiers: KeyModifiers::NONE | KeyModifiers::SHIFT,
             }) = ev
             {
                 query.push(c);
@@ -87,12 +79,12 @@ pub fn entrypoint(args: ArgsOs, stdout: &mut impl Write) -> Result<()> {
             } else if ev == Event::Key(KeyCode::Backspace.into()) {
                 query.pop();
                 state = State::QueryChanged;
-            } else if ev == Event::Key(KeyCode::Up.into()) {
+            } else if should_move_up(&ev) {
                 if selection > 0 {
                     selection -= 1;
                 }
                 state = State::SelectionChanged;
-            } else if ev == Event::Key(KeyCode::Down.into()) {
+            } else if should_move_down(&ev) {
                 if selection < paths_rows(rows) - 1 {
                     selection += 1;
                 }
@@ -133,6 +125,33 @@ enum State<'a> {
 fn paths_rows(row: u16) -> u16 {
     // TODO: raise an error when the number of rows is too small.
     row - 1
+}
+
+fn should_just_exit(ev: &Event) -> bool {
+    // CTRL-C does not send SIGINT even on UNIX/Linux because it's in Raw mode.
+    // Also, we handle Esc as the same.
+    ev == &Event::Key(KeyEvent {
+        code: KeyCode::Char('c'),
+        modifiers: KeyModifiers::CONTROL,
+    }) || ev == &Event::Key(KeyCode::Esc.into())
+}
+
+fn should_move_up(ev: &Event) -> bool {
+    ev == &Event::Key(KeyCode::Up.into())
+        || ev
+            == &Event::Key(KeyEvent {
+                code: KeyCode::Char('p'),
+                modifiers: KeyModifiers::CONTROL,
+            })
+}
+
+fn should_move_down(ev: &Event) -> bool {
+    ev == &Event::Key(KeyCode::Down.into())
+        || ev
+            == &Event::Key(KeyEvent {
+                code: KeyCode::Char('n'),
+                modifiers: KeyModifiers::CONTROL,
+            })
 }
 
 fn print_and_flush(buffer: &mut impl Write, content: &str) -> io::Result<()> {
