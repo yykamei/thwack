@@ -4,6 +4,10 @@
 
 [Full Changelog](https://github.com/yykamei/thwack/compare/v0.2.1...HEAD)
 
+**Fixed bugs:**
+
+- Fix the selection disappearance at KeyCode::Down [\#118](https://github.com/yykamei/thwack/pull/118) ([yykamei](https://github.com/yykamei))
+
 **Merged pull requests:**
 
 - Bump libc from 0.2.97 to 0.2.98 [\#116](https://github.com/yykamei/thwack/pull/116) ([dependabot[bot]](https://github.com/apps/dependabot))
