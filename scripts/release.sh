@@ -20,7 +20,7 @@ while IFS="" read -r line; do
 done < CHANGELOG.md
 
 cargo publish --dry-run --allow-dirty
-cargo package --list
+cargo package --list --allow-dirty
 gh release list
 cat tmp/notes.txt
 
