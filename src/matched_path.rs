@@ -338,14 +338,14 @@ mod tests {
     #[test]
     fn returns_absolute_chunks() {
         assert_eq!(
-            new("abc.txt", "/", "/abc/abc/abc.txt").absolute_chunks(30),
+            new("foo.txt", "/", "/foo/abc/foo.txt").absolute_chunks(30),
             vec![
                 Chunk {
-                    value: String::from("/abc/abc/"),
+                    value: String::from("/foo/abc/"),
                     matched: false,
                 },
                 Chunk {
-                    value: String::from("abc.txt"),
+                    value: String::from("foo.txt"),
                     matched: true,
                 },
             ],
@@ -370,8 +370,8 @@ mod tests {
         assert_eq!(
             new(
                 "tem",
-                "C:\\Documents",
-                "C:\\Documents\\Newsletters\\Summer2018.pdf"
+                "C:\\Downloads",
+                "C:\\Downloads\\Newsletters\\Summer2018.pdf"
             )
             .absolute_chunks(28),
             vec![
@@ -398,10 +398,10 @@ mod tests {
             ],
         );
         assert_eq!(
-            new("foo☕t", "\\Folder\\", "\\Folder\\foo\\bar\\☕.txt").absolute_chunks(30),
+            new("foo🍦t", "\\FF\\", "\\FF\\foo\\bar\\🍦.txt").absolute_chunks(50),
             vec![
                 Chunk {
-                    value: String::from("\\Folder\\"),
+                    value: String::from("\\FF\\"),
                     matched: false,
                 },
                 Chunk {
@@ -413,7 +413,7 @@ mod tests {
                     matched: false,
                 },
                 Chunk {
-                    value: String::from("☕"),
+                    value: String::from("🍦"),
                     matched: true,
                 },
                 Chunk {
@@ -427,10 +427,10 @@ mod tests {
             ],
         );
         assert_eq!(
-            new("a̐éö̲", "/", "/abc/Aa̐Béö̲.txt").absolute_chunks(30),
+            new("a̐éö̲", "/", "/☕/Aa̐Béö̲.txt").absolute_chunks(30),
             vec![
                 Chunk {
-                    value: String::from("/abc/A"),
+                    value: String::from("/☕/A"),
                     matched: false,
                 },
                 Chunk {
@@ -452,7 +452,7 @@ mod tests {
             ],
         );
         assert_eq!(
-            new("☕.txt", "/", "/abc/☕/abc/☕.txt").absolute_chunks(15),
+            new("☕.txt", "/", "/☕/☕/abc/☕.txt").absolute_chunks(15),
             vec![
                 Chunk {
                     value: String::from(".../abc/"),
@@ -465,21 +465,29 @@ mod tests {
             ],
         );
         assert_eq!(
-            new("👩‍🔬☕", "C:\\", "C:\\Documents\\👩‍🔬\\🦑\\abcde\\☕🌍.txt").absolute_chunks(24),
+            new("👩‍🔬🗑", "C:\\", "C:\\Documents\\👩‍🔬\\🦑\\abcde\\🗑🌍.txt").absolute_chunks(24),
             vec![
                 Chunk {
-                    value: String::from("...\\🦑\\abcde\\"),
-                    matched: false,
+                    value: String::from("..."),
+                    matched: false
                 },
                 Chunk {
-                    value: String::from("☕"),
-                    matched: true,
+                    value: String::from("👩‍🔬"),
+                    matched: true
+                },
+                Chunk {
+                    value: String::from("\\🦑\\abcde\\"),
+                    matched: false
+                },
+                Chunk {
+                    value: String::from("🗑"),
+                    matched: true
                 },
                 Chunk {
                     value: String::from("🌍.txt"),
-                    matched: false,
-                },
-            ],
+                    matched: false
+                }
+            ]
         );
     }
 
