@@ -189,7 +189,7 @@ fn output_on_terminal(
         queue!(stdout, style::Print(prefix))?;
 
         let max_columns: usize = max_columns as usize - 2; // The prefix "> " requires 2 columns.
-        for chunk in path.chunks(max_columns) {
+        for chunk in path.relative_chunks(max_columns) {
             if chunk.matched() {
                 queue!(
                     stdout,

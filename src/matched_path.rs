@@ -1,7 +1,6 @@
 use std::cmp::Ordering;
 use std::collections::VecDeque;
 use std::fmt::{self, Display, Formatter};
-use std::ops::Range;
 
 use unicode_segmentation::UnicodeSegmentation;
 use unicode_width::UnicodeWidthStr;
@@ -21,14 +20,16 @@ pub(crate) struct MatchedPath {
     /// *depth* is the number of path separator.
     depth: usize,
 
-    /// *positions* is a vector containing the matched indicies of *relative*.
-    positions: Vec<usize>,
+    /// *absolute_positions* is a vector containing the matched indicies of *absolute*.
+    absolute_positions: Vec<usize>,
+
+    /// *relative_positions* is a vector containing the matched indicies of *relative*.
+    relative_positions: Vec<usize>,
 }
 
 #[derive(Debug, Eq, PartialEq)]
 pub(crate) struct Chunk {
     value: String,
-    range: Range<usize>,
     matched: bool,
 }
 
@@ -37,12 +38,14 @@ impl MatchedPath {
     pub(crate) fn new(query: &str, starting_point: &str, absolute: &str) -> Option<Self> {
         let relative = relative(starting_point, absolute);
         let depth = depth_from(relative);
-        let positions = positions_from(query, relative)?;
+        let absolute_positions = positions_from(query, absolute)?;
+        let relative_positions = positions_from(query, relative)?;
         Some(Self {
             absolute: absolute.to_string(),
             relative: relative.to_string(),
             depth,
-            positions,
+            absolute_positions,
+            relative_positions,
         })
     }
 
@@ -51,22 +54,20 @@ impl MatchedPath {
         &self.absolute
     }
 
-    /// Returns the slice of Chunks. This generates reduced chunks if `Self::width` exceeds the `max_width`.
-    pub(crate) fn chunks(&self, max_width: usize) -> Vec<Chunk> {
-        let width = self.width();
-        let mut start = 0;
-        if width > max_width {
-            let max_width = max_width - 3; // NOTE: `...` requires 3 columns.
-            let mut accum = 0;
-            for (idx, s) in self.relative.grapheme_indices(true).rev() {
-                accum += s.width_cjk();
-                if accum > max_width {
-                    break;
-                }
-                start = idx;
-            }
-        }
-        chunks_from(&self.relative[start..], &self.positions[..], start)
+    /// Returns the truncated absolute path.
+    pub(crate) fn truncated_absolute(&self, max_width: usize) -> String {
+        let chunks = self.absolute_chunks(max_width);
+        chunks.iter().map(|c| format!("{}", c)).collect()
+    }
+
+    /// Returns the chunks of `absolute`. This generates reduced chunks if the width of the `absolute` exceeds the `max_width`.
+    pub(crate) fn absolute_chunks(&self, max_width: usize) -> Vec<Chunk> {
+        chunks_from(&self.absolute, &self.absolute_positions[..], max_width)
+    }
+
+    /// Returns the chunks of `relative`. This generates reduced chunks if the width of the `absolute` exceeds the `max_width`.
+    pub(crate) fn relative_chunks(&self, max_width: usize) -> Vec<Chunk> {
+        chunks_from(&self.relative, &self.relative_positions[..], max_width)
     }
 
     /// Calculate the total distance between each position.
@@ -74,7 +75,7 @@ impl MatchedPath {
     /// If the `positions` is `vec![1, 4, 5]`, then the distance will be `4`.
     /// The least distance is `length of query - 1`.
     fn distance(&self) -> usize {
-        let mut iter = self.positions.iter().peekable();
+        let mut iter = self.relative_positions.iter().peekable();
         let mut total = 0;
         while let Some(pos) = iter.next() {
             if let Some(next) = iter.peek() {
@@ -82,11 +83,6 @@ impl MatchedPath {
             }
         }
         total
-    }
-
-    /// Returns the width in terminal columns
-    fn width(&self) -> usize {
-        self.relative.width_cjk()
     }
 }
 
@@ -155,17 +151,17 @@ fn depth_from(relative: &str) -> usize {
 
 // TODO: This should change the algorithm of calculation by `query`.
 //       For example, the `query` is `"src/"` (suffixed with `'/'`), a user is expecting items that start with `"src/"`.
-/// Calculates matched positions of `relative` with `query`.
-/// This searches for characters of `query` in `relative` from the right one by one.
-fn positions_from(query: &str, relative: &str) -> Option<Vec<usize>> {
+/// Calculates matched positions of `path` with `query`.
+/// This searches for characters of `query` in `path` from the right one by one.
+fn positions_from(query: &str, path: &str) -> Option<Vec<usize>> {
     let mut positions: VecDeque<usize> = VecDeque::with_capacity(query.len());
     for q in normalize_query(query).graphemes(true).rev() {
         let end = if let Some(pos) = positions.front() {
             *pos
         } else {
-            relative.len()
+            path.len()
         };
-        let target = &relative[..end];
+        let target = &path[..end];
         let pos = target
             .grapheme_indices(true)
             .rfind(|(_idx, s)| q.eq_ignore_ascii_case(s))
@@ -175,37 +171,50 @@ fn positions_from(query: &str, relative: &str) -> Option<Vec<usize>> {
     Some(positions.into())
 }
 
-fn chunks_from(relative: &str, positions: &[usize], offset: usize) -> Vec<Chunk> {
+/// Returns the width in terminal columns
+fn width_of(path: &str) -> usize {
+    path.width_cjk()
+}
+
+fn chunks_from(path: &str, positions: &[usize], max_width: usize) -> Vec<Chunk> {
+    let mut offset = 0;
+    if width_of(path) > max_width {
+        let max_width = max_width - 3; // NOTE: `...` requires 3 columns.
+        let mut accum = 0;
+        for (idx, s) in path.grapheme_indices(true).rev() {
+            accum += s.width_cjk();
+            if accum > max_width {
+                break;
+            }
+            offset = idx;
+        }
+    }
+
     // NOTE: Allocate more capacity than the actual number of chunks.
-    let mut chunks: Vec<Chunk> = Vec::with_capacity(relative.len() / 2);
+    let mut chunks: Vec<Chunk> = Vec::with_capacity(path.len() / 2);
     if offset > 0 {
         chunks.push(Chunk {
             value: String::from("..."),
-            range: (0..3),
             matched: false,
         })
     }
-    let mut grapheme_indices = relative.grapheme_indices(true).peekable();
+    let mut grapheme_indices = path.grapheme_indices(true);
     while let Some((idx, s)) = grapheme_indices.next() {
-        let next_idx = grapheme_indices
-            .peek()
-            .map(|(i, _)| *i)
-            .unwrap_or_else(|| relative.len());
-        let matched = positions.contains(&(idx + offset));
+        if idx < offset {
+            continue;
+        }
+        let matched = positions.contains(&idx);
         match chunks.last_mut() {
             Some(chunk) if chunk.matched == matched => {
                 chunk.value.push_str(s);
-                chunk.range.end = next_idx;
             }
             Some(_) => chunks.push(Chunk {
                 value: s.to_string(),
                 matched,
-                range: (idx..next_idx),
             }),
             None => chunks.push(Chunk {
                 value: s.to_string(),
                 matched,
-                range: (idx..next_idx),
             }),
         }
     }
@@ -234,7 +243,7 @@ mod tests {
 
     fn assert_chunks_eq_relative(path: MatchedPath, max_width: usize) {
         let chunks: String = path
-            .chunks(max_width)
+            .relative_chunks(max_width)
             .iter()
             .map(|c| c.value.clone())
             .collect::<Vec<String>>()
@@ -249,7 +258,8 @@ mod tests {
             MatchedPath {
                 absolute: String::from("/abc/abc/abc.txt"),
                 relative: String::from("abc/abc/abc.txt"),
-                positions: vec![8, 9, 10, 11, 12, 13, 14],
+                absolute_positions: vec![9, 10, 11, 12, 13, 14, 15],
+                relative_positions: vec![8, 9, 10, 11, 12, 13, 14],
                 depth: 2,
             },
         );
@@ -258,7 +268,8 @@ mod tests {
             MatchedPath {
                 absolute: String::from("/abc/abc/abc.txt"),
                 relative: String::from("abc/abc/abc.txt"),
-                positions: vec![8, 9, 10],
+                absolute_positions: vec![9, 10, 11],
+                relative_positions: vec![8, 9, 10],
                 depth: 2,
             },
         );
@@ -271,7 +282,8 @@ mod tests {
             MatchedPath {
                 absolute: String::from("C:\\Documents\\Newsletters\\Summer2018.pdf"),
                 relative: String::from("Newsletters\\Summer2018.pdf"),
-                positions: vec![7, 8, 15],
+                absolute_positions: vec![20, 21, 28],
+                relative_positions: vec![7, 8, 15],
                 depth: 1,
             },
         );
@@ -280,7 +292,8 @@ mod tests {
             MatchedPath {
                 absolute: String::from("\\Folder\\foo\\bar\\☕.txt"),
                 relative: String::from("foo\\bar\\☕.txt"),
-                positions: vec![0, 1, 2, 8, 14],
+                absolute_positions: vec![8, 9, 10, 16, 22],
+                relative_positions: vec![0, 1, 2, 8, 14],
                 depth: 2,
             },
         );
@@ -289,7 +302,8 @@ mod tests {
             MatchedPath {
                 absolute: String::from("/abc/Aa̐Béö̲.txt"),
                 relative: String::from("abc/Aa̐Béö̲.txt"),
-                positions: vec![5, 9, 12],
+                absolute_positions: vec![6, 10, 13],
+                relative_positions: vec![5, 9, 12],
                 depth: 1,
             },
         );
@@ -310,39 +324,46 @@ mod tests {
     }
 
     #[test]
-    fn returns_chunks() {
+    fn returns_truncated_absolute() {
+        let path = new("abc", "/home", "/home/☕/special/test/bar/🚞/abc.txt");
         assert_eq!(
-            new("abc.txt", "/", "/abc/abc/abc.txt").chunks(30),
+            path.truncated_absolute(100),
+            "/home/☕/special/test/bar/🚞/abc.txt"
+        );
+
+        let path = new("abc", "/home", "/home/☕/special/test/bar/🚞/abc.txt");
+        assert_eq!(path.truncated_absolute(20), "...st/bar/🚞/abc.txt");
+    }
+
+    #[test]
+    fn returns_absolute_chunks() {
+        assert_eq!(
+            new("abc.txt", "/", "/abc/abc/abc.txt").absolute_chunks(30),
             vec![
                 Chunk {
-                    value: String::from("abc/abc/"),
+                    value: String::from("/abc/abc/"),
                     matched: false,
-                    range: (0..8),
                 },
                 Chunk {
                     value: String::from("abc.txt"),
                     matched: true,
-                    range: (8..15),
                 },
             ],
         );
         assert_eq!(
-            new("abc", "/", "/abc/abc/abc.txt").chunks(30),
+            new("abc", "/", "/abc/abc/abc.txt").absolute_chunks(30),
             vec![
                 Chunk {
-                    value: String::from("abc/abc/"),
+                    value: String::from("/abc/abc/"),
                     matched: false,
-                    range: (0..8),
                 },
                 Chunk {
                     value: String::from("abc"),
                     matched: true,
-                    range: (8..11),
                 },
                 Chunk {
                     value: String::from(".txt"),
                     matched: false,
-                    range: (11..15),
                 },
             ],
         );
@@ -352,127 +373,255 @@ mod tests {
                 "C:\\Documents",
                 "C:\\Documents\\Newsletters\\Summer2018.pdf"
             )
-            .chunks(30),
+            .absolute_chunks(28),
             vec![
                 Chunk {
-                    value: String::from("Newslet"),
+                    value: String::from("...ewslet"),
                     matched: false,
-                    range: (0..7),
                 },
                 Chunk {
                     value: String::from("te"),
                     matched: true,
-                    range: (7..9),
                 },
                 Chunk {
                     value: String::from("rs\\Sum"),
                     matched: false,
-                    range: (9..15),
                 },
                 Chunk {
                     value: String::from("m"),
                     matched: true,
-                    range: (15..16),
                 },
                 Chunk {
                     value: String::from("er2018.pdf"),
                     matched: false,
-                    range: (16..26),
                 },
             ],
         );
         assert_eq!(
-            new("foo☕t", "\\Folder\\", "\\Folder\\foo\\bar\\☕.txt").chunks(30),
+            new("foo☕t", "\\Folder\\", "\\Folder\\foo\\bar\\☕.txt").absolute_chunks(30),
             vec![
+                Chunk {
+                    value: String::from("\\Folder\\"),
+                    matched: false,
+                },
                 Chunk {
                     value: String::from("foo"),
                     matched: true,
-                    range: (0..3),
                 },
                 Chunk {
                     value: String::from("\\bar\\"),
                     matched: false,
-                    range: (3..8),
                 },
                 Chunk {
                     value: String::from("☕"),
                     matched: true,
-                    range: (8..11),
                 },
                 Chunk {
                     value: String::from(".tx"),
                     matched: false,
-                    range: (11..14),
                 },
                 Chunk {
                     value: String::from("t"),
                     matched: true,
-                    range: (14..15),
                 },
             ],
         );
         assert_eq!(
-            new("a̐éö̲", "/", "/abc/Aa̐Béö̲.txt").chunks(30),
+            new("a̐éö̲", "/", "/abc/Aa̐Béö̲.txt").absolute_chunks(30),
             vec![
                 Chunk {
-                    value: String::from("abc/A"),
+                    value: String::from("/abc/A"),
                     matched: false,
-                    range: (0..5),
                 },
                 Chunk {
                     value: String::from("a̐"),
                     matched: true,
-                    range: (5..8),
                 },
                 Chunk {
                     value: String::from("B"),
                     matched: false,
-                    range: (8..9),
                 },
                 Chunk {
                     value: String::from("éö̲"),
                     matched: true,
-                    range: (9..17),
                 },
                 Chunk {
                     value: String::from(".txt"),
                     matched: false,
-                    range: (17..21),
                 },
             ],
         );
         assert_eq!(
-            new("☕.txt", "/", "/abc/☕/abc/☕.txt").chunks(15),
+            new("☕.txt", "/", "/abc/☕/abc/☕.txt").absolute_chunks(15),
             vec![
                 Chunk {
                     value: String::from(".../abc/"),
                     matched: false,
-                    range: (0..5),
                 },
                 Chunk {
                     value: String::from("☕.txt"),
                     matched: true,
-                    range: (5..12),
                 },
             ],
         );
         assert_eq!(
-            new("👩‍🔬☕", "C:\\", "C:\\Documents\\👩‍🔬\\🦑\\abcde\\☕🌍.txt").chunks(24),
+            new("👩‍🔬☕", "C:\\", "C:\\Documents\\👩‍🔬\\🦑\\abcde\\☕🌍.txt").absolute_chunks(24),
             vec![
                 Chunk {
                     value: String::from("...\\🦑\\abcde\\"),
                     matched: false,
-                    range: (0..12),
                 },
                 Chunk {
                     value: String::from("☕"),
                     matched: true,
-                    range: (12..15),
                 },
                 Chunk {
                     value: String::from("🌍.txt"),
                     matched: false,
-                    range: (15..23),
+                },
+            ],
+        );
+    }
+
+    #[test]
+    fn returns_relative_chunks() {
+        assert_eq!(
+            new("abc.txt", "/", "/abc/abc/abc.txt").relative_chunks(30),
+            vec![
+                Chunk {
+                    value: String::from("abc/abc/"),
+                    matched: false,
+                },
+                Chunk {
+                    value: String::from("abc.txt"),
+                    matched: true,
+                },
+            ],
+        );
+        assert_eq!(
+            new("abc", "/", "/abc/abc/abc.txt").relative_chunks(30),
+            vec![
+                Chunk {
+                    value: String::from("abc/abc/"),
+                    matched: false,
+                },
+                Chunk {
+                    value: String::from("abc"),
+                    matched: true,
+                },
+                Chunk {
+                    value: String::from(".txt"),
+                    matched: false,
+                },
+            ],
+        );
+        assert_eq!(
+            new(
+                "tem",
+                "C:\\Documents",
+                "C:\\Documents\\Newsletters\\Summer2018.pdf"
+            )
+            .relative_chunks(30),
+            vec![
+                Chunk {
+                    value: String::from("Newslet"),
+                    matched: false,
+                },
+                Chunk {
+                    value: String::from("te"),
+                    matched: true,
+                },
+                Chunk {
+                    value: String::from("rs\\Sum"),
+                    matched: false,
+                },
+                Chunk {
+                    value: String::from("m"),
+                    matched: true,
+                },
+                Chunk {
+                    value: String::from("er2018.pdf"),
+                    matched: false,
+                },
+            ],
+        );
+        assert_eq!(
+            new("foo☕t", "\\Folder\\", "\\Folder\\foo\\bar\\☕.txt").relative_chunks(30),
+            vec![
+                Chunk {
+                    value: String::from("foo"),
+                    matched: true,
+                },
+                Chunk {
+                    value: String::from("\\bar\\"),
+                    matched: false,
+                },
+                Chunk {
+                    value: String::from("☕"),
+                    matched: true,
+                },
+                Chunk {
+                    value: String::from(".tx"),
+                    matched: false,
+                },
+                Chunk {
+                    value: String::from("t"),
+                    matched: true,
+                },
+            ],
+        );
+        assert_eq!(
+            new("a̐éö̲", "/", "/abc/Aa̐Béö̲.txt").relative_chunks(30),
+            vec![
+                Chunk {
+                    value: String::from("abc/A"),
+                    matched: false,
+                },
+                Chunk {
+                    value: String::from("a̐"),
+                    matched: true,
+                },
+                Chunk {
+                    value: String::from("B"),
+                    matched: false,
+                },
+                Chunk {
+                    value: String::from("éö̲"),
+                    matched: true,
+                },
+                Chunk {
+                    value: String::from(".txt"),
+                    matched: false,
+                },
+            ],
+        );
+        assert_eq!(
+            new("☕.txt", "/", "/abc/☕/abc/☕.txt").relative_chunks(15),
+            vec![
+                Chunk {
+                    value: String::from(".../abc/"),
+                    matched: false,
+                },
+                Chunk {
+                    value: String::from("☕.txt"),
+                    matched: true,
+                },
+            ],
+        );
+        assert_eq!(
+            new("👩‍🔬☕", "C:\\", "C:\\Documents\\👩‍🔬\\🦑\\abcde\\☕🌍.txt").relative_chunks(24),
+            vec![
+                Chunk {
+                    value: String::from("...\\🦑\\abcde\\"),
+                    matched: false,
+                },
+                Chunk {
+                    value: String::from("☕"),
+                    matched: true,
+                },
+                Chunk {
+                    value: String::from("🌍.txt"),
+                    matched: false,
                 },
             ],
         );
