@@ -12,6 +12,10 @@
 
 - Fix Resize event handling to update paths [\#123](https://github.com/yykamei/thwack/pull/123) ([yykamei](https://github.com/yykamei))
 
+**Merged pull requests:**
+
+- Refactor MatchedPath to return chunks of absolute [\#125](https://github.com/yykamei/thwack/pull/125) ([yykamei](https://github.com/yykamei))
+
 ## [v0.2.2](https://github.com/yykamei/thwack/tree/v0.2.2) (2021-07-10)
 
 [Full Changelog](https://github.com/yykamei/thwack/compare/v0.2.1...v0.2.2)
