@@ -351,116 +351,45 @@ mod tests {
             ],
         );
         assert_eq!(
-            new("abc", "/", "/abc/abc/abc.txt").absolute_chunks(30),
+            new("abc.txt", "/", "/morning/morning/abc.txt").absolute_chunks(30),
             vec![
                 Chunk {
-                    value: String::from("/abc/abc/"),
+                    value: String::from("/morning/morning/"),
                     matched: false,
                 },
                 Chunk {
-                    value: String::from("abc"),
+                    value: String::from("abc.txt"),
                     matched: true,
-                },
-                Chunk {
-                    value: String::from(".txt"),
-                    matched: false,
                 },
             ],
         );
         assert_eq!(
             new(
-                "tem",
+                "gs",
                 "C:\\Downloads",
-                "C:\\Downloads\\Newsletters\\Summer2018.pdf"
+                "C:\\Downloads\\Final\\Porting\\Special2019.pdf"
             )
             .absolute_chunks(28),
             vec![
                 Chunk {
-                    value: String::from("...ewslet"),
+                    value: String::from("...l\\Portin"),
                     matched: false,
                 },
                 Chunk {
-                    value: String::from("te"),
+                    value: String::from("g"),
                     matched: true,
                 },
                 Chunk {
-                    value: String::from("rs\\Sum"),
+                    value: String::from("\\"),
                     matched: false,
                 },
                 Chunk {
-                    value: String::from("m"),
+                    value: String::from("S"),
                     matched: true,
                 },
                 Chunk {
-                    value: String::from("er2018.pdf"),
+                    value: String::from("pecial2019.pdf"),
                     matched: false,
-                },
-            ],
-        );
-        assert_eq!(
-            new("foo🍦t", "\\FF\\", "\\FF\\foo\\bar\\🍦.txt").absolute_chunks(50),
-            vec![
-                Chunk {
-                    value: String::from("\\FF\\"),
-                    matched: false,
-                },
-                Chunk {
-                    value: String::from("foo"),
-                    matched: true,
-                },
-                Chunk {
-                    value: String::from("\\bar\\"),
-                    matched: false,
-                },
-                Chunk {
-                    value: String::from("🍦"),
-                    matched: true,
-                },
-                Chunk {
-                    value: String::from(".tx"),
-                    matched: false,
-                },
-                Chunk {
-                    value: String::from("t"),
-                    matched: true,
-                },
-            ],
-        );
-        assert_eq!(
-            new("a̐éö̲", "/", "/☕/Aa̐Béö̲.txt").absolute_chunks(30),
-            vec![
-                Chunk {
-                    value: String::from("/☕/A"),
-                    matched: false,
-                },
-                Chunk {
-                    value: String::from("a̐"),
-                    matched: true,
-                },
-                Chunk {
-                    value: String::from("B"),
-                    matched: false,
-                },
-                Chunk {
-                    value: String::from("éö̲"),
-                    matched: true,
-                },
-                Chunk {
-                    value: String::from(".txt"),
-                    matched: false,
-                },
-            ],
-        );
-        assert_eq!(
-            new("☕.txt", "/", "/☕/☕/abc/☕.txt").absolute_chunks(15),
-            vec![
-                Chunk {
-                    value: String::from(".../abc/"),
-                    matched: false,
-                },
-                Chunk {
-                    value: String::from("☕.txt"),
-                    matched: true,
                 },
             ],
         );
