@@ -6,6 +6,7 @@
 
 **Implemented enhancements:**
 
+- Show help screen like nano\(1\) and let users enable/disable it [\#20](https://github.com/yykamei/thwack/issues/20)
 - Allow to move selections with Ctrl-p and Ctrl-n [\#120](https://github.com/yykamei/thwack/pull/120) ([yykamei](https://github.com/yykamei))
 
 **Fixed bugs:**
