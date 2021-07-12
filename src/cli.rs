@@ -96,6 +96,11 @@ pub fn entrypoint(args: ArgsOs, stdout: &mut impl Write) -> Result<()> {
             } else if let Event::Resize(c, r) = ev {
                 columns = c;
                 rows = r;
+                selection = if selection > r {
+                    paths_rows(r) - 1
+                } else {
+                    selection
+                };
                 paths = find_paths(&starting_point, &query, paths_rows(rows))?;
                 state = State::PathsChanged;
             }
