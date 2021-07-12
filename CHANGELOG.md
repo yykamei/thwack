@@ -10,6 +10,7 @@
 
 **Fixed bugs:**
 
+- Change selection when the resize event happens [\#128](https://github.com/yykamei/thwack/pull/128) ([yykamei](https://github.com/yykamei))
 - Fix Resize event handling to update paths [\#123](https://github.com/yykamei/thwack/pull/123) ([yykamei](https://github.com/yykamei))
 
 **Merged pull requests:**
