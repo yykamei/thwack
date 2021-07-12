@@ -52,14 +52,14 @@ pub fn entrypoint(args: ArgsOs, stdout: &mut impl Write) -> Result<()> {
     loop {
         match state {
             State::QueryChanged => {
-                output_on_terminal(stdout, &query, &paths[..], selection, columns)?
+                output_on_terminal(stdout, &query, &paths[..], selection, columns, rows)?
             }
             State::PathsChanged => {
-                output_on_terminal(stdout, &query, &paths[..], selection, columns)?;
+                output_on_terminal(stdout, &query, &paths[..], selection, columns, rows)?;
                 state = State::Ready;
             }
             State::SelectionChanged => {
-                output_on_terminal(stdout, &query, &paths[..], selection, columns)?;
+                output_on_terminal(stdout, &query, &paths[..], selection, columns, rows)?;
                 state = State::Ready;
             }
             _ => (),
@@ -130,7 +130,7 @@ enum State<'a> {
 
 fn paths_rows(row: u16) -> u16 {
     // TODO: raise an error when the number of rows is too small.
-    row - 1
+    row - 3
 }
 
 fn should_just_exit(ev: &Event) -> bool {
@@ -178,6 +178,7 @@ fn output_on_terminal(
     paths: &[MatchedPath],
     selection: u16,
     max_columns: u16,
+    max_rows: u16,
 ) -> Result<()> {
     queue!(
         stdout,
@@ -188,13 +189,20 @@ fn output_on_terminal(
         cursor::SavePosition,
         cursor::MoveToNextLine(1),
     )?;
+
+    let max_path_width: usize = max_columns as usize - 2; // The prefix "> " requires 2 columns.
+    let mut selected: Option<&MatchedPath> = None;
     for (idx, path) in paths.iter().enumerate() {
         let idx = idx as u16;
-        let prefix = if idx == selection { "> " } else { "  " };
+        let prefix = if idx == selection {
+            selected = Some(path);
+            "> "
+        } else {
+            "  "
+        };
         queue!(stdout, style::Print(prefix))?;
 
-        let max_columns: usize = max_columns as usize - 2; // The prefix "> " requires 2 columns.
-        for chunk in path.relative_chunks(max_columns) {
+        for chunk in path.relative_chunks(max_path_width) {
             if chunk.matched() {
                 queue!(
                     stdout,
@@ -208,8 +216,55 @@ fn output_on_terminal(
         }
         queue!(stdout, cursor::MoveToNextLine(1))?;
     }
+
+    queue!(stdout, cursor::MoveToRow(max_rows - 1))?;
+    let selected = &selected
+        .map(|s| s.truncated_absolute(max_columns as usize))
+        .unwrap_or_else(|| "No matching files found.".to_string());
+    status_line(stdout, max_columns as usize, selected)?;
+    help_line(stdout, max_columns as usize)?;
     queue!(stdout, cursor::RestorePosition)?;
     stdout.flush()?;
+    Ok(())
+}
+
+fn status_line(stdout: &mut impl Write, max_columns: usize, selected: &str) -> Result<()> {
+    queue!(
+        stdout,
+        style::SetAttribute(Attribute::Bold),
+        style::SetAttribute(Attribute::Reverse),
+        style::Print(format!("{:width$}", selected, width = max_columns)),
+        style::SetAttribute(Attribute::Reset),
+    )?;
+    Ok(())
+}
+
+fn help_line(stdout: &mut impl Write, max_columns: usize) -> Result<()> {
+    // TODO: This number is the same amount of columns occupied by this status line.
+    if max_columns < 58 {
+        return Ok(());
+    }
+    queue!(
+        stdout,
+        cursor::MoveToNextLine(1),
+        style::SetAttribute(Attribute::Bold),
+        style::Print(format!("<Up>/<Ctrl-p>:")),
+        style::SetAttribute(Attribute::Reset),
+        cursor::MoveRight(1),
+        style::Print(format!("Up")),
+        cursor::MoveRight(2),
+        style::SetAttribute(Attribute::Bold),
+        style::Print(format!("<Down>/<Ctrl-n>:")),
+        style::SetAttribute(Attribute::Reset),
+        cursor::MoveRight(1),
+        style::Print(format!("Down")),
+        cursor::MoveRight(2),
+        style::SetAttribute(Attribute::Bold),
+        style::Print(format!("<Enter>:")),
+        style::SetAttribute(Attribute::Reset),
+        cursor::MoveRight(1),
+        style::Print(format!("Execute")),
+    )?;
     Ok(())
 }
 
