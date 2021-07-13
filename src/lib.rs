@@ -1,3 +1,4 @@
+pub use args::HELP;
 pub use cli::{entrypoint, safe_exit};
 pub use error::{Error, ErrorKind, Result};
 

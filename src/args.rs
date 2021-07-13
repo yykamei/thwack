@@ -3,7 +3,7 @@ use std::ffi::OsString;
 use crate::error::{Error, Result};
 
 // TODO: --no-exec? might be required; users sometimes want to execute the file itself.
-pub(crate) const HELP: &str = "thwack
+pub const HELP: &str = "thwack
 Find a file and open it with an arbitrary command.
 
 USAGE:
