@@ -1,5 +1,13 @@
 # Changelog
 
+## [Unreleased](https://github.com/yykamei/thwack/tree/HEAD)
+
+[Full Changelog](https://github.com/yykamei/thwack/compare/v0.3.0...HEAD)
+
+**Merged pull requests:**
+
+- \[refactor\] Add show\_help.rs for integration tests [\#131](https://github.com/yykamei/thwack/pull/131) ([yykamei](https://github.com/yykamei))
+
 ## [v0.3.0](https://github.com/yykamei/thwack/tree/v0.3.0) (2021-07-12)
 
 [Full Changelog](https://github.com/yykamei/thwack/compare/v0.2.2...v0.3.0)
