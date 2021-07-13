@@ -1,5 +1,4 @@
-use std::env::ArgsOs;
-use std::ffi::CString;
+use std::ffi::{CString, OsString};
 use std::io::{self, Stderr, Stdout, Write};
 use std::os::raw::c_char;
 use std::process::exit;
@@ -27,7 +26,7 @@ pub fn safe_exit(code: i32, stdout: Stdout, stderr: Stderr) {
     exit(code)
 }
 
-pub fn entrypoint(args: ArgsOs, stdout: &mut impl Write) -> Result<()> {
+pub fn entrypoint<A: Iterator<Item = OsString>, W: Write>(args: A, stdout: &mut W) -> Result<()> {
     let args = Parser::new(args).parse()?;
     if args.help {
         print_and_flush(stdout, HELP)?;
@@ -166,7 +165,7 @@ fn print_and_flush(buffer: &mut impl Write, content: &str) -> io::Result<()> {
 }
 
 fn initialize_terminal(stdout: &mut impl Write) -> Result<()> {
-    queue!(stdout, terminal::EnterAlternateScreen, style::ResetColor,)?;
+    queue!(stdout, terminal::EnterAlternateScreen, style::ResetColor)?;
     stdout.flush()?;
     terminal::enable_raw_mode()?;
     Ok(())
