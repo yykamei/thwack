@@ -35,18 +35,26 @@ impl Write for Buffer {
         Ok(self.inner.len())
     }
 
-    fn write_all(&mut self, buf: &[u8]) -> Result<()> {
-        let _ = self.inner.extend(buf);
+    fn flush(&mut self) -> Result<()> {
         Ok(())
     }
 
-    fn flush(&mut self) -> Result<()> {
+    fn write_all(&mut self, buf: &[u8]) -> Result<()> {
+        let _ = self.inner.extend(buf);
         Ok(())
     }
 }
 
 impl From<&str> for Buffer {
     fn from(s: &str) -> Self {
+        Self {
+            inner: Vec::from(s.as_bytes()),
+        }
+    }
+}
+
+impl From<String> for Buffer {
+    fn from(s: String) -> Self {
         Self {
             inner: Vec::from(s.as_bytes()),
         }
