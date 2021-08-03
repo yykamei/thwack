@@ -6,6 +6,7 @@
 
 **Merged pull requests:**
 
+- \[refactor\] Add show\_version.rs to test --version [\#133](https://github.com/yykamei/thwack/pull/133) ([yykamei](https://github.com/yykamei))
 - \[refactor\] Add show\_help.rs for integration tests [\#131](https://github.com/yykamei/thwack/pull/131) ([yykamei](https://github.com/yykamei))
 
 ## [v0.3.0](https://github.com/yykamei/thwack/tree/v0.3.0) (2021-07-12)
