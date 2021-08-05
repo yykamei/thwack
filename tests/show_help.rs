@@ -1,5 +1,6 @@
 use std::ffi::OsString;
 
+use helper::MockTerminal;
 use thwack::{entrypoint, HELP};
 
 mod helper;
@@ -8,7 +9,7 @@ mod helper;
 fn show_help() {
     let args = args!["thwack", "--help"];
     let mut buffer = buf!();
-    let result = entrypoint(args, &mut buffer);
+    let result = entrypoint(args, &mut buffer, MockTerminal);
     assert!(result.is_ok());
     assert_eq!(buffer, buf!(HELP));
 }
@@ -17,7 +18,7 @@ fn show_help() {
 fn show_help_with_version() {
     let args = args!["thwack", "--help", "--version"];
     let mut buffer = buf!();
-    let result = entrypoint(args, &mut buffer);
+    let result = entrypoint(args, &mut buffer, MockTerminal);
     assert!(result.is_ok());
     assert_eq!(buffer, buf!(HELP));
 }
@@ -26,7 +27,7 @@ fn show_help_with_version() {
 fn show_help_with_query() {
     let args = args!["thwack", "--help", "--", "query"];
     let mut buffer = buf!();
-    let result = entrypoint(args, &mut buffer);
+    let result = entrypoint(args, &mut buffer, MockTerminal);
     assert!(result.is_ok());
     assert_eq!(buffer, buf!(HELP));
 }
@@ -35,7 +36,7 @@ fn show_help_with_query() {
 fn show_help_with_starting_point() {
     let args = args!["thwack", "--help", "--starting-point=/tmp"];
     let mut buffer = buf!();
-    let result = entrypoint(args, &mut buffer);
+    let result = entrypoint(args, &mut buffer, MockTerminal);
     assert!(result.is_ok());
     assert_eq!(buffer, buf!(HELP));
 }
