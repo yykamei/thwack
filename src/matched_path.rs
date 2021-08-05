@@ -198,8 +198,8 @@ fn chunks_from(path: &str, positions: &[usize], max_width: usize) -> Vec<Chunk> 
             matched: false,
         })
     }
-    let mut grapheme_indices = path.grapheme_indices(true);
-    while let Some((idx, s)) = grapheme_indices.next() {
+    let grapheme_indices = path.grapheme_indices(true);
+    for (idx, s) in grapheme_indices {
         if idx < offset {
             continue;
         }

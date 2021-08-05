@@ -10,7 +10,7 @@ use crossterm::{
     event::{self, Event, KeyCode, KeyEvent, KeyModifiers},
     execute, queue,
     style::{self, Attribute},
-    terminal::{self, ClearType},
+    terminal::{Clear, ClearType, EnterAlternateScreen, LeaveAlternateScreen},
 };
 
 use crate::args::{Parser, HELP};
@@ -18,6 +18,7 @@ use crate::error::Result;
 use crate::finder::Finder;
 use crate::matched_path::MatchedPath;
 use crate::starting_point::StartingPoint;
+use crate::terminal::Terminal;
 use crate::Error;
 
 pub fn safe_exit(code: i32, stdout: Stdout, stderr: Stderr) {
@@ -26,7 +27,11 @@ pub fn safe_exit(code: i32, stdout: Stdout, stderr: Stderr) {
     exit(code)
 }
 
-pub fn entrypoint<A: Iterator<Item = OsString>, W: Write>(args: A, stdout: &mut W) -> Result<()> {
+pub fn entrypoint<A: Iterator<Item = OsString>, W: Write>(
+    args: A,
+    stdout: &mut W,
+    terminal: impl Terminal,
+) -> Result<()> {
     let args = Parser::new(args).parse()?;
     if args.help {
         print_and_flush(stdout, HELP)?;
@@ -40,13 +45,13 @@ pub fn entrypoint<A: Iterator<Item = OsString>, W: Write>(args: A, stdout: &mut 
         return Ok(());
     }
 
-    let (mut columns, mut rows) = terminal::size()?;
+    let (mut columns, mut rows) = terminal.size()?;
     let starting_point = StartingPoint::new(args.starting_point)?;
     let mut query = args.query;
     let mut paths = find_paths(&starting_point, &query, paths_rows(rows))?;
     let mut selection: u16 = 0;
     let mut state = State::QueryChanged;
-    initialize_terminal(stdout)?;
+    initialize_terminal(stdout, &terminal)?;
 
     loop {
         match state {
@@ -90,7 +95,7 @@ pub fn entrypoint<A: Iterator<Item = OsString>, W: Write>(args: A, stdout: &mut 
                 state = State::SelectionChanged;
             } else if ev == Event::Key(KeyCode::Enter.into()) {
                 let path: &MatchedPath = paths.get(selection as usize).unwrap(); // TODO: Do not use unwrap()
-                state = State::Invoke(&path);
+                state = State::Invoke(path);
                 break;
             } else if let Event::Resize(c, r) = ev {
                 columns = c;
@@ -110,8 +115,8 @@ pub fn entrypoint<A: Iterator<Item = OsString>, W: Write>(args: A, stdout: &mut 
         }
     }
 
-    execute!(stdout, terminal::LeaveAlternateScreen)?;
-    terminal::disable_raw_mode()?;
+    execute!(stdout, LeaveAlternateScreen)?;
+    terminal.disable_raw_mode()?;
 
     if let State::Invoke(path) = state {
         invoke(&args.exec, path.absolute())?;
@@ -164,10 +169,10 @@ fn print_and_flush(buffer: &mut impl Write, content: &str) -> io::Result<()> {
     buffer.flush()
 }
 
-fn initialize_terminal(stdout: &mut impl Write) -> Result<()> {
-    queue!(stdout, terminal::EnterAlternateScreen, style::ResetColor)?;
+fn initialize_terminal(stdout: &mut impl Write, terminal: &impl Terminal) -> Result<()> {
+    queue!(stdout, EnterAlternateScreen, style::ResetColor)?;
     stdout.flush()?;
-    terminal::enable_raw_mode()?;
+    terminal.enable_raw_mode()?;
     Ok(())
 }
 
@@ -182,7 +187,7 @@ fn output_on_terminal(
     queue!(
         stdout,
         cursor::MoveTo(0, 0),
-        terminal::Clear(ClearType::FromCursorDown),
+        Clear(ClearType::FromCursorDown),
         style::Print("Search: "),
         style::Print(query),
         cursor::SavePosition,
@@ -247,22 +252,22 @@ fn help_line(stdout: &mut impl Write, max_columns: usize) -> Result<()> {
         stdout,
         cursor::MoveToNextLine(1),
         style::SetAttribute(Attribute::Bold),
-        style::Print(format!("<Up>/<Ctrl-p>:")),
+        style::Print("<Up>/<Ctrl-p>:"),
         style::SetAttribute(Attribute::Reset),
         cursor::MoveRight(1),
-        style::Print(format!("Up")),
+        style::Print("Up"),
         cursor::MoveRight(2),
         style::SetAttribute(Attribute::Bold),
-        style::Print(format!("<Down>/<Ctrl-n>:")),
+        style::Print("<Down>/<Ctrl-n>:"),
         style::SetAttribute(Attribute::Reset),
         cursor::MoveRight(1),
-        style::Print(format!("Down")),
+        style::Print("Down"),
         cursor::MoveRight(2),
         style::SetAttribute(Attribute::Bold),
-        style::Print(format!("<Enter>:")),
+        style::Print("<Enter>:"),
         style::SetAttribute(Attribute::Reset),
         cursor::MoveRight(1),
-        style::Print(format!("Execute")),
+        style::Print("Execute"),
     )?;
     Ok(())
 }
