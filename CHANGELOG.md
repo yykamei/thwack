@@ -6,6 +6,7 @@
 
 **Merged pull requests:**
 
+- Add --status-line=\<absolute|relative|none\> [\#137](https://github.com/yykamei/thwack/pull/137) ([yykamei](https://github.com/yykamei))
 - \[refafctor\] Add Terminal trait for testing [\#135](https://github.com/yykamei/thwack/pull/135) ([yykamei](https://github.com/yykamei))
 - \[refactor\] Add show\_version.rs to test --version [\#133](https://github.com/yykamei/thwack/pull/133) ([yykamei](https://github.com/yykamei))
 - \[refactor\] Add show\_help.rs for integration tests [\#131](https://github.com/yykamei/thwack/pull/131) ([yykamei](https://github.com/yykamei))
