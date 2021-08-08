@@ -1,3 +1,4 @@
+// TODO: This file requires refactoring, but first I want to make sure the behavior is expected through testing.
 use std::ffi::{CString, OsString};
 use std::io::{self, Stderr, Stdout, Write};
 use std::os::raw::c_char;
@@ -13,7 +14,7 @@ use crossterm::{
     terminal::{Clear, ClearType, EnterAlternateScreen, LeaveAlternateScreen},
 };
 
-use crate::args::{Parser, HELP};
+use crate::args::{ParsedArgs, Parser, StatusLine, HELP};
 use crate::error::Result;
 use crate::finder::Finder;
 use crate::matched_path::MatchedPath;
@@ -46,9 +47,9 @@ pub fn entrypoint<A: Iterator<Item = OsString>, W: Write>(
     }
 
     let (mut columns, mut rows) = terminal.size()?;
-    let starting_point = StartingPoint::new(args.starting_point)?;
-    let mut query = args.query;
-    let mut paths = find_paths(&starting_point, &query, paths_rows(rows))?;
+    let starting_point = StartingPoint::new(&args.starting_point)?;
+    let mut query = args.query.clone();
+    let mut paths = find_paths(&starting_point, &query, paths_rows(&args, rows))?;
     let mut selection: u16 = 0;
     let mut state = State::QueryChanged;
     initialize_terminal(stdout, &terminal)?;
@@ -56,14 +57,14 @@ pub fn entrypoint<A: Iterator<Item = OsString>, W: Write>(
     loop {
         match state {
             State::QueryChanged => {
-                output_on_terminal(stdout, &query, &paths[..], selection, columns, rows)?
+                output_on_terminal(stdout, &args, &query, &paths[..], selection, columns, rows)?
             }
             State::PathsChanged => {
-                output_on_terminal(stdout, &query, &paths[..], selection, columns, rows)?;
+                output_on_terminal(stdout, &args, &query, &paths[..], selection, columns, rows)?;
                 state = State::Ready;
             }
             State::SelectionChanged => {
-                output_on_terminal(stdout, &query, &paths[..], selection, columns, rows)?;
+                output_on_terminal(stdout, &args, &query, &paths[..], selection, columns, rows)?;
                 state = State::Ready;
             }
             _ => (),
@@ -89,7 +90,7 @@ pub fn entrypoint<A: Iterator<Item = OsString>, W: Write>(
                 }
                 state = State::SelectionChanged;
             } else if should_move_down(&ev) {
-                if selection < paths_rows(rows) - 1 {
+                if selection < paths_rows(&args, rows) - 1 {
                     selection += 1;
                 }
                 state = State::SelectionChanged;
@@ -101,15 +102,15 @@ pub fn entrypoint<A: Iterator<Item = OsString>, W: Write>(
                 columns = c;
                 rows = r;
                 selection = if selection > r {
-                    paths_rows(r) - 1
+                    paths_rows(&args, r) - 1
                 } else {
                     selection
                 };
-                paths = find_paths(&starting_point, &query, paths_rows(rows))?;
+                paths = find_paths(&starting_point, &query, paths_rows(&args, rows))?;
                 state = State::PathsChanged;
             }
         } else if let State::QueryChanged = state {
-            paths = find_paths(&starting_point, &query, paths_rows(rows))?;
+            paths = find_paths(&starting_point, &query, paths_rows(&args, rows))?;
             state = State::PathsChanged;
             selection = 0;
         }
@@ -132,9 +133,12 @@ enum State<'a> {
     Invoke(&'a MatchedPath),
 }
 
-fn paths_rows(row: u16) -> u16 {
+fn paths_rows(args: &ParsedArgs, row: u16) -> u16 {
     // TODO: raise an error when the number of rows is too small.
-    row - 3
+    match args.status_line {
+        StatusLine::None => row - 2,
+        _ => row - 3,
+    }
 }
 
 fn should_just_exit(ev: &Event) -> bool {
@@ -178,6 +182,7 @@ fn initialize_terminal(stdout: &mut impl Write, terminal: &impl Terminal) -> Res
 
 fn output_on_terminal(
     stdout: &mut impl Write,
+    args: &ParsedArgs,
     query: &str,
     paths: &[MatchedPath],
     selection: u16,
@@ -221,11 +226,18 @@ fn output_on_terminal(
         queue!(stdout, cursor::MoveToNextLine(1))?;
     }
 
-    queue!(stdout, cursor::MoveToRow(max_rows - 1))?;
-    let selected = &selected
-        .map(|s| s.truncated_absolute(max_columns as usize))
-        .unwrap_or_else(|| "No matching files found.".to_string());
-    status_line(stdout, max_columns as usize, selected)?;
+    let selected = match (selected, &args.status_line) {
+        (_, StatusLine::None) => None,
+        (None, _) => Some("No matching files found.".to_string()),
+        (Some(s), StatusLine::Absolute) => Some(s.truncated_absolute(max_columns as usize)),
+        (Some(s), StatusLine::Relative) => Some(s.truncated_relative(max_columns as usize)),
+    };
+    if let Some(ref s) = selected {
+        queue!(stdout, cursor::MoveToRow(max_rows - 1))?;
+        status_line(stdout, max_columns as usize, s)?;
+    } else {
+        queue!(stdout, cursor::MoveToRow(max_rows))?;
+    }
     help_line(stdout, max_columns as usize)?;
     queue!(stdout, cursor::RestorePosition)?;
     stdout.flush()?;

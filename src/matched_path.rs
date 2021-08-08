@@ -60,6 +60,12 @@ impl MatchedPath {
         chunks.iter().map(|c| format!("{}", c)).collect()
     }
 
+    /// Returns the truncated relative path.
+    pub(crate) fn truncated_relative(&self, max_width: usize) -> String {
+        let chunks = self.relative_chunks(max_width);
+        chunks.iter().map(|c| format!("{}", c)).collect()
+    }
+
     /// Returns the chunks of `absolute`. This generates reduced chunks if the width of the `absolute` exceeds the `max_width`.
     pub(crate) fn absolute_chunks(&self, max_width: usize) -> Vec<Chunk> {
         chunks_from(&self.absolute, &self.absolute_positions[..], max_width)
@@ -333,6 +339,18 @@ mod tests {
 
         let path = new("abc", "/home", "/home/☕/special/test/bar/🚞/abc.txt");
         assert_eq!(path.truncated_absolute(20), "...st/bar/🚞/abc.txt");
+    }
+
+    #[test]
+    fn returns_truncated_relative() {
+        let path = new("abc", "/home", "/home/☕/special-test-bar-🚞-abc.txt");
+        assert_eq!(
+            path.truncated_relative(100),
+            "☕/special-test-bar-🚞-abc.txt"
+        );
+
+        let path = new("abc", "/home", "/home/☕/special-test-bar-🚞-abc.txt");
+        assert_eq!(path.truncated_relative(20), "...st-bar-🚞-abc.txt");
     }
 
     #[test]
