@@ -1,5 +1,13 @@
 # Changelog
 
+## [Unreleased](https://github.com/yykamei/thwack/tree/HEAD)
+
+[Full Changelog](https://github.com/yykamei/thwack/compare/v0.4.0...HEAD)
+
+**Merged pull requests:**
+
+- \[refactor\] Add tests for query [\#139](https://github.com/yykamei/thwack/pull/139) ([yykamei](https://github.com/yykamei))
+
 ## [v0.4.0](https://github.com/yykamei/thwack/tree/v0.4.0) (2021-08-08)
 
 [Full Changelog](https://github.com/yykamei/thwack/compare/v0.3.0...v0.4.0)
