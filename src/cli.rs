@@ -8,7 +8,7 @@ use std::time::Duration;
 
 use crossterm::{
     cursor,
-    event::{self, Event, KeyCode, KeyEvent, KeyModifiers},
+    event::{Event, KeyCode, KeyEvent, KeyModifiers},
     execute, queue,
     style::{self, Attribute},
     terminal::{Clear, ClearType, EnterAlternateScreen, LeaveAlternateScreen},
@@ -19,7 +19,7 @@ use crate::error::Result;
 use crate::finder::Finder;
 use crate::matched_path::MatchedPath;
 use crate::starting_point::StartingPoint;
-use crate::terminal::Terminal;
+use crate::terminal::{Terminal, TerminalEvent};
 use crate::Error;
 
 pub fn safe_exit(code: i32, stdout: Stdout, stderr: Stderr) {
@@ -32,6 +32,7 @@ pub fn entrypoint<A: Iterator<Item = OsString>, W: Write>(
     args: A,
     stdout: &mut W,
     terminal: impl Terminal,
+    mut event: impl TerminalEvent,
 ) -> Result<()> {
     let args = Parser::new(args).parse()?;
     if args.help {
@@ -70,8 +71,8 @@ pub fn entrypoint<A: Iterator<Item = OsString>, W: Write>(
             _ => (),
         }
 
-        if event::poll(Duration::from_millis(300))? {
-            let ev = event::read()?;
+        if event.poll(Duration::from_millis(300))? {
+            let ev = event.read()?;
             if should_just_exit(&ev) {
                 break;
             } else if let Event::Key(KeyEvent {
