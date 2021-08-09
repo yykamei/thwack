@@ -8,6 +8,7 @@ use thwack::entrypoint;
 mod helper;
 
 #[test]
+#[cfg(not(target_os = "windows"))]
 fn show_all_as_many_as_the_size_of_terminal_without_query() {
     let dir = create_tree().unwrap();
     let args = args![
@@ -49,6 +50,49 @@ fn show_all_as_many_as_the_size_of_terminal_without_query() {
 }
 
 #[test]
+#[cfg(target_os = "windows")]
+fn show_all_as_many_as_the_size_of_terminal_without_query() {
+    let dir = create_tree().unwrap();
+    let args = args![
+        "thwack",
+        "--starting-point",
+        dir.path().to_str().unwrap(),
+        "--status-line=relative"
+    ];
+    let mut event = MockTerminalEvent::new();
+    event.add(Some(Event::Key(KeyCode::Esc.into())));
+    let mut buffer = buf!();
+    let result = entrypoint(args, &mut buffer, MockTerminal, event);
+    assert!(result.is_ok());
+    assert_eq!(
+        buffer,
+        buf!(
+            b"\x1b[?1049h\x1b[0m\x1b[1;1H\x1b[JSearch: \x1b7\x1b[1E\
+            >\x20.browserslistrc\x1b[1E\
+            \x20\x20.editorconfig\x1b[1E\
+            \x20\x20.env\x1b[1E\
+            \x20\x20.env.local\x1b[1E\
+            \x20\x20.gitignore\x1b[1E\
+            \x20\x20.npmrc\x1b[1E\
+            \x20\x20.nvmrc\x1b[1E\
+            \x20\x20Dockerfile\x1b[1E\
+            \x20\x20LICENSE\x1b[1E\
+            \x20\x20README.md\x1b[1E\
+            \x20\x20package-lock.json\x1b[1E\
+            \x20\x20package.json\x1b[1E\
+            \x20\x20tsconfig.json\x1b[1E\
+            \x20\x20\xe2\x98\x95.txt\x1b[1E\
+            \x20\x20.config\\bar.toml\x1b[1E\
+            \x20\x20.config\\ok.toml\x1b[1E\
+            \x20\x20lib\\bar.js\x1b[1E\
+            \x1b[19d\x1b[1m\x1b[7m.browserslistrc                                                                 \x1b[0m\x1b[1E\
+            \x1b[1m<Up>/<Ctrl-p>:\x1b[0m\x1b[1CUp\x1b[2C\x1b[1m<Down>/<Ctrl-n>:\x1b[0m\x1b[1CDown\x1b[2C\x1b[1m<Enter>:\x1b[0m\x1b[1CExecute\x1b8\x1b[?1049l"
+        )
+    );
+}
+
+#[test]
+#[cfg(not(target_os = "windows"))]
 fn show_filtered_paths_with_query() {
     let dir = create_tree().unwrap();
     let args = args![
@@ -75,6 +119,7 @@ fn show_filtered_paths_with_query() {
 }
 
 #[test]
+#[cfg(not(target_os = "windows"))]
 fn show_filtered_paths_with_query_interactively() {
     let dir = create_tree().unwrap();
     let args = args![
@@ -251,6 +296,7 @@ fn show_filtered_paths_with_query_interactively() {
 }
 
 #[test]
+#[cfg(not(target_os = "windows"))]
 fn show_filtered_paths_with_query_interactively_including_backspace() {
     let dir = create_tree().unwrap();
     let args = args![
@@ -269,7 +315,6 @@ fn show_filtered_paths_with_query_interactively_including_backspace() {
     let mut buffer = buf!();
     let result = entrypoint(args, &mut buffer, MockTerminal, event);
     assert!(result.is_ok());
-    println!("{:?}", buffer);
     assert_eq!(
         buffer,
         buf!(
