@@ -127,7 +127,7 @@ jobs:
       - name: Calculate checksums
         run: |
           mv Artifact-thwack-*/thwack-* .
-          for f in thwack-*; do sha256sum $f | awk '{print $1}' > $f.sha256; done
+          for f in thwack-*; do sha256sum "$f" | awk '{print $1}' > "${f}.sha256"; done
 
       - name: Upload assets to the release
         if: github.event.inputs.apply == 'true'
