@@ -6,6 +6,7 @@
 
 **Merged pull requests:**
 
+- Bump libc from 0.2.98 to 0.2.99 [\#142](https://github.com/yykamei/thwack/pull/142) ([dependabot[bot]](https://github.com/apps/dependabot))
 - \[refactor\] Add tests for query [\#139](https://github.com/yykamei/thwack/pull/139) ([yykamei](https://github.com/yykamei))
 
 ## [v0.4.0](https://github.com/yykamei/thwack/tree/v0.4.0) (2021-08-08)
