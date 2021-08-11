@@ -1,8 +1,8 @@
 # Changelog
 
-## [Unreleased](https://github.com/yykamei/thwack/tree/HEAD)
+## [v0.4.1](https://github.com/yykamei/thwack/tree/v0.4.1) (2021-08-11)
 
-[Full Changelog](https://github.com/yykamei/thwack/compare/v0.4.0...HEAD)
+[Full Changelog](https://github.com/yykamei/thwack/compare/v0.4.0...v0.4.1)
 
 **Merged pull requests:**
 
