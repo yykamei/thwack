@@ -43,8 +43,19 @@ pub struct MockTerminalEvent {
 }
 
 impl Buffer {
+    #[allow(dead_code)]
     pub fn new() -> Self {
         Self { inner: vec![] }
+    }
+
+    #[allow(dead_code)]
+    pub fn normalize_path(mut self) -> Self {
+        for value in self.inner.iter_mut() {
+            if *value == b'\\' {
+                *value = b'/';
+            }
+        }
+        Self { inner: self.inner }
     }
 }
 
@@ -116,12 +127,14 @@ impl Terminal for MockTerminal {
 }
 
 impl MockTerminalEvent {
+    #[allow(dead_code)]
     pub fn new() -> Self {
         Self {
             events: Arc::new(Mutex::new(VecDeque::new())),
         }
     }
 
+    #[allow(dead_code)]
     pub fn add(&mut self, event: Option<Event>) {
         let data = self.events.clone();
         let mut events = data.lock().unwrap();
@@ -160,6 +173,7 @@ impl TerminalEvent for MockTerminalEvent {
     }
 }
 
+#[allow(dead_code)]
 pub fn create_tree() -> io::Result<TempDir> {
     let tmp = tempdir()?;
     create_dir_all(tmp.path().join("src/a/b/c"))?;
