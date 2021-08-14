@@ -1,5 +1,13 @@
 # Changelog
 
+## [Unreleased](https://github.com/yykamei/thwack/tree/HEAD)
+
+[Full Changelog](https://github.com/yykamei/thwack/compare/v0.4.1...HEAD)
+
+**Merged pull requests:**
+
+- Add Buffer::normalize\_path to ignore the difference between Windows and Unix [\#144](https://github.com/yykamei/thwack/pull/144) ([yykamei](https://github.com/yykamei))
+
 ## [v0.4.1](https://github.com/yykamei/thwack/tree/v0.4.1) (2021-08-11)
 
 [Full Changelog](https://github.com/yykamei/thwack/compare/v0.4.0...v0.4.1)
