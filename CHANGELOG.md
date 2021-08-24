@@ -6,6 +6,7 @@
 
 **Merged pull requests:**
 
+- Bump libc from 0.2.99 to 0.2.100 [\#146](https://github.com/yykamei/thwack/pull/146) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Add Buffer::normalize\_path to ignore the difference between Windows and Unix [\#144](https://github.com/yykamei/thwack/pull/144) ([yykamei](https://github.com/yykamei))
 
 ## [v0.4.1](https://github.com/yykamei/thwack/tree/v0.4.1) (2021-08-11)
