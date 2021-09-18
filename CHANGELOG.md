@@ -6,6 +6,7 @@
 
 **Merged pull requests:**
 
+- Bump unicode-width from 0.1.8 to 0.1.9 [\#153](https://github.com/yykamei/thwack/pull/153) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump libc from 0.2.101 to 0.2.102 [\#152](https://github.com/yykamei/thwack/pull/152) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump libc from 0.2.100 to 0.2.101 [\#150](https://github.com/yykamei/thwack/pull/150) ([dependabot[bot]](https://github.com/apps/dependabot))
 
