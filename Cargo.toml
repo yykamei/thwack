@@ -13,7 +13,7 @@ version = "0.4.2"
 crossterm = "0.21.0"
 libc = "0.2.102"
 unicode-segmentation = "1.8.0"
-unicode-width = "0.1.8"
+unicode-width = "0.1.9"
 
 [dev-dependencies]
 tempfile = "3.2.0"
