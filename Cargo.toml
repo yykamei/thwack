@@ -11,7 +11,7 @@ version = "0.4.5"
 
 [dependencies]
 crossterm = "0.22.1"
-libc = "0.2.105"
+libc = "0.2.106"
 unicode-segmentation = "1.8.0"
 unicode-width = "0.1.9"
 
