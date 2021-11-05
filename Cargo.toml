@@ -10,7 +10,7 @@ edition = "2018"
 version = "0.4.5"
 
 [dependencies]
-crossterm = "0.21.0"
+crossterm = "0.22.1"
 libc = "0.2.105"
 unicode-segmentation = "1.8.0"
 unicode-width = "0.1.9"
