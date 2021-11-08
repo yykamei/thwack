@@ -62,7 +62,7 @@ impl Buffer {
 impl Debug for Buffer {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         let mut buf: Vec<u8> = Vec::with_capacity(self.inner.len());
-        &self.inner.iter().for_each(|v| {
+        let _ = &self.inner.iter().for_each(|v| {
             for e in escape_default(*v) {
                 buf.push(e);
             }

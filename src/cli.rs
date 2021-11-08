@@ -88,13 +88,13 @@ pub fn entrypoint<A: Iterator<Item = OsString>, W: Write>(
             } else if should_move_up(&ev) {
                 if selection > 0 {
                     selection -= 1;
+                    state = State::SelectionChanged;
                 }
-                state = State::SelectionChanged;
             } else if should_move_down(&ev) {
-                if selection < paths_rows(&args, rows) - 1 {
+                if (selection as usize) < paths.len() - 1 {
                     selection += 1;
+                    state = State::SelectionChanged;
                 }
-                state = State::SelectionChanged;
             } else if ev == Event::Key(KeyCode::Enter.into()) {
                 let path: &MatchedPath = paths.get(selection as usize).unwrap(); // TODO: Do not use unwrap()
                 state = State::Invoke(path);
