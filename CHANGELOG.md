@@ -1,5 +1,13 @@
 # Changelog
 
+## [Unreleased](https://github.com/yykamei/thwack/tree/HEAD)
+
+[Full Changelog](https://github.com/yykamei/thwack/compare/v0.4.6...HEAD)
+
+**Fixed bugs:**
+
+- Fix move down behavior [\#167](https://github.com/yykamei/thwack/pull/167) ([yykamei](https://github.com/yykamei))
+
 ## [v0.4.6](https://github.com/yykamei/thwack/tree/v0.4.6) (2021-11-05)
 
 [Full Changelog](https://github.com/yykamei/thwack/compare/v0.4.5...v0.4.6)
