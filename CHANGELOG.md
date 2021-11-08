@@ -1,5 +1,17 @@
 # Changelog
 
+## [Unreleased](https://github.com/yykamei/thwack/tree/HEAD)
+
+[Full Changelog](https://github.com/yykamei/thwack/compare/v0.4.6...HEAD)
+
+**Fixed bugs:**
+
+- Fix move down behavior [\#167](https://github.com/yykamei/thwack/pull/167) ([yykamei](https://github.com/yykamei))
+
+**Merged pull requests:**
+
+- Bump libc from 0.2.106 to 0.2.107 [\#166](https://github.com/yykamei/thwack/pull/166) ([dependabot[bot]](https://github.com/apps/dependabot))
+
 ## [v0.4.6](https://github.com/yykamei/thwack/tree/v0.4.6) (2021-11-05)
 
 [Full Changelog](https://github.com/yykamei/thwack/compare/v0.4.5...v0.4.6)
