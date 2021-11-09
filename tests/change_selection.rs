@@ -27,83 +27,96 @@ fn cannot_move_up_because_selection_reaches_to_top() {
     assert_eq!(
         buffer.normalize_path(),
         buf!(
-            b"\x1b[?1049h\x1b[0m\x1b[1;1H\x1b[JSearch: \x1b7\x1b[1E\
-            > .browserslistrc\x1b[1E\
-            \x20\x20.editorconfig\x1b[1E\
-            \x20\x20.env\x1b[1E\
-            \x20\x20.env.local\x1b[1E\
-            \x20\x20.gitignore\x1b[1E\
-            \x20\x20.npmrc\x1b[1E\
-            \x20\x20.nvmrc\x1b[1E\
-            \x20\x20Dockerfile\x1b[1E\
-            \x20\x20LICENSE\x1b[1E\
-            \x20\x20README.md\x1b[1E\
-            \x20\x20package-lock.json\x1b[1E\
-            \x20\x20package.json\x1b[1E\
-            \x20\x20tsconfig.json\x1b[1E\
-            \x20\x20\xe2\x98\x95.txt\x1b[1E\
-            \x20\x20.config/bar.toml\x1b[1E\
-            \x20\x20.config/ok.toml\x1b[1E\
-            \x20\x20lib/bar.js\x1b[1E\
-            \x1b[19d\x1b[1m\x1b[7m.browserslistrc                                                                 \x1b[0m\x1b[1E\
-            \x1b[1m<Up>/<Ctrl-p>:\x1b[0m\x1b[1CUp\x1b[2C\x1b[1m<Down>/<Ctrl-n>:\x1b[0m\x1b[1CDown\x1b[2C\x1b[1m<Enter>:\x1b[0m\x1b[1CExecute\x1b8\x1b[1;1H\x1b[JSearch: \x1b7\x1b[1E\
-            > .browserslistrc\x1b[1E\
-            \x20\x20.editorconfig\x1b[1E\
-            \x20\x20.env\x1b[1E\
-            \x20\x20.env.local\x1b[1E\
-            \x20\x20.gitignore\x1b[1E\
-            \x20\x20.npmrc\x1b[1E\
-            \x20\x20.nvmrc\x1b[1E\
-            \x20\x20Dockerfile\x1b[1E\
-            \x20\x20LICENSE\x1b[1E\
-            \x20\x20README.md\x1b[1E\
-            \x20\x20package-lock.json\x1b[1E\
-            \x20\x20package.json\x1b[1E\
-            \x20\x20tsconfig.json\x1b[1E\
-            \x20\x20\xe2\x98\x95.txt\x1b[1E\
-            \x20\x20.config/bar.toml\x1b[1E\
-            \x20\x20.config/ok.toml\x1b[1E\
-            \x20\x20lib/bar.js\x1b[1E\
-            \x1b[19d\x1b[1m\x1b[7m.browserslistrc                                                                 \x1b[0m\x1b[1E\
-            \x1b[1m<Up>/<Ctrl-p>:\x1b[0m\x1b[1CUp\x1b[2C\x1b[1m<Down>/<Ctrl-n>:\x1b[0m\x1b[1CDown\x1b[2C\x1b[1m<Enter>:\x1b[0m\x1b[1CExecute\x1b8\x1b[1;1H\x1b[JSearch: \x1b7\x1b[1E\
-            > .browserslistrc\x1b[1E\
-            \x20\x20.editorconfig\x1b[1E\
-            \x20\x20.env\x1b[1E\
-            \x20\x20.env.local\x1b[1E\
-            \x20\x20.gitignore\x1b[1E\
-            \x20\x20.npmrc\x1b[1E\
-            \x20\x20.nvmrc\x1b[1E\
-            \x20\x20Dockerfile\x1b[1E\
-            \x20\x20LICENSE\x1b[1E\
-            \x20\x20README.md\x1b[1E\
-            \x20\x20package-lock.json\x1b[1E\
-            \x20\x20package.json\x1b[1E\
-            \x20\x20tsconfig.json\x1b[1E\
-            \x20\x20\xe2\x98\x95.txt\x1b[1E\
-            \x20\x20.config/bar.toml\x1b[1E\
-            \x20\x20.config/ok.toml\x1b[1E\
-            \x20\x20lib/bar.js\x1b[1E\
-            \x1b[19d\x1b[1m\x1b[7m.browserslistrc                                                                 \x1b[0m\x1b[1E\
-            \x1b[1m<Up>/<Ctrl-p>:\x1b[0m\x1b[1CUp\x1b[2C\x1b[1m<Down>/<Ctrl-n>:\x1b[0m\x1b[1CDown\x1b[2C\x1b[1m<Enter>:\x1b[0m\x1b[1CExecute\x1b8\x1b[1;1H\x1b[JSearch: \x1b7\x1b[1E\
-            > .browserslistrc\x1b[1E\
-            \x20\x20.editorconfig\x1b[1E\
-            \x20\x20.env\x1b[1E\
-            \x20\x20.env.local\x1b[1E\
-            \x20\x20.gitignore\x1b[1E\
-            \x20\x20.npmrc\x1b[1E\
-            \x20\x20.nvmrc\x1b[1E\
-            \x20\x20Dockerfile\x1b[1E\
-            \x20\x20LICENSE\x1b[1E\
-            \x20\x20README.md\x1b[1E\
-            \x20\x20package-lock.json\x1b[1E\
-            \x20\x20package.json\x1b[1E\
-            \x20\x20tsconfig.json\x1b[1E\
-            \x20\x20\xe2\x98\x95.txt\x1b[1E\
-            \x20\x20.config/bar.toml\x1b[1E\
-            \x20\x20.config/ok.toml\x1b[1E\
-            \x20\x20lib/bar.js\x1b[1E\
-            \x1b[19d\x1b[1m\x1b[7m.browserslistrc                                                                 \x1b[0m\x1b[1E\
-            \x1b[1m<Up>/<Ctrl-p>:\x1b[0m\x1b[1CUp\x1b[2C\x1b[1m<Down>/<Ctrl-n>:\x1b[0m\x1b[1CDown\x1b[2C\x1b[1m<Enter>:\x1b[0m\x1b[1CExecute\x1b8\x1b[?1049l"
+            b"\x1b[?1049h\x1b[0m",
+            b"\x1b[1;1H\x1b[J",
+            b"Search: \x1b7\x1b[1E",
+            b"> .browserslistrc\x1b[1E",
+            b"  .editorconfig\x1b[1E",
+            b"  .env\x1b[1E",
+            b"  .env.local\x1b[1E",
+            b"  .gitignore\x1b[1E",
+            b"  .npmrc\x1b[1E",
+            b"  .nvmrc\x1b[1E",
+            b"  Dockerfile\x1b[1E",
+            b"  LICENSE\x1b[1E",
+            b"  README.md\x1b[1E",
+            b"  package-lock.json\x1b[1E",
+            b"  package.json\x1b[1E",
+            b"  tsconfig.json\x1b[1E",
+            b"  \xe2\x98\x95.txt\x1b[1E",
+            b"  .config/bar.toml\x1b[1E",
+            b"  .config/ok.toml\x1b[1E",
+            b"  lib/bar.js\x1b[1E",
+            b"\x1b[19d\x1b[1m\x1b[7m.browserslistrc                                                                 \x1b[0m\x1b[1E",
+            b"\x1b[1m<Up>/<Ctrl-p>:\x1b[0m\x1b[1CUp\x1b[2C\x1b[1m<Down>/<Ctrl-n>:\x1b[0m\x1b[1CDown\x1b[2C\x1b[1m<Enter>:\x1b[0m\x1b[1CExecute",
+            b"\x1b8",
+            b"\x1b[1;1H\x1b[J",
+            b"Search: \x1b7\x1b[1E",
+            b"> .browserslistrc\x1b[1E",
+            b"  .editorconfig\x1b[1E",
+            b"  .env\x1b[1E",
+            b"  .env.local\x1b[1E",
+            b"  .gitignore\x1b[1E",
+            b"  .npmrc\x1b[1E",
+            b"  .nvmrc\x1b[1E",
+            b"  Dockerfile\x1b[1E",
+            b"  LICENSE\x1b[1E",
+            b"  README.md\x1b[1E",
+            b"  package-lock.json\x1b[1E",
+            b"  package.json\x1b[1E",
+            b"  tsconfig.json\x1b[1E",
+            b"  \xe2\x98\x95.txt\x1b[1E",
+            b"  .config/bar.toml\x1b[1E",
+            b"  .config/ok.toml\x1b[1E",
+            b"  lib/bar.js\x1b[1E",
+            b"\x1b[19d\x1b[1m\x1b[7m.browserslistrc                                                                 \x1b[0m\x1b[1E",
+            b"\x1b[1m<Up>/<Ctrl-p>:\x1b[0m\x1b[1CUp\x1b[2C\x1b[1m<Down>/<Ctrl-n>:\x1b[0m\x1b[1CDown\x1b[2C\x1b[1m<Enter>:\x1b[0m\x1b[1CExecute",
+            b"\x1b8",
+            b"\x1b[1;1H\x1b[J",
+            b"Search: \x1b7\x1b[1E",
+            b"> .browserslistrc\x1b[1E",
+            b"  .editorconfig\x1b[1E",
+            b"  .env\x1b[1E",
+            b"  .env.local\x1b[1E",
+            b"  .gitignore\x1b[1E",
+            b"  .npmrc\x1b[1E",
+            b"  .nvmrc\x1b[1E",
+            b"  Dockerfile\x1b[1E",
+            b"  LICENSE\x1b[1E",
+            b"  README.md\x1b[1E",
+            b"  package-lock.json\x1b[1E",
+            b"  package.json\x1b[1E",
+            b"  tsconfig.json\x1b[1E",
+            b"  \xe2\x98\x95.txt\x1b[1E",
+            b"  .config/bar.toml\x1b[1E",
+            b"  .config/ok.toml\x1b[1E",
+            b"  lib/bar.js\x1b[1E",
+            b"\x1b[19d\x1b[1m\x1b[7m.browserslistrc                                                                 \x1b[0m\x1b[1E",
+            b"\x1b[1m<Up>/<Ctrl-p>:\x1b[0m\x1b[1CUp\x1b[2C\x1b[1m<Down>/<Ctrl-n>:\x1b[0m\x1b[1CDown\x1b[2C\x1b[1m<Enter>:\x1b[0m\x1b[1CExecute",
+            b"\x1b8",
+            b"\x1b[1;1H\x1b[J",
+            b"Search: \x1b7\x1b[1E",
+            b"> .browserslistrc\x1b[1E",
+            b"  .editorconfig\x1b[1E",
+            b"  .env\x1b[1E",
+            b"  .env.local\x1b[1E",
+            b"  .gitignore\x1b[1E",
+            b"  .npmrc\x1b[1E",
+            b"  .nvmrc\x1b[1E",
+            b"  Dockerfile\x1b[1E",
+            b"  LICENSE\x1b[1E",
+            b"  README.md\x1b[1E",
+            b"  package-lock.json\x1b[1E",
+            b"  package.json\x1b[1E",
+            b"  tsconfig.json\x1b[1E",
+            b"  \xe2\x98\x95.txt\x1b[1E",
+            b"  .config/bar.toml\x1b[1E",
+            b"  .config/ok.toml\x1b[1E",
+            b"  lib/bar.js\x1b[1E",
+            b"\x1b[19d\x1b[1m\x1b[7m.browserslistrc                                                                 \x1b[0m\x1b[1E",
+            b"\x1b[1m<Up>/<Ctrl-p>:\x1b[0m\x1b[1CUp\x1b[2C\x1b[1m<Down>/<Ctrl-n>:\x1b[0m\x1b[1CDown\x1b[2C\x1b[1m<Enter>:\x1b[0m\x1b[1CExecute",
+            b"\x1b8",
+            b"\x1b[?1049l"
         )
     );
 }
@@ -135,170 +148,190 @@ fn cannot_move_down_because_selection_reaches_to_bottom() {
     assert_eq!(
         buffer.normalize_path(),
         buf!(
-            b"\x1b[?1049h\x1b[0m\x1b[1;1H\x1b[JSearch: \x1b7\x1b[1E\
-            > .browserslistrc\x1b[1E\
-            \x20\x20.editorconfig\x1b[1E\
-            \x20\x20.env\x1b[1E\
-            \x20\x20.env.local\x1b[1E\
-            \x20\x20.gitignore\x1b[1E\
-            \x20\x20.npmrc\x1b[1E\
-            \x20\x20.nvmrc\x1b[1E\
-            \x20\x20Dockerfile\x1b[1E\
-            \x20\x20LICENSE\x1b[1E\
-            \x20\x20README.md\x1b[1E\
-            \x20\x20package-lock.json\x1b[1E\
-            \x20\x20package.json\x1b[1E\
-            \x20\x20tsconfig.json\x1b[1E\
-            \x20\x20\xe2\x98\x95.txt\x1b[1E\
-            \x20\x20.config/bar.toml\x1b[1E\
-            \x20\x20.config/ok.toml\x1b[1E\
-            \x20\x20lib/bar.js\x1b[1E\
-            \x1b[19d\x1b[1m\x1b[7m.browserslistrc                                                                 \x1b[0m\x1b[1E\
-            \x1b[1m<Up>/<Ctrl-p>:\x1b[0m\x1b[1CUp\x1b[2C\x1b[1m<Down>/<Ctrl-n>:\x1b[0m\x1b[1CDown\x1b[2C\x1b[1m<Enter>:\x1b[0m\x1b[1CExecute\x1b8\x1b[1;1H\
-            \x1b[JSearch: b\x1b7\x1b[1E\
-            > .browserslistrc\x1b[1E\
-            \x20\x20.editorconfig\x1b[1E\
-            \x20\x20.env\x1b[1E\
-            \x20\x20.env.local\x1b[1E\
-            \x20\x20.gitignore\x1b[1E\
-            \x20\x20.npmrc\x1b[1E\
-            \x20\x20.nvmrc\x1b[1E\
-            \x20\x20Dockerfile\x1b[1E\
-            \x20\x20LICENSE\x1b[1E\
-            \x20\x20README.md\x1b[1E\
-            \x20\x20package-lock.json\x1b[1E\
-            \x20\x20package.json\x1b[1E\
-            \x20\x20tsconfig.json\x1b[1E\
-            \x20\x20\xe2\x98\x95.txt\x1b[1E\
-            \x20\x20.config/bar.toml\x1b[1E\
-            \x20\x20.config/ok.toml\x1b[1E\
-            \x20\x20lib/bar.js\x1b[1E\
-            \x1b[19d\x1b[1m\x1b[7m.browserslistrc                                                                 \x1b[0m\x1b[1E\
-            \x1b[1m<Up>/<Ctrl-p>:\x1b[0m\x1b[1CUp\x1b[2C\x1b[1m<Down>/<Ctrl-n>:\x1b[0m\x1b[1CDown\x1b[2C\x1b[1m<Enter>:\x1b[0m\x1b[1CExecute\x1b8\x1b[1;1H\
-            \x1b[JSearch: br\x1b7\x1b[1E\
-            > .browserslistrc\x1b[1E\
-            \x20\x20.editorconfig\x1b[1E\
-            \x20\x20.env\x1b[1E\
-            \x20\x20.env.local\x1b[1E\
-            \x20\x20.gitignore\x1b[1E\
-            \x20\x20.npmrc\x1b[1E\
-            \x20\x20.nvmrc\x1b[1E\
-            \x20\x20Dockerfile\x1b[1E\
-            \x20\x20LICENSE\x1b[1E\
-            \x20\x20README.md\x1b[1E\
-            \x20\x20package-lock.json\x1b[1E\
-            \x20\x20package.json\x1b[1E\
-            \x20\x20tsconfig.json\x1b[1E\
-            \x20\x20\xe2\x98\x95.txt\x1b[1E\
-            \x20\x20.config/bar.toml\x1b[1E\
-            \x20\x20.config/ok.toml\x1b[1E\
-            \x20\x20lib/bar.js\x1b[1E\
-            \x1b[19d\x1b[1m\x1b[7m.browserslistrc                                                                 \x1b[0m\x1b[1E\
-            \x1b[1m<Up>/<Ctrl-p>:\x1b[0m\x1b[1CUp\x1b[2C\x1b[1m<Down>/<Ctrl-n>:\x1b[0m\x1b[1CDown\x1b[2C\x1b[1m<Enter>:\x1b[0m\x1b[1CExecute\x1b8\x1b[1;1H\
-            \x1b[JSearch: bro\x1b7\x1b[1E\
-            > .browserslistrc\x1b[1E\
-            \x20\x20.editorconfig\x1b[1E\
-            \x20\x20.env\x1b[1E\
-            \x20\x20.env.local\x1b[1E\
-            \x20\x20.gitignore\x1b[1E\
-            \x20\x20.npmrc\x1b[1E\
-            \x20\x20.nvmrc\x1b[1E\
-            \x20\x20Dockerfile\x1b[1E\
-            \x20\x20LICENSE\x1b[1E\
-            \x20\x20README.md\x1b[1E\
-            \x20\x20package-lock.json\x1b[1E\
-            \x20\x20package.json\x1b[1E\
-            \x20\x20tsconfig.json\x1b[1E\
-            \x20\x20\xe2\x98\x95.txt\x1b[1E\
-            \x20\x20.config/bar.toml\x1b[1E\
-            \x20\x20.config/ok.toml\x1b[1E\
-            \x20\x20lib/bar.js\x1b[1E\
-            \x1b[19d\x1b[1m\x1b[7m.browserslistrc                                                                 \x1b[0m\x1b[1E\
-            \x1b[1m<Up>/<Ctrl-p>:\x1b[0m\x1b[1CUp\x1b[2C\x1b[1m<Down>/<Ctrl-n>:\x1b[0m\x1b[1CDown\x1b[2C\x1b[1m<Enter>:\x1b[0m\x1b[1CExecute\x1b8\x1b[1;1H\
-            \x1b[JSearch: brow\x1b7\x1b[1E\
-            > .browserslistrc\x1b[1E\
-            \x20\x20.editorconfig\x1b[1E\
-            \x20\x20.env\x1b[1E\
-            \x20\x20.env.local\x1b[1E\
-            \x20\x20.gitignore\x1b[1E\
-            \x20\x20.npmrc\x1b[1E\
-            \x20\x20.nvmrc\x1b[1E\
-            \x20\x20Dockerfile\x1b[1E\
-            \x20\x20LICENSE\x1b[1E\
-            \x20\x20README.md\x1b[1E\
-            \x20\x20package-lock.json\x1b[1E\
-            \x20\x20package.json\x1b[1E\
-            \x20\x20tsconfig.json\x1b[1E\
-            \x20\x20\xe2\x98\x95.txt\x1b[1E\
-            \x20\x20.config/bar.toml\x1b[1E\
-            \x20\x20.config/ok.toml\x1b[1E\
-            \x20\x20lib/bar.js\x1b[1E\
-            \x1b[19d\x1b[1m\x1b[7m.browserslistrc                                                                 \x1b[0m\x1b[1E\
-            \x1b[1m<Up>/<Ctrl-p>:\x1b[0m\x1b[1CUp\x1b[2C\x1b[1m<Down>/<Ctrl-n>:\x1b[0m\x1b[1CDown\x1b[2C\x1b[1m<Enter>:\x1b[0m\x1b[1CExecute\x1b8\x1b[1;1H\
-            \x1b[JSearch: brows\x1b7\x1b[1E\
-            > .browserslistrc\x1b[1E\
-            \x20\x20.editorconfig\x1b[1E\
-            \x20\x20.env\x1b[1E\
-            \x20\x20.env.local\x1b[1E\
-            \x20\x20.gitignore\x1b[1E\
-            \x20\x20.npmrc\x1b[1E\
-            \x20\x20.nvmrc\x1b[1E\
-            \x20\x20Dockerfile\x1b[1E\
-            \x20\x20LICENSE\x1b[1E\
-            \x20\x20README.md\x1b[1E\
-            \x20\x20package-lock.json\x1b[1E\
-            \x20\x20package.json\x1b[1E\
-            \x20\x20tsconfig.json\x1b[1E\
-            \x20\x20\xe2\x98\x95.txt\x1b[1E\
-            \x20\x20.config/bar.toml\x1b[1E\
-            \x20\x20.config/ok.toml\x1b[1E\
-            \x20\x20lib/bar.js\x1b[1E\
-            \x1b[19d\x1b[1m\x1b[7m.browserslistrc                                                                 \x1b[0m\x1b[1E\
-            \x1b[1m<Up>/<Ctrl-p>:\x1b[0m\x1b[1CUp\x1b[2C\x1b[1m<Down>/<Ctrl-n>:\x1b[0m\x1b[1CDown\x1b[2C\x1b[1m<Enter>:\x1b[0m\x1b[1CExecute\x1b8\x1b[1;1H\
-            \x1b[JSearch: browse\x1b7\x1b[1E\
-            > .browserslistrc\x1b[1E\
-            \x20\x20.editorconfig\x1b[1E\
-            \x20\x20.env\x1b[1E\
-            \x20\x20.env.local\x1b[1E\
-            \x20\x20.gitignore\x1b[1E\
-            \x20\x20.npmrc\x1b[1E\
-            \x20\x20.nvmrc\x1b[1E\
-            \x20\x20Dockerfile\x1b[1E\
-            \x20\x20LICENSE\x1b[1E\
-            \x20\x20README.md\x1b[1E\
-            \x20\x20package-lock.json\x1b[1E\
-            \x20\x20package.json\x1b[1E\
-            \x20\x20tsconfig.json\x1b[1E\
-            \x20\x20\xe2\x98\x95.txt\x1b[1E\
-            \x20\x20.config/bar.toml\x1b[1E\
-            \x20\x20.config/ok.toml\x1b[1E\
-            \x20\x20lib/bar.js\x1b[1E\
-            \x1b[19d\x1b[1m\x1b[7m.browserslistrc                                                                 \x1b[0m\x1b[1E\
-            \x1b[1m<Up>/<Ctrl-p>:\x1b[0m\x1b[1CUp\x1b[2C\x1b[1m<Down>/<Ctrl-n>:\x1b[0m\x1b[1CDown\x1b[2C\x1b[1m<Enter>:\x1b[0m\x1b[1CExecute\x1b8\x1b[1;1H\
-            \x1b[JSearch: browser\x1b7\x1b[1E\
-            > .browserslistrc\x1b[1E\
-            \x20\x20.editorconfig\x1b[1E\
-            \x20\x20.env\x1b[1E\
-            \x20\x20.env.local\x1b[1E\
-            \x20\x20.gitignore\x1b[1E\
-            \x20\x20.npmrc\x1b[1E\
-            \x20\x20.nvmrc\x1b[1E\
-            \x20\x20Dockerfile\x1b[1E\
-            \x20\x20LICENSE\x1b[1E\
-            \x20\x20README.md\x1b[1E\
-            \x20\x20package-lock.json\x1b[1E\
-            \x20\x20package.json\x1b[1E\
-            \x20\x20tsconfig.json\x1b[1E\
-            \x20\x20\xe2\x98\x95.txt\x1b[1E\
-            \x20\x20.config/bar.toml\x1b[1E\
-            \x20\x20.config/ok.toml\x1b[1E\
-            \x20\x20lib/bar.js\x1b[1E\
-            \x1b[19d\x1b[1m\x1b[7m.browserslistrc                                                                 \x1b[0m\x1b[1E\
-            \x1b[1m<Up>/<Ctrl-p>:\x1b[0m\x1b[1CUp\x1b[2C\x1b[1m<Down>/<Ctrl-n>:\x1b[0m\x1b[1CDown\x1b[2C\x1b[1m<Enter>:\x1b[0m\x1b[1CExecute\x1b8\x1b[1;1H\
-            \x1b[JSearch: browser\x1b7\x1b[1E\
-            > .\x1b[1mbrowse\x1b[0mrslist\x1b[1mr\x1b[0mc\x1b[1E\
-            \x1b[19d\x1b[1m\x1b[7m.browserslistrc                                                                 \x1b[0m\x1b[1E\
-            \x1b[1m<Up>/<Ctrl-p>:\x1b[0m\x1b[1CUp\x1b[2C\x1b[1m<Down>/<Ctrl-n>:\x1b[0m\x1b[1CDown\x1b[2C\x1b[1m<Enter>:\x1b[0m\x1b[1CExecute\x1b8\x1b[?1049l"
+            b"\x1b[?1049h\x1b[0m",
+            b"\x1b[1;1H\x1b[J",
+            b"Search: \x1b7\x1b[1E",
+            b"> .browserslistrc\x1b[1E",
+            b"  .editorconfig\x1b[1E",
+            b"  .env\x1b[1E",
+            b"  .env.local\x1b[1E",
+            b"  .gitignore\x1b[1E",
+            b"  .npmrc\x1b[1E",
+            b"  .nvmrc\x1b[1E",
+            b"  Dockerfile\x1b[1E",
+            b"  LICENSE\x1b[1E",
+            b"  README.md\x1b[1E",
+            b"  package-lock.json\x1b[1E",
+            b"  package.json\x1b[1E",
+            b"  tsconfig.json\x1b[1E",
+            b"  \xe2\x98\x95.txt\x1b[1E",
+            b"  .config/bar.toml\x1b[1E",
+            b"  .config/ok.toml\x1b[1E",
+            b"  lib/bar.js\x1b[1E",
+            b"\x1b[19d\x1b[1m\x1b[7m.browserslistrc                                                                 \x1b[0m\x1b[1E",
+            b"\x1b[1m<Up>/<Ctrl-p>:\x1b[0m\x1b[1CUp\x1b[2C\x1b[1m<Down>/<Ctrl-n>:\x1b[0m\x1b[1CDown\x1b[2C\x1b[1m<Enter>:\x1b[0m\x1b[1CExecute",
+            b"\x1b8",
+            b"\x1b[1;1H\x1b[J",
+            b"Search: b\x1b7\x1b[1E",
+            b"> .browserslistrc\x1b[1E",
+            b"  .editorconfig\x1b[1E",
+            b"  .env\x1b[1E",
+            b"  .env.local\x1b[1E",
+            b"  .gitignore\x1b[1E",
+            b"  .npmrc\x1b[1E",
+            b"  .nvmrc\x1b[1E",
+            b"  Dockerfile\x1b[1E",
+            b"  LICENSE\x1b[1E",
+            b"  README.md\x1b[1E",
+            b"  package-lock.json\x1b[1E",
+            b"  package.json\x1b[1E",
+            b"  tsconfig.json\x1b[1E",
+            b"  \xe2\x98\x95.txt\x1b[1E",
+            b"  .config/bar.toml\x1b[1E",
+            b"  .config/ok.toml\x1b[1E",
+            b"  lib/bar.js\x1b[1E",
+            b"\x1b[19d\x1b[1m\x1b[7m.browserslistrc                                                                 \x1b[0m\x1b[1E",
+            b"\x1b[1m<Up>/<Ctrl-p>:\x1b[0m\x1b[1CUp\x1b[2C\x1b[1m<Down>/<Ctrl-n>:\x1b[0m\x1b[1CDown\x1b[2C\x1b[1m<Enter>:\x1b[0m\x1b[1CExecute",
+            b"\x1b8",
+            b"\x1b[1;1H\x1b[J",
+            b"Search: br\x1b7\x1b[1E",
+            b"> .browserslistrc\x1b[1E",
+            b"  .editorconfig\x1b[1E",
+            b"  .env\x1b[1E",
+            b"  .env.local\x1b[1E",
+            b"  .gitignore\x1b[1E",
+            b"  .npmrc\x1b[1E",
+            b"  .nvmrc\x1b[1E",
+            b"  Dockerfile\x1b[1E",
+            b"  LICENSE\x1b[1E",
+            b"  README.md\x1b[1E",
+            b"  package-lock.json\x1b[1E",
+            b"  package.json\x1b[1E",
+            b"  tsconfig.json\x1b[1E",
+            b"  \xe2\x98\x95.txt\x1b[1E",
+            b"  .config/bar.toml\x1b[1E",
+            b"  .config/ok.toml\x1b[1E",
+            b"  lib/bar.js\x1b[1E",
+            b"\x1b[19d\x1b[1m\x1b[7m.browserslistrc                                                                 \x1b[0m\x1b[1E",
+            b"\x1b[1m<Up>/<Ctrl-p>:\x1b[0m\x1b[1CUp\x1b[2C\x1b[1m<Down>/<Ctrl-n>:\x1b[0m\x1b[1CDown\x1b[2C\x1b[1m<Enter>:\x1b[0m\x1b[1CExecute",
+            b"\x1b8",
+            b"\x1b[1;1H\x1b[J",
+            b"Search: bro\x1b7\x1b[1E",
+            b"> .browserslistrc\x1b[1E",
+            b"  .editorconfig\x1b[1E",
+            b"  .env\x1b[1E",
+            b"  .env.local\x1b[1E",
+            b"  .gitignore\x1b[1E",
+            b"  .npmrc\x1b[1E",
+            b"  .nvmrc\x1b[1E",
+            b"  Dockerfile\x1b[1E",
+            b"  LICENSE\x1b[1E",
+            b"  README.md\x1b[1E",
+            b"  package-lock.json\x1b[1E",
+            b"  package.json\x1b[1E",
+            b"  tsconfig.json\x1b[1E",
+            b"  \xe2\x98\x95.txt\x1b[1E",
+            b"  .config/bar.toml\x1b[1E",
+            b"  .config/ok.toml\x1b[1E",
+            b"  lib/bar.js\x1b[1E",
+            b"\x1b[19d\x1b[1m\x1b[7m.browserslistrc                                                                 \x1b[0m\x1b[1E",
+            b"\x1b[1m<Up>/<Ctrl-p>:\x1b[0m\x1b[1CUp\x1b[2C\x1b[1m<Down>/<Ctrl-n>:\x1b[0m\x1b[1CDown\x1b[2C\x1b[1m<Enter>:\x1b[0m\x1b[1CExecute",
+            b"\x1b8",
+            b"\x1b[1;1H\x1b[J",
+            b"Search: brow\x1b7\x1b[1E",
+            b"> .browserslistrc\x1b[1E",
+            b"  .editorconfig\x1b[1E",
+            b"  .env\x1b[1E",
+            b"  .env.local\x1b[1E",
+            b"  .gitignore\x1b[1E",
+            b"  .npmrc\x1b[1E",
+            b"  .nvmrc\x1b[1E",
+            b"  Dockerfile\x1b[1E",
+            b"  LICENSE\x1b[1E",
+            b"  README.md\x1b[1E",
+            b"  package-lock.json\x1b[1E",
+            b"  package.json\x1b[1E",
+            b"  tsconfig.json\x1b[1E",
+            b"  \xe2\x98\x95.txt\x1b[1E",
+            b"  .config/bar.toml\x1b[1E",
+            b"  .config/ok.toml\x1b[1E",
+            b"  lib/bar.js\x1b[1E",
+            b"\x1b[19d\x1b[1m\x1b[7m.browserslistrc                                                                 \x1b[0m\x1b[1E",
+            b"\x1b[1m<Up>/<Ctrl-p>:\x1b[0m\x1b[1CUp\x1b[2C\x1b[1m<Down>/<Ctrl-n>:\x1b[0m\x1b[1CDown\x1b[2C\x1b[1m<Enter>:\x1b[0m\x1b[1CExecute",
+            b"\x1b8",
+            b"\x1b[1;1H\x1b[J",
+            b"Search: brows\x1b7\x1b[1E",
+            b"> .browserslistrc\x1b[1E",
+            b"  .editorconfig\x1b[1E",
+            b"  .env\x1b[1E",
+            b"  .env.local\x1b[1E",
+            b"  .gitignore\x1b[1E",
+            b"  .npmrc\x1b[1E",
+            b"  .nvmrc\x1b[1E",
+            b"  Dockerfile\x1b[1E",
+            b"  LICENSE\x1b[1E",
+            b"  README.md\x1b[1E",
+            b"  package-lock.json\x1b[1E",
+            b"  package.json\x1b[1E",
+            b"  tsconfig.json\x1b[1E",
+            b"  \xe2\x98\x95.txt\x1b[1E",
+            b"  .config/bar.toml\x1b[1E",
+            b"  .config/ok.toml\x1b[1E",
+            b"  lib/bar.js\x1b[1E",
+            b"\x1b[19d\x1b[1m\x1b[7m.browserslistrc                                                                 \x1b[0m\x1b[1E",
+            b"\x1b[1m<Up>/<Ctrl-p>:\x1b[0m\x1b[1CUp\x1b[2C\x1b[1m<Down>/<Ctrl-n>:\x1b[0m\x1b[1CDown\x1b[2C\x1b[1m<Enter>:\x1b[0m\x1b[1CExecute",
+            b"\x1b8",
+            b"\x1b[1;1H\x1b[J",
+            b"Search: browse\x1b7\x1b[1E",
+            b"> .browserslistrc\x1b[1E",
+            b"  .editorconfig\x1b[1E",
+            b"  .env\x1b[1E",
+            b"  .env.local\x1b[1E",
+            b"  .gitignore\x1b[1E",
+            b"  .npmrc\x1b[1E",
+            b"  .nvmrc\x1b[1E",
+            b"  Dockerfile\x1b[1E",
+            b"  LICENSE\x1b[1E",
+            b"  README.md\x1b[1E",
+            b"  package-lock.json\x1b[1E",
+            b"  package.json\x1b[1E",
+            b"  tsconfig.json\x1b[1E",
+            b"  \xe2\x98\x95.txt\x1b[1E",
+            b"  .config/bar.toml\x1b[1E",
+            b"  .config/ok.toml\x1b[1E",
+            b"  lib/bar.js\x1b[1E",
+            b"\x1b[19d\x1b[1m\x1b[7m.browserslistrc                                                                 \x1b[0m\x1b[1E",
+            b"\x1b[1m<Up>/<Ctrl-p>:\x1b[0m\x1b[1CUp\x1b[2C\x1b[1m<Down>/<Ctrl-n>:\x1b[0m\x1b[1CDown\x1b[2C\x1b[1m<Enter>:\x1b[0m\x1b[1CExecute",
+            b"\x1b8",
+            b"\x1b[1;1H\x1b[J",
+            b"Search: browser\x1b7\x1b[1E",
+            b"> .browserslistrc\x1b[1E",
+            b"  .editorconfig\x1b[1E",
+            b"  .env\x1b[1E",
+            b"  .env.local\x1b[1E",
+            b"  .gitignore\x1b[1E",
+            b"  .npmrc\x1b[1E",
+            b"  .nvmrc\x1b[1E",
+            b"  Dockerfile\x1b[1E",
+            b"  LICENSE\x1b[1E",
+            b"  README.md\x1b[1E",
+            b"  package-lock.json\x1b[1E",
+            b"  package.json\x1b[1E",
+            b"  tsconfig.json\x1b[1E",
+            b"  \xe2\x98\x95.txt\x1b[1E",
+            b"  .config/bar.toml\x1b[1E",
+            b"  .config/ok.toml\x1b[1E",
+            b"  lib/bar.js\x1b[1E",
+            b"\x1b[19d\x1b[1m\x1b[7m.browserslistrc                                                                 \x1b[0m\x1b[1E",
+            b"\x1b[1m<Up>/<Ctrl-p>:\x1b[0m\x1b[1CUp\x1b[2C\x1b[1m<Down>/<Ctrl-n>:\x1b[0m\x1b[1CDown\x1b[2C\x1b[1m<Enter>:\x1b[0m\x1b[1CExecute",
+            b"\x1b8",
+            b"\x1b[1;1H\x1b[J",
+            b"Search: browser\x1b7\x1b[1E",
+            b"> .\x1b[1mbrowse\x1b[0mrslist\x1b[1mr\x1b[0mc\x1b[1E",
+            b"\x1b[19d\x1b[1m\x1b[7m.browserslistrc                                                                 \x1b[0m\x1b[1E",
+            b"\x1b[1m<Up>/<Ctrl-p>:\x1b[0m\x1b[1CUp\x1b[2C\x1b[1m<Down>/<Ctrl-n>:\x1b[0m\x1b[1CDown\x1b[2C\x1b[1m<Enter>:\x1b[0m\x1b[1CExecute",
+            b"\x1b8",
+            b"\x1b[?1049l"
         )
     );
 }

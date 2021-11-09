@@ -19,8 +19,8 @@ macro_rules! buf {
         $crate::helper::Buffer::new()
     }};
 
-    ($s:expr) => {{
-        $crate::helper::Buffer::from($s)
+    ($($s:expr),+) => {{
+        $crate::helper::Buffer::from([$(&$s[..]),+].concat())
     }};
 }
 
@@ -100,6 +100,14 @@ impl From<String> for Buffer {
     fn from(s: String) -> Self {
         Self {
             inner: Vec::from(s.as_bytes()),
+        }
+    }
+}
+
+impl From<Vec<u8>> for Buffer {
+    fn from(b: Vec<u8>) -> Self {
+        Self {
+            inner: Vec::from(b),
         }
     }
 }
