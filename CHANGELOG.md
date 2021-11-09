@@ -1,5 +1,13 @@
 # Changelog
 
+## [Unreleased](https://github.com/yykamei/thwack/tree/HEAD)
+
+[Full Changelog](https://github.com/yykamei/thwack/compare/v0.4.7...HEAD)
+
+**Merged pull requests:**
+
+- Make `buf!` receive multiple expressions [\#170](https://github.com/yykamei/thwack/pull/170) ([yykamei](https://github.com/yykamei))
+
 ## [v0.4.7](https://github.com/yykamei/thwack/tree/v0.4.7) (2021-11-08)
 
 [Full Changelog](https://github.com/yykamei/thwack/compare/v0.4.6...v0.4.7)
