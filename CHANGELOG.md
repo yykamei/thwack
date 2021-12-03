@@ -6,6 +6,7 @@
 
 **Merged pull requests:**
 
+- Bump libc from 0.2.107 to 0.2.108 [\#172](https://github.com/yykamei/thwack/pull/172) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Make `buf!` receive multiple expressions [\#170](https://github.com/yykamei/thwack/pull/170) ([yykamei](https://github.com/yykamei))
 
 ## [v0.4.7](https://github.com/yykamei/thwack/tree/v0.4.7) (2021-11-08)
