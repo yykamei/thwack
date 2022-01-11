@@ -1,5 +1,13 @@
 # Changelog
 
+## [Unreleased](https://github.com/yykamei/thwack/tree/HEAD)
+
+[Full Changelog](https://github.com/yykamei/thwack/compare/v0.4.9...HEAD)
+
+**Merged pull requests:**
+
+- Bump tempfile from 3.2.0 to 3.3.0 [\#179](https://github.com/yykamei/thwack/pull/179) ([dependabot[bot]](https://github.com/apps/dependabot))
+
 ## [v0.4.9](https://github.com/yykamei/thwack/tree/v0.4.9) (2021-12-13)
 
 [Full Changelog](https://github.com/yykamei/thwack/compare/v0.4.8...v0.4.9)
