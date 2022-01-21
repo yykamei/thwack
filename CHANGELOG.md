@@ -6,6 +6,7 @@
 
 **Merged pull requests:**
 
+- Bump libc from 0.2.111 to 0.2.113 [\#181](https://github.com/yykamei/thwack/pull/181) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump tempfile from 3.2.0 to 3.3.0 [\#179](https://github.com/yykamei/thwack/pull/179) ([dependabot[bot]](https://github.com/apps/dependabot))
 
 ## [v0.4.9](https://github.com/yykamei/thwack/tree/v0.4.9) (2021-12-13)
