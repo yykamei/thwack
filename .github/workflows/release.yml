@@ -27,10 +27,10 @@ jobs:
             os: ubuntu-latest
             suffix: .tar.gz
           - target: x86_64-apple-darwin
-            os: macOS-latest
+            os: macOS-11
             suffix: .tar.gz
           - target: aarch64-apple-darwin
-            os: macOS-latest
+            os: macOS-11
             suffix: .tar.gz
           - target: x86_64-pc-windows-msvc
             os: windows-latest
@@ -55,9 +55,6 @@ jobs:
           command: build
           args: --release --locked --target ${{ matrix.target }}
           use-cross: ${{ matrix.os == 'ubuntu-latest' }}
-        env:
-          # TODO: SDKROOT can be removed once it's the default. See https://github.com/starship/starship/pull/2300
-          SDKROOT: /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk
 
       - name: Bundle on Windows
         run: 7z a ../../../thwack-${{ matrix.target }}${{ matrix.suffix }} thwack.exe
