@@ -6,6 +6,7 @@
 
 **Merged pull requests:**
 
+- Run `cargo update` [\#194](https://github.com/yykamei/thwack/pull/194) ([yykamei](https://github.com/yykamei))
 - Bump unicode-segmentation from 1.8.0 to 1.9.0 [\#190](https://github.com/yykamei/thwack/pull/190) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump crossterm from 0.22.1 to 0.23.0 [\#189](https://github.com/yykamei/thwack/pull/189) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump libc from 0.2.113 to 0.2.117 [\#188](https://github.com/yykamei/thwack/pull/188) ([dependabot[bot]](https://github.com/apps/dependabot))
