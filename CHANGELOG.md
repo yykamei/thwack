@@ -7,6 +7,7 @@
 **Merged pull requests:**
 
 - Bump unicode-segmentation from 1.8.0 to 1.9.0 [\#190](https://github.com/yykamei/thwack/pull/190) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump libc from 0.2.113 to 0.2.117 [\#188](https://github.com/yykamei/thwack/pull/188) ([dependabot[bot]](https://github.com/apps/dependabot))
 
 ## [v0.4.10](https://github.com/yykamei/thwack/tree/v0.4.10) (2022-01-21)
 
