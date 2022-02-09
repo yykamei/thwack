@@ -300,6 +300,8 @@ fn find_paths(starting_point: &StartingPoint, query: &str, limit: u16) -> Result
 
 /// Invoke the specified command with the selected path.
 fn invoke(exec: &str, path: &str) -> Result<()> {
+    // TODO: This function is not tested because execvp(3) replaces the current process with a new process, which means tests will stop.
+
     let mut cstrings: Vec<CString> = Vec::with_capacity(10); // TODO: Why is it 10?
     for arg in exec.split_whitespace() {
         cstrings.push(CString::new(arg)?);
