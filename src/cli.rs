@@ -1,4 +1,3 @@
-// TODO: This file requires refactoring, but first I want to make sure the behavior is expected through testing.
 use std::ffi::{CString, OsString};
 use std::io::{self, Stderr, Stdout, Write};
 use std::os::raw::c_char;
