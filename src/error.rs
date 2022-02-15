@@ -11,7 +11,6 @@ pub type Result<T> = StdResult<T, Error>;
 #[derive(Debug)]
 pub enum ErrorKind {
     Args,
-    InsufficientQuery, // TODO: Delete
     InvalidUnicode,
     IO,
     Terminal,
@@ -45,15 +44,6 @@ impl Error {
         Self {
             message: message.to_string(),
             kind: ErrorKind::Args,
-            source: None,
-            exit_code: FAILURE,
-        }
-    }
-
-    pub fn insufficient_query(message: &str) -> Self {
-        Self {
-            message: message.to_string(),
-            kind: ErrorKind::InsufficientQuery,
             source: None,
             exit_code: FAILURE,
         }
