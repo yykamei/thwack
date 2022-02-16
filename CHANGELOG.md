@@ -4,6 +4,10 @@
 
 [Full Changelog](https://github.com/yykamei/thwack/compare/v0.4.10...HEAD)
 
+**Fixed bugs:**
+
+- thwack cannot run on directories that contain inaccessible files [\#198](https://github.com/yykamei/thwack/issues/198)
+
 **Merged pull requests:**
 
 - Bump libc from 0.2.117 to 0.2.118 [\#200](https://github.com/yykamei/thwack/pull/200) ([dependabot[bot]](https://github.com/apps/dependabot))
