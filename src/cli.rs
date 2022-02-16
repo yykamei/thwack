@@ -289,8 +289,10 @@ fn find_paths(starting_point: &StartingPoint, query: &str, limit: u16) -> Result
 
     for path in Finder::new(starting_point, query)? {
         // TODO: Shouldn't we stop iteration when some paths returns Err?
-        let path = path?;
-        paths.push(path);
+        match path {
+            Ok(path) => paths.push(path),
+            Err(_) => (), // TODO: Output failed paths to a log file.
+        }
     }
 
     paths.sort();
