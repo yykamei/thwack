@@ -1,5 +1,13 @@
 # Changelog
 
+## [Unreleased](https://github.com/yykamei/thwack/tree/HEAD)
+
+[Full Changelog](https://github.com/yykamei/thwack/compare/v0.4.11...HEAD)
+
+**Implemented enhancements:**
+
+- Support --log-file option to write logs [\#204](https://github.com/yykamei/thwack/pull/204) ([yykamei](https://github.com/yykamei))
+
 ## [v0.4.11](https://github.com/yykamei/thwack/tree/v0.4.11) (2022-02-16)
 
 [Full Changelog](https://github.com/yykamei/thwack/compare/v0.4.10...v0.4.11)
