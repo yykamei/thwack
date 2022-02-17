@@ -19,7 +19,7 @@ use crate::finder::Finder;
 use crate::matched_path::MatchedPath;
 use crate::starting_point::StartingPoint;
 use crate::terminal::{Terminal, TerminalEvent};
-use crate::Error;
+use crate::{logger, Error};
 
 pub fn safe_exit(code: i32, stdout: Stdout, stderr: Stderr) {
     let _ = stdout.lock().flush();
@@ -34,8 +34,13 @@ pub fn entrypoint<A: Iterator<Item = OsString>, W: Write>(
     mut event: impl TerminalEvent,
 ) -> Result<()> {
     let args = Parser::new(args).parse()?;
+    if let Some(ref path) = args.log_file {
+        logger::init(path)?;
+        log::trace!("Logger initialized!");
+    }
     if args.help {
         print_and_flush(stdout, HELP)?;
+        log::trace!("Show help and exit");
         return Ok(());
     }
     if args.version {
@@ -43,6 +48,7 @@ pub fn entrypoint<A: Iterator<Item = OsString>, W: Write>(
             stdout,
             &format!("{} {}\n", env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION")),
         )?;
+        log::trace!("Show version and exit");
         return Ok(());
     }
 

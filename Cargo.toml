@@ -12,6 +12,7 @@ version = "0.4.11"
 [dependencies]
 crossterm = "0.23.0"
 libc = "0.2.118"
+log = { version = "0.4.14", features = ["std"] }
 unicode-segmentation = "1.9.0"
 unicode-width = "0.1.9"
 
