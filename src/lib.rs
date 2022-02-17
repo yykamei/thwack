@@ -7,6 +7,7 @@ mod args;
 mod cli;
 mod error;
 mod finder;
+mod logger;
 mod matched_path;
 mod starting_point;
 mod terminal;

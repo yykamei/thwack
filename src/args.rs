@@ -15,13 +15,15 @@ ARGS:
 
 OPTIONS:
     --exec <COMMAND>          Change the execution command from the default.
-                              This is run when you hit the Enter on a path
+                              This is run when you hit the Enter on a path.
                               The default command is \"notepad\" on Windows, or \"cat\" on other platforms.
-    --starting-point <PATH>   Change the starting point from the default (\".\")
+    --log-file <PATH>         Log what the program is doing to the specified PATH.
+                              Log information is not output by default.
+    --starting-point <PATH>   Change the starting point from the default (\".\").
     --status-line <TYPE>      Change the information on the status line.
                               The possible values are \"absolute\", \"relative\", and \"none.\"
                               The default is \"absolute.\"
-    -h, --help                Prints help information
+    -h, --help                Prints help information.
     -v, --version             Prints version info and exit
 ";
 
@@ -56,6 +58,7 @@ impl<A: Iterator<Item = OsString>> Parser<A> {
                 "--exec" => self.set_exec(None)?,
                 "--starting-point" => self.set_starting_point(None)?,
                 "--status-line" => self.set_status_line(None)?,
+                "--log-file" => self.set_log_file(None)?,
                 x if x.starts_with("--exec=") => {
                     if let Some((_, val)) = x.split_once('=') {
                         self.set_exec(Some(val))?;
@@ -69,6 +72,11 @@ impl<A: Iterator<Item = OsString>> Parser<A> {
                 x if x.starts_with("--status-line=") => {
                     if let Some((_, val)) = x.split_once('=') {
                         self.set_status_line(Some(val))?;
+                    }
+                }
+                x if x.starts_with("--log-file=") => {
+                    if let Some((_, val)) = x.split_once('=') {
+                        self.set_log_file(Some(val))?;
                     }
                 }
                 x => {
@@ -125,6 +133,11 @@ impl<A: Iterator<Item = OsString>> Parser<A> {
     fn set_status_line(&mut self, value: Option<&str>) -> Result<()> {
         let value = self.arg_value("--status-line", value)?;
         self.parsed_args.status_line = StatusLine::try_from(value).map_err(|(_, given)| Error::args(&format!("The argument of \"--status-line\" must be one of \"absolute\", \"relative\", or \"none\": {:?} was given.", given)))?;
+        Ok(())
+    }
+
+    fn set_log_file(&mut self, value: Option<&str>) -> Result<()> {
+        self.parsed_args.log_file = Some(self.arg_value("--log-file", value)?);
         Ok(())
     }
 
@@ -190,6 +203,7 @@ pub(crate) struct ParsedArgs {
     pub(crate) version: bool,
     pub(crate) starting_point: String,
     pub(crate) status_line: StatusLine,
+    pub(crate) log_file: Option<String>,
     pub(crate) query: String,
     pub(crate) exec: String,
 }
@@ -201,6 +215,7 @@ impl Default for ParsedArgs {
             version: false,
             starting_point: String::from("."),
             status_line: StatusLine::Absolute,
+            log_file: None,
             query: String::from(""),
             exec: if cfg!(windows) {
                 String::from("notepad")
@@ -385,6 +400,72 @@ mod tests {
                 .message,
             format!(
                 "{}\n\n\"--starting-point\" needs a value. Empty string cannot be processed.",
+                HELP
+            ),
+        );
+    }
+
+    #[test]
+    fn parser_with_log_file() {
+        assert_eq!(
+            Parser::new(args!["program", "--log-file=./log.txt"])
+                .parse()
+                .unwrap(),
+            ParsedArgs {
+                log_file: Some(String::from("./log.txt")),
+                ..default!()
+            }
+        );
+        assert_eq!(
+            Parser::new(args!["program", "--log-file", "./abc"])
+                .parse()
+                .unwrap(),
+            ParsedArgs {
+                log_file: Some(String::from("./abc")),
+                ..default!()
+            }
+        );
+        assert_eq!(
+            Parser::new(args!["program", "--log-file==ok="])
+                .parse()
+                .unwrap(),
+            ParsedArgs {
+                log_file: Some(String::from("=ok=")),
+                ..default!()
+            }
+        );
+        assert_eq!(
+            Parser::new(args!["program", "--log-file", "xyz", "--help", "query"])
+                .parse()
+                .unwrap(),
+            ParsedArgs {
+                help: true,
+                query: String::from("query"),
+                log_file: Some(String::from("xyz")),
+                ..default!()
+            }
+        );
+        assert_eq!(
+            Parser::new(args!["program", "--log-file"])
+                .parse()
+                .unwrap_err()
+                .message,
+            format!("{}\n\n\"--log-file\" needs a value.", HELP),
+        );
+        assert_eq!(
+            Parser::new(args!["program", "--log-file", "--"])
+                .parse()
+                .unwrap_err()
+                .message,
+            format!("{}\n\n\"--log-file\" needs a value.", HELP),
+        );
+        assert_eq!(
+            Parser::new(args!["program", "--log-file="])
+                .parse()
+                .unwrap_err()
+                .message,
+            format!(
+                "{}\n\n\"--log-file\" needs a value. Empty string cannot be processed.",
                 HELP
             ),
         );
@@ -613,6 +694,7 @@ mod tests {
                 version: false,
                 starting_point: String::from("."),
                 status_line: StatusLine::Absolute,
+                log_file: None,
                 query: String::from(""),
                 exec,
             }
