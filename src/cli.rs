@@ -36,11 +36,11 @@ pub fn entrypoint<A: Iterator<Item = OsString>, W: Write>(
     let args = Parser::new(args).parse()?;
     if let Some(ref path) = args.log_file {
         logger::init(path)?;
-        log::trace!("Logger initialized!");
+        log::debug!("Logger initialized!");
     }
     if args.help {
         print_and_flush(stdout, HELP)?;
-        log::trace!("Show help and exit");
+        log::debug!("Show help and exit");
         return Ok(());
     }
     if args.version {
@@ -48,7 +48,7 @@ pub fn entrypoint<A: Iterator<Item = OsString>, W: Write>(
             stdout,
             &format!("{} {}\n", env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION")),
         )?;
-        log::trace!("Show version and exit");
+        log::debug!("Show version and exit");
         return Ok(());
     }
 
@@ -59,8 +59,15 @@ pub fn entrypoint<A: Iterator<Item = OsString>, W: Write>(
     let mut selection: u16 = 0;
     let mut state = State::QueryChanged;
     initialize_terminal(stdout, &terminal)?;
+    log::debug!(
+        "Initialized terminal! size=({:?}, {:?}), starting_point={:?}",
+        columns,
+        rows,
+        starting_point
+    );
 
     loop {
+        log::trace!("state={:?}", state);
         match state {
             State::QueryChanged => {
                 output_on_terminal(stdout, &args, &query, &paths[..], selection, columns, rows)?
@@ -78,6 +85,7 @@ pub fn entrypoint<A: Iterator<Item = OsString>, W: Write>(
 
         if event.poll(Duration::from_millis(300))? {
             let ev = event.read()?;
+            log::trace!("Event={:?}", ev);
             if should_just_exit(&ev) {
                 break;
             } else if let Event::Key(KeyEvent {
@@ -131,6 +139,7 @@ pub fn entrypoint<A: Iterator<Item = OsString>, W: Write>(
     Ok(())
 }
 
+#[derive(Debug)]
 enum State<'a> {
     Ready,
     QueryChanged,
