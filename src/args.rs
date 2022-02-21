@@ -23,6 +23,7 @@ OPTIONS:
     --status-line <TYPE>      Change the information on the status line.
                               The possible values are \"absolute\", \"relative\", and \"none.\"
                               The default is \"absolute.\"
+    --no-gitignore            Do not respect .gitignore and search all paths including Git ignored paths.
     -h, --help                Prints help information.
     -v, --version             Prints version info and exit
 ";
@@ -58,6 +59,7 @@ impl<A: Iterator<Item = OsString>> Parser<A> {
                 "--exec" => self.set_exec(None)?,
                 "--starting-point" => self.set_starting_point(None)?,
                 "--status-line" => self.set_status_line(None)?,
+                "--no-gitignore" => self.parsed_args.gitignore = false,
                 "--log-file" => self.set_log_file(None)?,
                 x if x.starts_with("--exec=") => {
                     if let Some((_, val)) = x.split_once('=') {
@@ -201,6 +203,7 @@ impl TryFrom<String> for StatusLine {
 pub(crate) struct ParsedArgs {
     pub(crate) help: bool,
     pub(crate) version: bool,
+    pub(crate) gitignore: bool,
     pub(crate) starting_point: String,
     pub(crate) status_line: StatusLine,
     pub(crate) log_file: Option<String>,
@@ -213,6 +216,7 @@ impl Default for ParsedArgs {
         Self {
             help: false,
             version: false,
+            gitignore: true,
             starting_point: String::from("."),
             status_line: StatusLine::Absolute,
             log_file: None,
@@ -692,6 +696,7 @@ mod tests {
             ParsedArgs {
                 help: false,
                 version: false,
+                gitignore: true,
                 starting_point: String::from("."),
                 status_line: StatusLine::Absolute,
                 log_file: None,
