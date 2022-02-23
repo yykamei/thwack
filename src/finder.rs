@@ -199,7 +199,7 @@ mod tests {
     }
 
     #[test]
-    fn returns_all_paths() {
+    fn includes_gitignore_paths() {
         let dir = create_tree().unwrap();
         let paths = find_paths(dir.path().to_str().unwrap(), "", None);
         assert!(paths.contains(&".git/config".to_string()));
@@ -207,11 +207,10 @@ mod tests {
     }
 
     #[test]
-    fn returns_all_paths_excluding_git() {
+    fn excludes_gitignore_paths() {
         let dir = create_tree().unwrap();
         let repo = Some(Repository::open(dir.path()).unwrap());
         let paths = find_paths(dir.path().to_str().unwrap(), "", repo.as_ref());
-        assert_eq!(paths.len(), 29);
         assert!(!paths.contains(&".git/config".to_string()));
         assert!(!paths.contains(&".log.txt".to_string()));
     }
