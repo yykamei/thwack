@@ -166,6 +166,10 @@ mod tests {
         let _ = File::create(tmp.path().join("tsconfig.json"))?;
         let _ = File::create(tmp.path().join("☕.txt"))?;
         let repo = Repository::init(tmp.path()).unwrap();
+        repo.config()
+            .unwrap()
+            .set_bool("core.autocrlf", true)
+            .unwrap();
         let signature = Signature::now("test", "test@example.com").unwrap();
         let tree = repo
             .find_tree(repo.index().unwrap().write_tree().unwrap())
