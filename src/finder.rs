@@ -135,14 +135,14 @@ mod tests {
         create_dir_all(tmp.path().join("src/a/b/c"))?;
         create_dir_all(tmp.path().join("lib/a/b/c"))?;
         create_dir_all(tmp.path().join(".config"))?;
-        let _ = File::create(tmp.path().join(".log.txt"))?;
+        let _ = File::create(tmp.path().join("log.txt"))?;
         let _ = File::create(tmp.path().join(".browserslistrc"))?;
         let _ = File::create(tmp.path().join(".config/bar.toml"))?;
         let _ = File::create(tmp.path().join(".config/ok.toml"))?;
         let _ = File::create(tmp.path().join(".editorconfig"))?;
         let _ = File::create(tmp.path().join(".env"))?;
         let _ = File::create(tmp.path().join(".env.local"))?;
-        let _ = File::create(tmp.path().join(".gitignore"))?.write_all(b".log.txt")?;
+        let _ = File::create(tmp.path().join(".gitignore"))?.write_all(b"log.txt")?;
         let _ = File::create(tmp.path().join(".npmrc"))?;
         let _ = File::create(tmp.path().join(".nvmrc"))?;
         let _ = File::create(tmp.path().join("Dockerfile"))?;
@@ -203,7 +203,7 @@ mod tests {
         let dir = create_tree().unwrap();
         let paths = find_paths(dir.path().to_str().unwrap(), "", None);
         assert!(paths.contains(&".git/config".to_string()));
-        assert!(paths.contains(&".log.txt".to_string()));
+        assert!(paths.contains(&"log.txt".to_string()));
     }
 
     #[test]
@@ -211,8 +211,9 @@ mod tests {
         let dir = create_tree().unwrap();
         let repo = Some(Repository::open(dir.path()).unwrap());
         let paths = find_paths(dir.path().to_str().unwrap(), "", repo.as_ref());
+        assert_eq!(paths.len(), 29);
         assert!(!paths.contains(&".git/config".to_string()));
-        assert!(!paths.contains(&".log.txt".to_string()));
+        assert!(!paths.contains(&"log.txt".to_string()));
     }
 
     #[test]
