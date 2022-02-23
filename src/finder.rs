@@ -142,7 +142,7 @@ mod tests {
         let _ = File::create(tmp.path().join(".editorconfig"))?;
         let _ = File::create(tmp.path().join(".env"))?;
         let _ = File::create(tmp.path().join(".env.local"))?;
-        let _ = File::create(tmp.path().join(".gitignore"))?.write_all(b"log.txt")?;
+        let _ = File::create(tmp.path().join(".gitignore"))?.write_all(b"log.txt\r\n")?;
         let _ = File::create(tmp.path().join(".npmrc"))?;
         let _ = File::create(tmp.path().join(".nvmrc"))?;
         let _ = File::create(tmp.path().join("Dockerfile"))?;
@@ -166,10 +166,6 @@ mod tests {
         let _ = File::create(tmp.path().join("tsconfig.json"))?;
         let _ = File::create(tmp.path().join("☕.txt"))?;
         let repo = Repository::init(tmp.path()).unwrap();
-        repo.config()
-            .unwrap()
-            .set_bool("core.autocrlf", true)
-            .unwrap();
         let signature = Signature::now("test", "test@example.com").unwrap();
         let tree = repo
             .find_tree(repo.index().unwrap().write_tree().unwrap())
