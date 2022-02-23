@@ -202,7 +202,6 @@ mod tests {
     fn returns_all_paths() {
         let dir = create_tree().unwrap();
         let paths = find_paths(dir.path().to_str().unwrap(), "", None);
-        assert_eq!(paths.len(), 40);
         assert!(paths.contains(&".git/config".to_string()));
         assert!(paths.contains(&".log.txt".to_string()));
     }
