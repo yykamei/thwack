@@ -135,6 +135,7 @@ mod tests {
         create_dir_all(tmp.path().join("src/a/b/c"))?;
         create_dir_all(tmp.path().join("lib/a/b/c"))?;
         create_dir_all(tmp.path().join(".config"))?;
+        let _ = File::create(tmp.path().join(".gitignore"))?.write_all(b"log.txt\r\n")?;
         let _ = File::create(tmp.path().join("log.txt"))?;
         let _ = File::create(tmp.path().join(".browserslistrc"))?;
         let _ = File::create(tmp.path().join(".config/bar.toml"))?;
@@ -142,7 +143,6 @@ mod tests {
         let _ = File::create(tmp.path().join(".editorconfig"))?;
         let _ = File::create(tmp.path().join(".env"))?;
         let _ = File::create(tmp.path().join(".env.local"))?;
-        let _ = File::create(tmp.path().join(".gitignore"))?.write_all(b"log.txt\r\n")?;
         let _ = File::create(tmp.path().join(".npmrc"))?;
         let _ = File::create(tmp.path().join(".nvmrc"))?;
         let _ = File::create(tmp.path().join("Dockerfile"))?;
