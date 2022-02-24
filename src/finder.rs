@@ -194,12 +194,6 @@ mod tests {
         let target = head.target().unwrap();
         let commit = repo.find_commit(target).unwrap();
         let tree = repo.find_tree(commit.tree_id()).unwrap();
-        let statuses = repo
-            .statuses(Some(&mut git2::StatusOptions::new()))
-            .unwrap();
-        for entry in statuses.iter() {
-            println!("{:?}", entry.path());
-        }
         let _ = repo
             .commit(
                 Some("HEAD"),
@@ -239,8 +233,14 @@ mod tests {
     #[test]
     fn excludes_gitignore_paths() {
         let dir = create_tree().unwrap();
-        let repo = Some(Repository::open(dir.path()).unwrap());
-        let paths = find_paths(dir.path().to_str().unwrap(), "", repo.as_ref());
+        let repo = Repository::open(dir.path()).unwrap();
+        let statuses = repo
+            .statuses(Some(&mut git2::StatusOptions::new()))
+            .unwrap();
+        for entry in statuses.iter() {
+            println!("{:?}", entry.path());
+        }
+        let paths = find_paths(dir.path().to_str().unwrap(), "", Some(&repo));
         assert_eq!(paths.len(), 29);
         assert!(!paths.contains(&".git/config".to_string()));
         assert!(!paths.contains(&"log.txt".to_string()));
