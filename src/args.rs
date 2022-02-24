@@ -565,6 +565,19 @@ mod tests {
     }
 
     #[test]
+    fn parser_with_no_gitignore() {
+        assert_eq!(
+            Parser::new(args!["program", "--no-gitignore"])
+                .parse()
+                .unwrap(),
+            ParsedArgs {
+                gitignore: false,
+                ..default!()
+            }
+        );
+    }
+
+    #[test]
     fn parser_with_starting_point_disallow_option_like_value() {
         assert_eq!(
             Parser::new(args!["program", "--starting-point", "--option-like-value"])

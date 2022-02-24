@@ -12,6 +12,7 @@ use crossterm::{
     style::{self, Attribute},
     terminal::{Clear, ClearType, EnterAlternateScreen, LeaveAlternateScreen},
 };
+use git2::Repository;
 
 use crate::args::{ParsedArgs, Parser, StatusLine, HELP};
 use crate::error::Result;
@@ -52,10 +53,29 @@ pub fn entrypoint<A: Iterator<Item = OsString>, W: Write>(
         return Ok(());
     }
 
+    let repo = if args.gitignore {
+        match Repository::discover(&args.starting_point) {
+            Ok(r) => Some(r),
+            Err(_) => {
+                log::info!(
+                    "The starting point `{}` is not a Git repository",
+                    &args.starting_point
+                );
+                None
+            }
+        }
+    } else {
+        None
+    };
     let (mut columns, mut rows) = terminal.size()?;
     let starting_point = StartingPoint::new(&args.starting_point)?;
     let mut query = args.query.clone();
-    let mut paths = find_paths(&starting_point, &query, paths_rows(&args, rows))?;
+    let mut paths = find_paths(
+        &starting_point,
+        &query,
+        paths_rows(&args, rows),
+        repo.as_ref(),
+    )?;
     let mut selection: u16 = 0;
     let mut state = State::QueryChanged;
     initialize_terminal(stdout, &terminal)?;
@@ -120,11 +140,21 @@ pub fn entrypoint<A: Iterator<Item = OsString>, W: Write>(
                 } else {
                     selection
                 };
-                paths = find_paths(&starting_point, &query, paths_rows(&args, rows))?;
+                paths = find_paths(
+                    &starting_point,
+                    &query,
+                    paths_rows(&args, rows),
+                    repo.as_ref(),
+                )?;
                 state = State::PathsChanged;
             }
         } else if let State::QueryChanged = state {
-            paths = find_paths(&starting_point, &query, paths_rows(&args, rows))?;
+            paths = find_paths(
+                &starting_point,
+                &query,
+                paths_rows(&args, rows),
+                repo.as_ref(),
+            )?;
             state = State::PathsChanged;
             selection = 0;
         }
@@ -299,14 +329,19 @@ fn help_line(stdout: &mut impl Write, max_columns: usize) -> Result<()> {
     Ok(())
 }
 
-fn find_paths(starting_point: &StartingPoint, query: &str, limit: u16) -> Result<Vec<MatchedPath>> {
+fn find_paths(
+    starting_point: &StartingPoint,
+    query: &str,
+    limit: u16,
+    repo: Option<&Repository>,
+) -> Result<Vec<MatchedPath>> {
     let mut paths = Vec::with_capacity(100); // TODO: Tune this capacity later.
 
-    for path in Finder::new(starting_point, query)? {
+    for path in Finder::new(starting_point, query, repo)? {
         // TODO: Shouldn't we stop iteration when some paths returns Err?
         match path {
             Ok(path) => paths.push(path),
-            Err(_) => (), // TODO: Output failed paths to a log file.
+            Err(e) => log::error!("Failed to get the path: {}", e),
         }
     }
 
