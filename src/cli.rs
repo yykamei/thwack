@@ -54,7 +54,7 @@ pub fn entrypoint<A: Iterator<Item = OsString>, W: Write>(
     }
 
     let repo = if args.gitignore {
-        match Repository::open(&args.starting_point) {
+        match Repository::discover(&args.starting_point) {
             Ok(r) => Some(r),
             Err(_) => {
                 log::info!(
