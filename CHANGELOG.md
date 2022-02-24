@@ -8,6 +8,10 @@
 
 - Support --log-file option to write logs [\#204](https://github.com/yykamei/thwack/pull/204) ([yykamei](https://github.com/yykamei))
 
+**Merged pull requests:**
+
+- Bump libc from 0.2.118 to 0.2.119 [\#206](https://github.com/yykamei/thwack/pull/206) ([dependabot[bot]](https://github.com/apps/dependabot))
+
 ## [v0.4.11](https://github.com/yykamei/thwack/tree/v0.4.11) (2022-02-16)
 
 [Full Changelog](https://github.com/yykamei/thwack/compare/v0.4.10...v0.4.11)
