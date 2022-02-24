@@ -132,10 +132,29 @@ mod tests {
 
     fn create_tree() -> io::Result<TempDir> {
         let tmp = tempdir()?;
+
+        // Initialize the Git repository
+        let repo = Repository::init(tmp.path()).unwrap();
+        let signature = Signature::now("test", "test@example.com").unwrap();
+        let tree = repo
+            .find_tree(repo.index().unwrap().write_tree().unwrap())
+            .unwrap();
+        let _ = repo
+            .commit(
+                Some("HEAD"),
+                &signature,
+                &signature,
+                "Initial commit",
+                &tree,
+                &[],
+            )
+            .unwrap();
+
+        // Prepare the files
         create_dir_all(tmp.path().join("src/a/b/c"))?;
         create_dir_all(tmp.path().join("lib/a/b/c"))?;
         create_dir_all(tmp.path().join(".config"))?;
-        let _ = File::create(tmp.path().join(".gitignore"))?.write_all(b"log.txt\r\n")?;
+        let _ = File::create(tmp.path().join(".gitignore"))?.write_all(b"log.txt")?;
         let _ = File::create(tmp.path().join("log.txt"))?;
         let _ = File::create(tmp.path().join(".browserslistrc"))?;
         let _ = File::create(tmp.path().join(".config/bar.toml"))?;
@@ -165,19 +184,24 @@ mod tests {
         let _ = File::create(tmp.path().join("src/index.js"))?;
         let _ = File::create(tmp.path().join("tsconfig.json"))?;
         let _ = File::create(tmp.path().join("☕.txt"))?;
-        let repo = Repository::init(tmp.path()).unwrap();
-        let signature = Signature::now("test", "test@example.com").unwrap();
-        let tree = repo
-            .find_tree(repo.index().unwrap().write_tree().unwrap())
+
+        // Create a commit with newly created files
+        let mut index = repo.index().unwrap();
+        let _ = index
+            .add_all(["*", ".*"].iter(), git2::IndexAddOption::DEFAULT, None)
             .unwrap();
+        let head = repo.head().unwrap();
+        let target = head.target().unwrap();
+        let commit = repo.find_commit(target).unwrap();
+        let tree = repo.find_tree(commit.tree_id()).unwrap();
         let _ = repo
             .commit(
                 Some("HEAD"),
                 &signature,
                 &signature,
-                "Initial commit",
+                "Add files",
                 &tree,
-                &[],
+                &[&commit],
             )
             .unwrap();
         Ok(tmp)
