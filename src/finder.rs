@@ -125,7 +125,7 @@ mod tests {
     use std::io;
     use std::io::Write;
 
-    use git2::{Repository, Signature};
+    use git2::{Repository, Signature, StatusOptions};
     use tempfile::{tempdir, TempDir};
 
     use super::*;
@@ -235,8 +235,9 @@ mod tests {
         let dir = create_tree().unwrap();
         let repo = Repository::open(dir.path()).unwrap();
         let statuses = repo
-            .statuses(Some(&mut git2::StatusOptions::new()))
+            .statuses(Some(&mut StatusOptions::new().include_untracked(true)))
             .unwrap();
+        println!("test!!");
         for entry in statuses.iter() {
             println!("{:?}", entry.path());
         }
