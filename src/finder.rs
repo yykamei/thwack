@@ -237,11 +237,11 @@ mod tests {
         let statuses = repo
             .statuses(Some(&mut StatusOptions::new().include_untracked(true)))
             .unwrap();
-        println!("test!!");
         for entry in statuses.iter() {
             println!("{:?}", entry.path());
         }
         let paths = find_paths(dir.path().to_str().unwrap(), "", Some(&repo));
+        println!("{:?}", paths);
         assert_eq!(paths.len(), 29);
         assert!(!paths.contains(&".git/config".to_string()));
         assert!(!paths.contains(&"log.txt".to_string()));
