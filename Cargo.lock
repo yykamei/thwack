@@ -305,7 +305,7 @@ dependencies = [
 
 [[package]]
 name = "thwack"
-version = "0.4.11"
+version = "0.5.0"
 dependencies = [
  "crossterm",
  "git2",
