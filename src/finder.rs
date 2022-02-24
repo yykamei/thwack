@@ -81,6 +81,7 @@ impl ConsumedDir {
             if let Some(r) = repo {
                 match r.is_path_ignored(&path) {
                     Ok(result) => {
+                        println!("{:?}={:?}", &path, result);
                         if result {
                             continue;
                         }
