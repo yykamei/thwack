@@ -194,6 +194,12 @@ mod tests {
         let target = head.target().unwrap();
         let commit = repo.find_commit(target).unwrap();
         let tree = repo.find_tree(commit.tree_id()).unwrap();
+        let statuses = repo
+            .statuses(Some(&mut git2::StatusOptions::new()))
+            .unwrap();
+        for entry in statuses.iter() {
+            println!("{:?}", entry.path());
+        }
         let _ = repo
             .commit(
                 Some("HEAD"),
