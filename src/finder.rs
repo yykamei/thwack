@@ -155,8 +155,8 @@ mod tests {
         create_dir_all(tmp.path().join("src/a/b/c"))?;
         create_dir_all(tmp.path().join("lib/a/b/c"))?;
         create_dir_all(tmp.path().join(".config"))?;
-        let _ = File::create(tmp.path().join(".gitignore"))?.write_all(b"log.txt")?;
-        let _ = File::create(tmp.path().join("log.txt"))?;
+        let _ = File::create(tmp.path().join(".gitignore"))?.write_all(b"LOG")?;
+        let _ = File::create(tmp.path().join("LOG"))?;
         let _ = File::create(tmp.path().join(".browserslistrc"))?;
         let _ = File::create(tmp.path().join(".config/bar.toml"))?;
         let _ = File::create(tmp.path().join(".config/ok.toml"))?;
@@ -228,7 +228,7 @@ mod tests {
         let dir = create_tree().unwrap();
         let paths = find_paths(dir.path().to_str().unwrap(), "", None);
         assert!(paths.contains(&".git/config".to_string()));
-        assert!(paths.contains(&"log.txt".to_string()));
+        assert!(paths.contains(&"LOG".to_string()));
     }
 
     #[test]
@@ -245,7 +245,7 @@ mod tests {
         println!("{:?}", paths);
         assert_eq!(paths.len(), 29);
         assert!(!paths.contains(&".git/config".to_string()));
-        assert!(!paths.contains(&"log.txt".to_string()));
+        assert!(!paths.contains(&"LOG".to_string()));
     }
 
     #[test]
