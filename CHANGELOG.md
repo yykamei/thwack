@@ -6,6 +6,7 @@
 
 **Implemented enhancements:**
 
+- Respect .gitignore [\#208](https://github.com/yykamei/thwack/pull/208) ([yykamei](https://github.com/yykamei))
 - Support --log-file option to write logs [\#204](https://github.com/yykamei/thwack/pull/204) ([yykamei](https://github.com/yykamei))
 
 **Merged pull requests:**
