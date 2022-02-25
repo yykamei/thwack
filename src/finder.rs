@@ -207,9 +207,6 @@ mod tests {
         assert!(paths.contains(&"log.txt".to_string()));
     }
 
-    // TODO: Fix this test on Windows.
-    //       Right now, it fails because the paths listed in `.gitignore` are not "ignored" on GitHub Actions' CI for some reason.
-    #[cfg(not(windows))]
     #[test]
     fn excludes_gitignore_paths() {
         let dir = create_tree().unwrap();
