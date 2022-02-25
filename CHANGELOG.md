@@ -1,5 +1,13 @@
 # Changelog
 
+## [Unreleased](https://github.com/yykamei/thwack/tree/HEAD)
+
+[Full Changelog](https://github.com/yykamei/thwack/compare/v0.5.0...HEAD)
+
+**Merged pull requests:**
+
+- Bump git2 from 0.13.25 to 0.14.0 [\#211](https://github.com/yykamei/thwack/pull/211) ([dependabot[bot]](https://github.com/apps/dependabot))
+
 ## [v0.5.0](https://github.com/yykamei/thwack/tree/v0.5.0) (2022-02-24)
 
 [Full Changelog](https://github.com/yykamei/thwack/compare/v0.4.11...v0.5.0)
