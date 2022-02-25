@@ -108,16 +108,38 @@ pub fn entrypoint<A: Iterator<Item = OsString>, W: Write>(
             log::trace!("Event={:?}", ev);
             if should_just_exit(&ev) {
                 break;
+            } else if left_arrow_key_pressed(&ev) {
+                let init_text = get_initialize_text();
+                if can_process_to_move_left(get_current_cursor_index_on_query(init_text)) {
+                    execute!(stdout, cursor::MoveLeft(1), cursor::SavePosition)?;
+                }
+            } else if right_arrow_key_pressed(&ev) {
+                let init_text = get_initialize_text();
+                let query_len = query.len();
+                if can_process_to_move_right(
+                    get_current_cursor_index_on_query(init_text),
+                    query_len as u16,
+                ) {
+                    execute!(stdout, cursor::MoveRight(1), cursor::SavePosition)?;
+                }
             } else if let Event::Key(KeyEvent {
                 code: KeyCode::Char(c),
                 modifiers: KeyModifiers::NONE | KeyModifiers::SHIFT,
             }) = ev
             {
-                query.push(c);
+                let current_cursor_index_on_query =
+                    get_current_cursor_index_on_query(get_initialize_text());
+                query.insert(current_cursor_index_on_query as usize, c);
+                execute!(stdout, cursor::MoveRight(1), cursor::SavePosition)?;
                 state = State::QueryChanged;
             } else if ev == Event::Key(KeyCode::Backspace.into()) {
-                query.pop();
-                state = State::QueryChanged;
+                let current_cursor_on_query =
+                    get_current_cursor_index_on_query(get_initialize_text());
+                if current_cursor_on_query != 0 {
+                    query.remove(current_cursor_on_query as usize - 1);
+                    execute!(stdout, cursor::MoveLeft(1), cursor::SavePosition)?;
+                    state = State::QueryChanged;
+                }
             } else if should_move_up(&ev) {
                 if selection > 0 {
                     selection -= 1;
@@ -213,6 +235,38 @@ fn should_move_down(ev: &Event) -> bool {
             })
 }
 
+fn left_arrow_key_pressed(event: &Event) -> bool {
+    event == &Event::Key(KeyCode::Left.into())
+}
+
+fn right_arrow_key_pressed(event: &Event) -> bool {
+    event == &Event::Key(KeyCode::Right.into())
+}
+
+fn get_current_cursor_index_on_terminal() -> u16 {
+    return cursor::position().unwrap().0;
+}
+
+fn get_current_cursor_index_on_query(init_text: &str) -> u16 {
+    let init_text_len = init_text.len() as u16;
+
+    get_current_cursor_index_on_terminal() - init_text_len
+}
+
+fn can_process_to_move_left(current_cursor_index_on_query: u16) -> bool {
+    if current_cursor_index_on_query > 0 {
+        return true;
+    }
+    false
+}
+
+fn can_process_to_move_right(current_cursor_index_on_query: u16, query_len: u16) -> bool {
+    if current_cursor_index_on_query < query_len {
+        return true;
+    }
+    return false;
+}
+
 fn print_and_flush(buffer: &mut impl Write, content: &str) -> io::Result<()> {
     buffer.write_all(content.as_bytes())?;
     buffer.flush()
@@ -220,9 +274,19 @@ fn print_and_flush(buffer: &mut impl Write, content: &str) -> io::Result<()> {
 
 fn initialize_terminal(stdout: &mut impl Write, terminal: &impl Terminal) -> Result<()> {
     queue!(stdout, EnterAlternateScreen, style::ResetColor)?;
+    let initial_cursor = get_initialize_text().len();
+    execute!(
+        stdout,
+        cursor::MoveTo(initial_cursor as u16, 0),
+        cursor::SavePosition
+    )?;
     stdout.flush()?;
     terminal.enable_raw_mode()?;
     Ok(())
+}
+
+fn get_initialize_text() -> &'static str {
+    "Search: "
 }
 
 fn output_on_terminal(
@@ -238,9 +302,8 @@ fn output_on_terminal(
         stdout,
         cursor::MoveTo(0, 0),
         Clear(ClearType::FromCursorDown),
-        style::Print("Search: "),
+        style::Print(get_initialize_text()),
         style::Print(query),
-        cursor::SavePosition,
         cursor::MoveToNextLine(1),
     )?;
 
