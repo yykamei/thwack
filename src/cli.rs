@@ -34,7 +34,7 @@ pub fn entrypoint<A: Iterator<Item = OsString>, W: Write>(
     terminal: impl Terminal,
     mut event: impl TerminalEvent,
 ) -> Result<()> {
-    let preferences = PreferencesParser::parse_args(args)?;
+    let preferences = PreferencesParser::new(args).parse_args()?;
     if let Some(ref path) = preferences.log_file {
         logger::init(path)?;
         log::debug!("Logger initialized!");
