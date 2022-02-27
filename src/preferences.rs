@@ -1,3 +1,5 @@
+use std::ffi::OsString;
+
 use crate::status_line::StatusLine;
 
 #[derive(Debug, PartialEq)]
@@ -10,6 +12,31 @@ pub(crate) struct Preferences {
     pub(crate) log_file: Option<String>,
     pub(crate) query: String,
     pub(crate) exec: String,
+}
+
+impl Preferences {
+    pub(crate) fn parse_env<V: Iterator<Item = (OsString, OsString)>>(
+        mut self,
+        vars_os: V,
+    ) -> Self {
+        for (key, value) in vars_os {
+            match (key.to_str(), value.to_str()) {
+                (Some("THWACK_LOG_FILE"), Some(value)) => {
+                    log::info!("Set log_file to {} from THWACK_LOG_FILE", value);
+                    self.log_file = Some(value.to_string())
+                }
+                (Some("THWACK_EXEC"), Some(value)) => {
+                    log::info!("Set exec to {} from THWACK_EXEC", value);
+                    self.exec = value.to_string()
+                }
+                _ => {
+                    log::debug!("Ignoring env var: {:?}", key);
+                    continue;
+                }
+            }
+        }
+        self
+    }
 }
 
 impl Default for Preferences {
@@ -34,6 +61,36 @@ impl Default for Preferences {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn parse_env() {
+        // NOTE: This test assumes that any thwack specific environment variables are not set.
+        let preferences = Preferences::default().parse_env(std::env::vars_os());
+        assert_eq!(preferences, Preferences::default());
+    }
+
+    #[test]
+    fn parse_env_with_dummy_envs() {
+        let preferences = Preferences::default().parse_env(
+            [
+                (
+                    OsString::from("THWACK_LOG_FILE"),
+                    OsString::from("/tmp/thwack.log"),
+                ),
+                (OsString::from("THWACK_EXEC"), OsString::from("/bin/echo")),
+            ]
+            .to_vec()
+            .into_iter(),
+        );
+        assert_eq!(
+            preferences,
+            Preferences {
+                log_file: Some(String::from("/tmp/thwack.log")),
+                exec: String::from("/bin/echo"),
+                ..Preferences::default()
+            }
+        );
+    }
 
     #[test]
     fn parsed_args_returns_default() {

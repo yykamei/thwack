@@ -2,8 +2,8 @@ use std::ffi::{CString, OsString};
 use std::io::{self, Stderr, Stdout, Write};
 use std::os::raw::c_char;
 use std::process::exit;
-use std::ptr;
 use std::time::Duration;
+use std::{env, ptr};
 
 use crossterm::{
     cursor,
@@ -36,17 +36,18 @@ pub fn entrypoint<A: Iterator<Item = OsString>, W: Write>(
     terminal: impl Terminal,
     mut event: impl TerminalEvent,
 ) -> Result<()> {
-    let args = Args::new(args).parse()?;
-    if let Some(ref path) = args.log_file {
+    let preferences = Args::new(args).parse()?.parse_env(env::vars_os());
+
+    if let Some(ref path) = preferences.log_file {
         logger::init(path)?;
         log::debug!("Logger initialized!");
     }
-    if args.help {
+    if preferences.help {
         print_and_flush(stdout, HELP)?;
         log::debug!("Show help and exit");
         return Ok(());
     }
-    if args.version {
+    if preferences.version {
         print_and_flush(
             stdout,
             &format!("{} {}\n", env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION")),
@@ -55,13 +56,13 @@ pub fn entrypoint<A: Iterator<Item = OsString>, W: Write>(
         return Ok(());
     }
 
-    let repo = if args.gitignore {
-        match Repository::discover(&args.starting_point) {
+    let repo = if preferences.gitignore {
+        match Repository::discover(&preferences.starting_point) {
             Ok(r) => Some(r),
             Err(_) => {
                 log::info!(
                     "The starting point `{}` is not a Git repository",
-                    &args.starting_point
+                    &preferences.starting_point
                 );
                 None
             }
@@ -70,12 +71,12 @@ pub fn entrypoint<A: Iterator<Item = OsString>, W: Write>(
         None
     };
     let (mut columns, mut rows) = terminal.size()?;
-    let starting_point = StartingPoint::new(&args.starting_point)?;
-    let mut query = args.query.clone();
+    let starting_point = StartingPoint::new(&preferences.starting_point)?;
+    let mut query = preferences.query.clone();
     let mut paths = find_paths(
         &starting_point,
         &query,
-        paths_rows(&args, rows),
+        paths_rows(&preferences, rows),
         repo.as_ref(),
     )?;
     let mut selection: u16 = 0;
@@ -91,15 +92,37 @@ pub fn entrypoint<A: Iterator<Item = OsString>, W: Write>(
     loop {
         log::trace!("state={:?}", state);
         match state {
-            State::QueryChanged => {
-                output_on_terminal(stdout, &args, &query, &paths[..], selection, columns, rows)?
-            }
+            State::QueryChanged => output_on_terminal(
+                stdout,
+                &preferences,
+                &query,
+                &paths[..],
+                selection,
+                columns,
+                rows,
+            )?,
             State::PathsChanged => {
-                output_on_terminal(stdout, &args, &query, &paths[..], selection, columns, rows)?;
+                output_on_terminal(
+                    stdout,
+                    &preferences,
+                    &query,
+                    &paths[..],
+                    selection,
+                    columns,
+                    rows,
+                )?;
                 state = State::Ready;
             }
             State::SelectionChanged => {
-                output_on_terminal(stdout, &args, &query, &paths[..], selection, columns, rows)?;
+                output_on_terminal(
+                    stdout,
+                    &preferences,
+                    &query,
+                    &paths[..],
+                    selection,
+                    columns,
+                    rows,
+                )?;
                 state = State::Ready;
             }
             _ => (),
@@ -138,14 +161,14 @@ pub fn entrypoint<A: Iterator<Item = OsString>, W: Write>(
                 columns = c;
                 rows = r;
                 selection = if selection > r {
-                    paths_rows(&args, r) - 1
+                    paths_rows(&preferences, r) - 1
                 } else {
                     selection
                 };
                 paths = find_paths(
                     &starting_point,
                     &query,
-                    paths_rows(&args, rows),
+                    paths_rows(&preferences, rows),
                     repo.as_ref(),
                 )?;
                 state = State::PathsChanged;
@@ -154,7 +177,7 @@ pub fn entrypoint<A: Iterator<Item = OsString>, W: Write>(
             paths = find_paths(
                 &starting_point,
                 &query,
-                paths_rows(&args, rows),
+                paths_rows(&preferences, rows),
                 repo.as_ref(),
             )?;
             state = State::PathsChanged;
@@ -166,7 +189,7 @@ pub fn entrypoint<A: Iterator<Item = OsString>, W: Write>(
     terminal.disable_raw_mode()?;
 
     if let State::Invoke(path) = state {
-        invoke(&args.exec, path.absolute())?;
+        invoke(&preferences.exec, path.absolute())?;
     }
     Ok(())
 }
