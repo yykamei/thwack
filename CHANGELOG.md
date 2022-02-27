@@ -6,6 +6,7 @@
 
 **Merged pull requests:**
 
+- Separate Preferences and StatusLine [\#216](https://github.com/yykamei/thwack/pull/216) ([yykamei](https://github.com/yykamei))
 - Bump git2 from 0.13.25 to 0.14.0 [\#211](https://github.com/yykamei/thwack/pull/211) ([dependabot[bot]](https://github.com/apps/dependabot))
 
 ## [v0.5.0](https://github.com/yykamei/thwack/tree/v0.5.0) (2022-02-24)
