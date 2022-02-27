@@ -4,6 +4,10 @@
 
 [Full Changelog](https://github.com/yykamei/thwack/compare/v0.5.0...HEAD)
 
+**Implemented enhancements:**
+
+- Read the environment variables: THWACK\_LOG\_FILE and THWACK\_EXEC [\#218](https://github.com/yykamei/thwack/pull/218) ([yykamei](https://github.com/yykamei))
+
 **Merged pull requests:**
 
 - Separate Preferences and StatusLine [\#216](https://github.com/yykamei/thwack/pull/216) ([yykamei](https://github.com/yykamei))
