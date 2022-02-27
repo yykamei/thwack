@@ -9,5 +9,7 @@ mod error;
 mod finder;
 mod logger;
 mod matched_path;
+mod preferences;
 mod starting_point;
+mod status_line;
 mod terminal;
