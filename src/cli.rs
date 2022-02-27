@@ -14,11 +14,13 @@ use crossterm::{
 };
 use git2::Repository;
 
-use crate::args::{ParsedArgs, Parser, StatusLine, HELP};
+use crate::args::{Args, HELP};
 use crate::error::Result;
 use crate::finder::Finder;
 use crate::matched_path::MatchedPath;
+use crate::preferences::Preferences;
 use crate::starting_point::StartingPoint;
+use crate::status_line::StatusLine;
 use crate::terminal::{Terminal, TerminalEvent};
 use crate::{logger, Error};
 
@@ -34,7 +36,7 @@ pub fn entrypoint<A: Iterator<Item = OsString>, W: Write>(
     terminal: impl Terminal,
     mut event: impl TerminalEvent,
 ) -> Result<()> {
-    let args = Parser::new(args).parse()?;
+    let args = Args::new(args).parse()?;
     if let Some(ref path) = args.log_file {
         logger::init(path)?;
         log::debug!("Logger initialized!");
@@ -178,7 +180,7 @@ enum State<'a> {
     Invoke(&'a MatchedPath),
 }
 
-fn paths_rows(args: &ParsedArgs, row: u16) -> u16 {
+fn paths_rows(args: &Preferences, row: u16) -> u16 {
     // TODO: raise an error when the number of rows is too small.
     match args.status_line {
         StatusLine::None => row - 2,
@@ -227,7 +229,7 @@ fn initialize_terminal(stdout: &mut impl Write, terminal: &impl Terminal) -> Res
 
 fn output_on_terminal(
     stdout: &mut impl Write,
-    args: &ParsedArgs,
+    args: &Preferences,
     query: &str,
     paths: &[MatchedPath],
     selection: u16,
