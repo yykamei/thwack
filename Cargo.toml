@@ -11,7 +11,7 @@ version = "0.6.0"
 
 [dependencies]
 crossterm = "0.23.0"
-git2 = { version = "0.14.0", default-features = false }
+git2 = { version = "0.14.1", default-features = false }
 libc = "0.2.119"
 log = { version = "0.4.14", features = ["std"] }
 unicode-segmentation = "1.9.0"
