@@ -6,6 +6,7 @@
 
 **Merged pull requests:**
 
+- Bump actions/checkout from 2 to 3 [\#223](https://github.com/yykamei/thwack/pull/223) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump git2 from 0.14.0 to 0.14.1 [\#221](https://github.com/yykamei/thwack/pull/221) ([dependabot[bot]](https://github.com/apps/dependabot))
 
 ## [v0.6.0](https://github.com/yykamei/thwack/tree/v0.6.0) (2022-02-27)
