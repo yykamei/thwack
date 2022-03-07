@@ -36,7 +36,7 @@ pub fn entrypoint<A: Iterator<Item = OsString>, W: Write>(
     terminal: impl Terminal,
     mut event: impl TerminalEvent,
 ) -> Result<()> {
-    let preferences = Args::new(args).parse()?.parse_env(env::vars_os());
+    let preferences = Args::new(args, env::vars_os()).parse()?;
 
     if let Some(ref path) = preferences.log_file {
         logger::init(path)?;

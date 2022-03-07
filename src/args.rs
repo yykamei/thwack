@@ -27,6 +27,14 @@ OPTIONS:
     --no-gitignore            Do not respect .gitignore and search all paths including Git ignored paths.
     -h, --help                Prints help information.
     -v, --version             Prints version info and exit
+
+ENVIRONMENT VARIABLES:
+    THWACK_EXEC               The command to use when you hit the Enter key.
+                              This affects the same way as \"--exec\".
+                              If both are set, the value of \"--exec\" takes precedence.
+    THWACK_LOG_FILE           The path to the file to log to.
+                              This affects the same way as \"--log-file\".
+                              If both are set, the value of \"--log-file\" takes precedence.
 ";
 
 // TODO: Config might be required: e.g. impl From<Args> for Config.
@@ -36,10 +44,10 @@ pub(crate) struct Args<A: Iterator<Item = OsString>> {
 }
 
 impl<A: Iterator<Item = OsString>> Args<A> {
-    pub(crate) fn new(args: A) -> Self {
+    pub(crate) fn new<V: Iterator<Item = (OsString, OsString)>>(args: A, vars_os: V) -> Self {
         Self {
             args,
-            preferences: Preferences::default(),
+            preferences: Preferences::default().parse_env(vars_os),
         }
     }
 
@@ -196,9 +204,12 @@ mod tests {
     #[test]
     fn parser_with_double_hyphen() {
         assert_eq!(
-            Args::new(args!["program", "-h", "--", "abc", "def", "ok!"])
-                .parse()
-                .unwrap(),
+            Args::new(
+                args!["program", "-h", "--", "abc", "def", "ok!"],
+                [].into_iter()
+            )
+            .parse()
+            .unwrap(),
             Preferences {
                 help: true,
                 query: String::from("abc def ok!"),
@@ -206,9 +217,12 @@ mod tests {
             }
         );
         assert_eq!(
-            Args::new(args!["program", "--starting-point=/tmp", "--", "hey"])
-                .parse()
-                .unwrap(),
+            Args::new(
+                args!["program", "--starting-point=/tmp", "--", "hey"],
+                [].into_iter()
+            )
+            .parse()
+            .unwrap(),
             Preferences {
                 starting_point: String::from("/tmp"),
                 query: String::from("hey"),
@@ -216,9 +230,12 @@ mod tests {
             }
         );
         assert_eq!(
-            Args::new(args!["program", "--", "--abc", "--version", "-h=ok!"])
-                .parse()
-                .unwrap(),
+            Args::new(
+                args!["program", "--", "--abc", "--version", "-h=ok!"],
+                [].into_iter()
+            )
+            .parse()
+            .unwrap(),
             Preferences {
                 query: String::from("--abc --version -h=ok!"),
                 ..default!()
@@ -229,21 +246,27 @@ mod tests {
     #[test]
     fn parser_with_help() {
         assert_eq!(
-            Args::new(args!["program", "-h"]).parse().unwrap(),
+            Args::new(args!["program", "-h"], [].into_iter())
+                .parse()
+                .unwrap(),
             Preferences {
                 help: true,
                 ..default!()
             }
         );
         assert_eq!(
-            Args::new(args!["program", "--help"]).parse().unwrap(),
+            Args::new(args!["program", "--help"], [].into_iter())
+                .parse()
+                .unwrap(),
             Preferences {
                 help: true,
                 ..default!()
             }
         );
         assert_eq!(
-            Args::new(args!["program", "-h", "--help"]).parse().unwrap(),
+            Args::new(args!["program", "-h", "--help"], [].into_iter())
+                .parse()
+                .unwrap(),
             Preferences {
                 help: true,
                 ..default!()
@@ -254,14 +277,16 @@ mod tests {
     #[test]
     fn parser_with_version() {
         assert_eq!(
-            Args::new(args!["program", "-v"]).parse().unwrap(),
+            Args::new(args!["program", "-v"], [].into_iter())
+                .parse()
+                .unwrap(),
             Preferences {
                 version: true,
                 ..default!()
             }
         );
         assert_eq!(
-            Args::new(args!["program", "-h", "--version"])
+            Args::new(args!["program", "-h", "--version"], [].into_iter())
                 .parse()
                 .unwrap(),
             Preferences {
@@ -271,7 +296,9 @@ mod tests {
             }
         );
         assert_eq!(
-            Args::new(args!["program", "-v", "--help"]).parse().unwrap(),
+            Args::new(args!["program", "-v", "--help"], [].into_iter())
+                .parse()
+                .unwrap(),
             Preferences {
                 help: true,
                 version: true,
@@ -283,7 +310,7 @@ mod tests {
     #[test]
     fn parser_with_starting_point() {
         assert_eq!(
-            Args::new(args!["program", "--starting-point=./abc"])
+            Args::new(args!["program", "--starting-point=./abc"], [].into_iter())
                 .parse()
                 .unwrap(),
             Preferences {
@@ -292,16 +319,19 @@ mod tests {
             }
         );
         assert_eq!(
-            Args::new(args!["program", "--starting-point", "./abc"])
-                .parse()
-                .unwrap(),
+            Args::new(
+                args!["program", "--starting-point", "./abc"],
+                [].into_iter()
+            )
+            .parse()
+            .unwrap(),
             Preferences {
                 starting_point: String::from("./abc"),
                 ..default!()
             }
         );
         assert_eq!(
-            Args::new(args!["program", "--starting-point==ok="])
+            Args::new(args!["program", "--starting-point==ok="], [].into_iter())
                 .parse()
                 .unwrap(),
             Preferences {
@@ -310,13 +340,10 @@ mod tests {
             }
         );
         assert_eq!(
-            Args::new(args![
-                "program",
-                "--starting-point",
-                "xyz",
-                "--help",
-                "query"
-            ])
+            Args::new(
+                args!["program", "--starting-point", "xyz", "--help", "query"],
+                [].into_iter()
+            )
             .parse()
             .unwrap(),
             Preferences {
@@ -327,21 +354,21 @@ mod tests {
             }
         );
         assert_eq!(
-            Args::new(args!["program", "--starting-point"])
+            Args::new(args!["program", "--starting-point"], [].into_iter())
                 .parse()
                 .unwrap_err()
                 .message,
             format!("{}\n\n\"--starting-point\" needs a value.", HELP),
         );
         assert_eq!(
-            Args::new(args!["program", "--starting-point", "--"])
+            Args::new(args!["program", "--starting-point", "--"], [].into_iter())
                 .parse()
                 .unwrap_err()
                 .message,
             format!("{}\n\n\"--starting-point\" needs a value.", HELP),
         );
         assert_eq!(
-            Args::new(args!["program", "--starting-point="])
+            Args::new(args!["program", "--starting-point="], [].into_iter())
                 .parse()
                 .unwrap_err()
                 .message,
@@ -355,7 +382,7 @@ mod tests {
     #[test]
     fn parser_with_log_file() {
         assert_eq!(
-            Args::new(args!["program", "--log-file=./log.txt"])
+            Args::new(args!["program", "--log-file=./log.txt"], [].into_iter())
                 .parse()
                 .unwrap(),
             Preferences {
@@ -364,7 +391,7 @@ mod tests {
             }
         );
         assert_eq!(
-            Args::new(args!["program", "--log-file", "./abc"])
+            Args::new(args!["program", "--log-file", "./abc"], [].into_iter())
                 .parse()
                 .unwrap(),
             Preferences {
@@ -373,7 +400,7 @@ mod tests {
             }
         );
         assert_eq!(
-            Args::new(args!["program", "--log-file==ok="])
+            Args::new(args!["program", "--log-file==ok="], [].into_iter())
                 .parse()
                 .unwrap(),
             Preferences {
@@ -382,9 +409,12 @@ mod tests {
             }
         );
         assert_eq!(
-            Args::new(args!["program", "--log-file", "xyz", "--help", "query"])
-                .parse()
-                .unwrap(),
+            Args::new(
+                args!["program", "--log-file", "xyz", "--help", "query"],
+                [].into_iter()
+            )
+            .parse()
+            .unwrap(),
             Preferences {
                 help: true,
                 query: String::from("query"),
@@ -393,21 +423,21 @@ mod tests {
             }
         );
         assert_eq!(
-            Args::new(args!["program", "--log-file"])
+            Args::new(args!["program", "--log-file"], [].into_iter())
                 .parse()
                 .unwrap_err()
                 .message,
             format!("{}\n\n\"--log-file\" needs a value.", HELP),
         );
         assert_eq!(
-            Args::new(args!["program", "--log-file", "--"])
+            Args::new(args!["program", "--log-file", "--"], [].into_iter())
                 .parse()
                 .unwrap_err()
                 .message,
             format!("{}\n\n\"--log-file\" needs a value.", HELP),
         );
         assert_eq!(
-            Args::new(args!["program", "--log-file="])
+            Args::new(args!["program", "--log-file="], [].into_iter())
                 .parse()
                 .unwrap_err()
                 .message,
@@ -421,7 +451,7 @@ mod tests {
     #[test]
     fn parser_with_status_line() {
         assert_eq!(
-            Args::new(args!["program", "--status-line=none"])
+            Args::new(args!["program", "--status-line=none"], [].into_iter())
                 .parse()
                 .unwrap(),
             Preferences {
@@ -430,7 +460,7 @@ mod tests {
             }
         );
         assert_eq!(
-            Args::new(args!["program", "--status-line=relative"])
+            Args::new(args!["program", "--status-line=relative"], [].into_iter())
                 .parse()
                 .unwrap(),
             Preferences {
@@ -439,7 +469,7 @@ mod tests {
             }
         );
         assert_eq!(
-            Args::new(args!["program", "--status-line=absolute"])
+            Args::new(args!["program", "--status-line=absolute"], [].into_iter())
                 .parse()
                 .unwrap(),
             Preferences {
@@ -448,7 +478,7 @@ mod tests {
             }
         );
         assert_eq!(
-            Args::new(args!["program", "--status-line", "none"])
+            Args::new(args!["program", "--status-line", "none"], [].into_iter())
                 .parse()
                 .unwrap(),
             Preferences {
@@ -457,46 +487,52 @@ mod tests {
             }
         );
         assert_eq!(
-            Args::new(args!["program", "--status-line", "relative"])
-                .parse()
-                .unwrap(),
+            Args::new(
+                args!["program", "--status-line", "relative"],
+                [].into_iter()
+            )
+            .parse()
+            .unwrap(),
             Preferences {
                 status_line: StatusLine::Relative,
                 ..default!()
             }
         );
         assert_eq!(
-            Args::new(args!["program", "--status-line", "absolute"])
-                .parse()
-                .unwrap(),
+            Args::new(
+                args!["program", "--status-line", "absolute"],
+                [].into_iter()
+            )
+            .parse()
+            .unwrap(),
             Preferences {
                 status_line: StatusLine::Absolute,
                 ..default!()
             }
         );
         assert_eq!(
-            Args::new(args!["program", "--status-line=unknown"])
+            Args::new(args!["program", "--status-line=unknown"], [].into_iter())
                 .parse()
                 .unwrap_err()
                 .message,
             format!("The argument of \"--status-line\" must be one of \"absolute\", \"relative\", or \"none\": \"unknown\" was given."),
         );
         assert_eq!(
-            Args::new(args!["program", "--status-line"])
+            Args::new(args!["program", "--status-line"], [].into_iter())
                 .parse()
                 .unwrap_err()
                 .message,
             format!("{}\n\n\"--status-line\" needs a value.", HELP),
         );
         assert_eq!(
-            Args::new(args!["program", "--status-line", "--"])
+            Args::new(args!["program", "--status-line", "--"], [].into_iter())
                 .parse()
                 .unwrap_err()
                 .message,
             format!("{}\n\n\"--status-line\" needs a value.", HELP),
         );
         assert_eq!(
-            Args::new(args!["program", "--status-line="])
+            Args::new(args!["program", "--status-line="], [].into_iter())
                 .parse()
                 .unwrap_err()
                 .message,
@@ -510,7 +546,7 @@ mod tests {
     #[test]
     fn parser_with_no_gitignore() {
         assert_eq!(
-            Args::new(args!["program", "--no-gitignore"])
+            Args::new(args!["program", "--no-gitignore"], [].into_iter())
                 .parse()
                 .unwrap(),
             Preferences {
@@ -523,10 +559,13 @@ mod tests {
     #[test]
     fn parser_with_starting_point_disallow_option_like_value() {
         assert_eq!(
-            Args::new(args!["program", "--starting-point", "--option-like-value"])
-                .parse()
-                .unwrap_err()
-                .message,
+            Args::new(
+                args!["program", "--starting-point", "--option-like-value"],
+                [].into_iter()
+            )
+            .parse()
+            .unwrap_err()
+            .message,
             format!("{}\n\n\"--starting-point\" needs a value.", HELP),
         );
     }
@@ -534,9 +573,12 @@ mod tests {
     #[test]
     fn parser_with_starting_point_allow_option_like_value() {
         assert_eq!(
-            Args::new(args!["program", "--starting-point=--option-like-value"])
-                .parse()
-                .unwrap(),
+            Args::new(
+                args!["program", "--starting-point=--option-like-value"],
+                [].into_iter()
+            )
+            .parse()
+            .unwrap(),
             Preferences {
                 starting_point: String::from("--option-like-value"),
                 ..default!()
@@ -547,14 +589,16 @@ mod tests {
     #[test]
     fn parser_with_exec() {
         assert_eq!(
-            Args::new(args!["program", "--exec=bat"]).parse().unwrap(),
+            Args::new(args!["program", "--exec=bat"], [].into_iter())
+                .parse()
+                .unwrap(),
             Preferences {
                 exec: String::from("bat"),
                 ..default!()
             }
         );
         assert_eq!(
-            Args::new(args!["program", "--exec", "open"])
+            Args::new(args!["program", "--exec", "open"], [].into_iter())
                 .parse()
                 .unwrap(),
             Preferences {
@@ -563,21 +607,26 @@ mod tests {
             }
         );
         assert_eq!(
-            Args::new(args!["program", "--exec==ok="]).parse().unwrap(),
+            Args::new(args!["program", "--exec==ok="], [].into_iter())
+                .parse()
+                .unwrap(),
             Preferences {
                 exec: String::from("=ok="),
                 ..default!()
             }
         );
         assert_eq!(
-            Args::new(args![
-                "program",
-                "--starting-point",
-                "xyz",
-                "--exec=fire",
-                "-v",
-                "query"
-            ])
+            Args::new(
+                args![
+                    "program",
+                    "--starting-point",
+                    "xyz",
+                    "--exec=fire",
+                    "-v",
+                    "query"
+                ],
+                [].into_iter()
+            )
             .parse()
             .unwrap(),
             Preferences {
@@ -589,21 +638,21 @@ mod tests {
             }
         );
         assert_eq!(
-            Args::new(args!["program", "--exec"])
+            Args::new(args!["program", "--exec"], [].into_iter())
                 .parse()
                 .unwrap_err()
                 .message,
             format!("{}\n\n\"--exec\" needs a value.", HELP),
         );
         assert_eq!(
-            Args::new(args!["program", "--exec", "--"])
+            Args::new(args!["program", "--exec", "--"], [].into_iter())
                 .parse()
                 .unwrap_err()
                 .message,
             format!("{}\n\n\"--exec\" needs a value.", HELP),
         );
         assert_eq!(
-            Args::new(args!["program", "--exec="])
+            Args::new(args!["program", "--exec="], [].into_iter())
                 .parse()
                 .unwrap_err()
                 .message,
@@ -615,9 +664,25 @@ mod tests {
     }
 
     #[test]
+    fn parser_with_exec_should_be_used_even_though_its_environment_variable_is_set() {
+        assert_eq!(
+            Args::new(
+                args!["program", "--exec=bat"],
+                [(OsString::from("THWACK_EXEC"), OsString::from("/bin/echo"))].into_iter()
+            )
+            .parse()
+            .unwrap(),
+            Preferences {
+                exec: String::from("bat"),
+                ..default!()
+            }
+        );
+    }
+
+    #[test]
     fn parser_with_exec_allow_option_like_value() {
         assert_eq!(
-            Args::new(args!["program", "--exec=--special--"])
+            Args::new(args!["program", "--exec=--special--"], [].into_iter())
                 .parse()
                 .unwrap(),
             Preferences {
@@ -630,10 +695,13 @@ mod tests {
     #[test]
     fn parser_with_exec_disallow_option_like_value() {
         assert_eq!(
-            Args::new(args!["program", "--exec", "--option-like-value"])
-                .parse()
-                .unwrap_err()
-                .message,
+            Args::new(
+                args!["program", "--exec", "--option-like-value"],
+                [].into_iter()
+            )
+            .parse()
+            .unwrap_err()
+            .message,
             format!("{}\n\n\"--exec\" needs a value.", HELP),
         );
     }

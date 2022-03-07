@@ -63,9 +63,8 @@ mod tests {
     use super::*;
 
     #[test]
-    fn parse_env() {
-        // NOTE: This test assumes that any thwack specific environment variables are not set.
-        let preferences = Preferences::default().parse_env(std::env::vars_os());
+    fn parse_env_without_thwack_environment_variables() {
+        let preferences = Preferences::default().parse_env([].into_iter());
         assert_eq!(preferences, Preferences::default());
     }
 
@@ -79,7 +78,6 @@ mod tests {
                 ),
                 (OsString::from("THWACK_EXEC"), OsString::from("/bin/echo")),
             ]
-            .to_vec()
             .into_iter(),
         );
         assert_eq!(
