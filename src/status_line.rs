@@ -1,5 +1,3 @@
-use std::convert::TryFrom;
-
 #[derive(Debug, PartialEq)]
 pub(crate) enum StatusLine {
     Absolute,

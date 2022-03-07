@@ -1,4 +1,3 @@
-use std::convert::TryFrom;
 use std::ffi::OsString;
 
 use crate::error::{Error, Result};
