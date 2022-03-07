@@ -4,6 +4,10 @@
 
 [Full Changelog](https://github.com/yykamei/thwack/compare/v0.6.0...HEAD)
 
+**Breaking changes:**
+
+- Make command-line arguments take precedence over envs [\#227](https://github.com/yykamei/thwack/pull/227) ([yykamei](https://github.com/yykamei))
+
 **Merged pull requests:**
 
 - Migrate the edition from 2018 to 2021 [\#225](https://github.com/yykamei/thwack/pull/225) ([yykamei](https://github.com/yykamei))
