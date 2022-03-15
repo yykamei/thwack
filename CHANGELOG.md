@@ -10,6 +10,7 @@
 
 **Merged pull requests:**
 
+- Bump libc from 0.2.119 to 0.2.120 [\#231](https://github.com/yykamei/thwack/pull/231) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump git2 from 0.14.1 to 0.14.2 [\#229](https://github.com/yykamei/thwack/pull/229) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Migrate the edition from 2018 to 2021 [\#225](https://github.com/yykamei/thwack/pull/225) ([yykamei](https://github.com/yykamei))
 - Bump git2 from 0.14.0 to 0.14.1 [\#221](https://github.com/yykamei/thwack/pull/221) ([dependabot[bot]](https://github.com/apps/dependabot))
