@@ -5,6 +5,7 @@ use std::process::exit;
 use std::time::Duration;
 use std::{env, ptr};
 
+use copypasta::{ClipboardContext, ClipboardProvider};
 use crossterm::{
     cursor,
     event::{Event, KeyCode, KeyEvent, KeyModifiers},
@@ -70,6 +71,7 @@ pub fn entrypoint<A: Iterator<Item = OsString>, W: Write>(
     } else {
         None
     };
+    let mut clipboard = ClipboardContext::new().map_err(|e| Error::clipboard(e))?;
     let (mut columns, mut rows) = terminal.size()?;
     let starting_point = StartingPoint::new(&preferences.starting_point)?;
     let mut query = preferences.query.clone();
@@ -157,6 +159,16 @@ pub fn entrypoint<A: Iterator<Item = OsString>, W: Write>(
                 let path: &MatchedPath = paths.get(selection as usize).unwrap(); // TODO: Do not use unwrap()
                 state = State::Invoke(path);
                 break;
+            } else if should_copy_absolutely(&ev) {
+                let path: &MatchedPath = paths.get(selection as usize).unwrap(); // TODO: Do not use unwrap()
+                clipboard
+                    .set_contents(path.absolute().to_owned())
+                    .map_err(|e| Error::clipboard(e))?;
+            } else if should_copy_relatively(&ev) {
+                let path: &MatchedPath = paths.get(selection as usize).unwrap(); // TODO: Do not use unwrap()
+                clipboard
+                    .set_contents(path.relative().to_owned())
+                    .map_err(|e| Error::clipboard(e))?;
             } else if let Event::Resize(c, r) = ev {
                 columns = c;
                 rows = r;
@@ -236,6 +248,20 @@ fn should_move_down(ev: &Event) -> bool {
                 code: KeyCode::Char('n'),
                 modifiers: KeyModifiers::CONTROL,
             })
+}
+
+fn should_copy_relatively(ev: &Event) -> bool {
+    ev == &Event::Key(KeyEvent {
+        code: KeyCode::Char('d'),
+        modifiers: KeyModifiers::CONTROL,
+    })
+}
+
+fn should_copy_absolutely(ev: &Event) -> bool {
+    ev == &Event::Key(KeyEvent {
+        code: KeyCode::Char('y'),
+        modifiers: KeyModifiers::CONTROL,
+    })
 }
 
 fn print_and_flush(buffer: &mut impl Write, content: &str) -> io::Result<()> {
@@ -327,7 +353,7 @@ fn status_line(stdout: &mut impl Write, max_columns: usize, selected: &str) -> R
 
 fn help_line(stdout: &mut impl Write, max_columns: usize) -> Result<()> {
     // TODO: This number is the same amount of columns occupied by this status line.
-    if max_columns < 58 {
+    if max_columns < 97 {
         return Ok(());
     }
     queue!(
@@ -350,6 +376,12 @@ fn help_line(stdout: &mut impl Write, max_columns: usize) -> Result<()> {
         style::SetAttribute(Attribute::Reset),
         cursor::MoveRight(1),
         style::Print("Execute"),
+        cursor::MoveRight(2),
+        style::SetAttribute(Attribute::Bold),
+        style::Print("<C-d>/<C-y>:"),
+        style::SetAttribute(Attribute::Reset),
+        cursor::MoveRight(1),
+        style::Print("Copy (relative/absolute)"),
     )?;
     Ok(())
 }

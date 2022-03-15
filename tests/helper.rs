@@ -122,7 +122,7 @@ impl<const N: usize> From<&[u8; N]> for Buffer {
 
 impl Terminal for MockTerminal {
     fn size(&self) -> Result<(u16, u16)> {
-        Ok((80, 20))
+        Ok((98, 20))
     }
 
     fn enable_raw_mode(&self) -> Result<()> {

@@ -11,6 +11,7 @@ pub type Result<T> = StdResult<T, Error>;
 #[derive(Debug)]
 pub enum ErrorKind {
     Args,
+    Clipboard,
     InvalidUnicode,
     IO,
     Terminal,
@@ -45,6 +46,15 @@ impl Error {
             message: message.to_string(),
             kind: ErrorKind::Args,
             source: None,
+            exit_code: FAILURE,
+        }
+    }
+
+    pub fn clipboard(error: Box<dyn std::error::Error + Send + Sync>) -> Self {
+        Self {
+            message: format!("Failed to handle clipboard: {}", error),
+            kind: ErrorKind::Clipboard,
+            source: Some(error),
             exit_code: FAILURE,
         }
     }
