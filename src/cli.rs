@@ -71,7 +71,13 @@ pub fn entrypoint<A: Iterator<Item = OsString>, W: Write>(
     } else {
         None
     };
-    let mut clipboard = ClipboardContext::new().map_err(|e| Error::clipboard(e))?;
+    let mut clipboard = match ClipboardContext::new().map_err(|e| Error::clipboard(e)) {
+        Ok(c) => Some(c),
+        Err(e) => {
+            log::warn!("Failed to initialize clipboard: {}", e);
+            None
+        }
+    };
     let (mut columns, mut rows) = terminal.size()?;
     let starting_point = StartingPoint::new(&preferences.starting_point)?;
     let mut query = preferences.query.clone();
@@ -161,14 +167,16 @@ pub fn entrypoint<A: Iterator<Item = OsString>, W: Write>(
                 break;
             } else if should_copy_absolutely(&ev) {
                 let path: &MatchedPath = paths.get(selection as usize).unwrap(); // TODO: Do not use unwrap()
-                clipboard
-                    .set_contents(path.absolute().to_owned())
-                    .map_err(|e| Error::clipboard(e))?;
+                if let Some(c) = clipboard.as_mut() {
+                    c.set_contents(path.absolute().to_owned())
+                        .map_err(|e| Error::clipboard(e))?;
+                }
             } else if should_copy_relatively(&ev) {
                 let path: &MatchedPath = paths.get(selection as usize).unwrap(); // TODO: Do not use unwrap()
-                clipboard
-                    .set_contents(path.relative().to_owned())
-                    .map_err(|e| Error::clipboard(e))?;
+                if let Some(c) = clipboard.as_mut() {
+                    c.set_contents(path.relative().to_owned())
+                        .map_err(|e| Error::clipboard(e))?;
+                }
             } else if let Event::Resize(c, r) = ev {
                 columns = c;
                 rows = r;
