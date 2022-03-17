@@ -30,6 +30,8 @@ jobs:
       - run: cargo clippy
 
       - run: cargo test
+        env:
+          RUST_BACKTRACE: '1'
 
   lint:
     runs-on: ubuntu-latest
