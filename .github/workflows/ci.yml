@@ -13,6 +13,9 @@ jobs:
         os: [ubuntu-latest, macOS-latest, windows-latest]
         rust: [stable, nightly]
     steps:
+      - run: sudo apt-get install libx11-xcb-dev libxcb-shape0-dev libxcb-xfixes0-dev
+        if: matrix.os == 'ubuntu-latest'
+
       - uses: actions/checkout@v3
 
       - uses: actions-rs/toolchain@v1
@@ -27,6 +30,8 @@ jobs:
       - run: cargo clippy
 
       - run: cargo test
+        env:
+          RUST_BACKTRACE: full
 
   lint:
     runs-on: ubuntu-latest

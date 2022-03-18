@@ -41,6 +41,9 @@ jobs:
 
     runs-on: ${{ matrix.os }}
     steps:
+      - run: sudo apt-get install libx11-xcb-dev libxcb-shape0-dev libxcb-xfixes0-dev
+        if: matrix.os == 'ubuntu-latest'
+
       - uses: actions/checkout@v3
 
       - uses: actions-rs/toolchain@v1
@@ -75,6 +78,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     steps:
+      - run: sudo apt-get install libx11-xcb-dev libxcb-shape0-dev libxcb-xfixes0-dev
+
       - uses: actions/checkout@v3
         with:
           token: ${{ secrets.PAT_FOR_RELEASE }}

@@ -11,6 +11,7 @@ rust-version = "1.59.0"
 version = "0.6.0"
 
 [dependencies]
+copypasta = "0.7.1"
 crossterm = "0.23.1"
 git2 = { version = "0.14.2", default-features = false }
 libc = "0.2.120"

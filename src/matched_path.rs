@@ -54,6 +54,11 @@ impl MatchedPath {
         &self.absolute
     }
 
+    /// Returns the relative path.
+    pub(crate) fn relative(&self) -> &str {
+        &self.relative
+    }
+
     /// Returns the truncated absolute path.
     pub(crate) fn truncated_absolute(&self, max_width: usize) -> String {
         let chunks = self.absolute_chunks(max_width);
@@ -327,6 +332,12 @@ mod tests {
     fn returns_absolute() {
         let path = new("abc", "/home", "/home/abc.txt");
         assert_eq!(path.absolute(), "/home/abc.txt");
+    }
+
+    #[test]
+    fn returns_relative() {
+        let path = new("abc", "/home", "/home/abc.txt");
+        assert_eq!(path.relative(), "abc.txt");
     }
 
     #[test]
