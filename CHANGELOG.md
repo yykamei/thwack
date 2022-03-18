@@ -8,6 +8,10 @@
 
 - Make command-line arguments take precedence over envs [\#227](https://github.com/yykamei/thwack/pull/227) ([yykamei](https://github.com/yykamei))
 
+**Implemented enhancements:**
+
+- Let a user copy the selected path [\#58](https://github.com/yykamei/thwack/issues/58)
+
 **Merged pull requests:**
 
 - Bump crossterm from 0.23.0 to 0.23.1 [\#234](https://github.com/yykamei/thwack/pull/234) ([dependabot[bot]](https://github.com/apps/dependabot))
