@@ -14,6 +14,7 @@
 
 **Merged pull requests:**
 
+- Refactor cli.rs to handle mutable variables within a struct [\#239](https://github.com/yykamei/thwack/pull/239) ([yykamei](https://github.com/yykamei))
 - Bump libc from 0.2.120 to 0.2.121 [\#237](https://github.com/yykamei/thwack/pull/237) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump crossterm from 0.23.0 to 0.23.1 [\#234](https://github.com/yykamei/thwack/pull/234) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump libc from 0.2.119 to 0.2.120 [\#231](https://github.com/yykamei/thwack/pull/231) ([dependabot[bot]](https://github.com/apps/dependabot))
