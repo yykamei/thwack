@@ -14,6 +14,7 @@
 
 **Merged pull requests:**
 
+- Bump libc from 0.2.120 to 0.2.121 [\#237](https://github.com/yykamei/thwack/pull/237) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump crossterm from 0.23.0 to 0.23.1 [\#234](https://github.com/yykamei/thwack/pull/234) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump libc from 0.2.119 to 0.2.120 [\#231](https://github.com/yykamei/thwack/pull/231) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump git2 from 0.14.1 to 0.14.2 [\#229](https://github.com/yykamei/thwack/pull/229) ([dependabot[bot]](https://github.com/apps/dependabot))
