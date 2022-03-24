@@ -80,5 +80,9 @@ fn copy_with_absolute_path() {
         )
     );
     let mut ctx = ClipboardContext::new().unwrap();
-    assert_eq!(ctx.get_contents().unwrap(), ".config/bar.toml");
+    if cfg!(windows) {
+        assert_eq!(ctx.get_contents().unwrap(), ".config\\bar.toml");
+    } else {
+        assert_eq!(ctx.get_contents().unwrap(), ".config/bar.toml");
+    }
 }
