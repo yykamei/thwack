@@ -6,6 +6,7 @@
 
 **Breaking changes:**
 
+- Change Ord for MatchedPath [\#243](https://github.com/yykamei/thwack/pull/243) ([yykamei](https://github.com/yykamei))
 - Make command-line arguments take precedence over envs [\#227](https://github.com/yykamei/thwack/pull/227) ([yykamei](https://github.com/yykamei))
 
 **Implemented enhancements:**
