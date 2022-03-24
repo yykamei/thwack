@@ -105,11 +105,7 @@ impl Display for MatchedPath {
 
 impl Ord for MatchedPath {
     fn cmp(&self, other: &Self) -> Ordering {
-        let depth = match self.distance().cmp(&other.distance()) {
-            Ordering::Equal => self.depth.cmp(&other.depth),
-            any => any,
-        };
-        match depth {
+        match self.distance().cmp(&other.distance()) {
             Ordering::Equal => self.relative.cmp(&other.relative),
             any => any,
         }
@@ -271,6 +267,16 @@ mod tests {
                 relative: String::from("abc/abc/abc.txt"),
                 absolute_positions: vec![9, 10, 11, 12, 13, 14, 15],
                 relative_positions: vec![8, 9, 10, 11, 12, 13, 14],
+                depth: 2,
+            },
+        );
+        assert_eq!(
+            new("", "/", "/abc/abc/abc.txt"),
+            MatchedPath {
+                absolute: String::from("/abc/abc/abc.txt"),
+                relative: String::from("abc/abc/abc.txt"),
+                absolute_positions: vec![],
+                relative_positions: vec![],
                 depth: 2,
             },
         );
@@ -625,8 +631,8 @@ mod tests {
             given,
             vec![
                 new("abc.txt", "/home", "/home/abc.txt"),
-                new("abc.txt", "/home", "/home/src/abc.txt"),
                 new("abc.txt", "/home", "/home/abc/src/abc.txt"),
+                new("abc.txt", "/home", "/home/src/abc.txt"),
                 new("abc.txt", "/home", "/home/src/n1/n2/abc.txt"),
                 new("abc.txt", "/home", "/home/lib/abc!.txt"),
                 new("abc.txt", "/home", "/home/src/n1/n2/Foo-aXbc.txt"),
