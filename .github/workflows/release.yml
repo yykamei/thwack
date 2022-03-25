@@ -41,7 +41,13 @@ jobs:
 
     runs-on: ${{ matrix.os }}
     steps:
-      - run: sudo apt-get install libx11-xcb-dev libxcb-shape0-dev libxcb-xfixes0-dev
+      - name: Create Dockerfile
+        run: |
+          cat <<EOD > Dockerfile
+          FROM ghcr.io/cross-rs/${{ matrix.target }}:latest
+          RUN apt-get update && apt-get install --yes --no-install-recommends libx11-xcb-dev libxcb-shape0-dev libxcb-xfixes0-dev
+          EOD
+          docker build -t ${{ matrix.target }}:latest
         if: matrix.os == 'ubuntu-latest'
 
       - uses: actions/checkout@v3
