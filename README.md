@@ -5,7 +5,7 @@
 
 thwack is the Command-line utility similar to ["Go to file" on GitHub](https://docs.github.com/en/github/searching-for-information-on-github/searching-on-github/finding-files-on-github). You can search for a file in a directory and invoke an arbitrary command on it.
 
-<img width="480" src="https://user-images.githubusercontent.com/13130705/128626409-d4b4ae18-1ccf-46e6-89d3-ae01be30c860.gif" alt="thwack on iTerm2">
+<img width="480" src="https://user-images.githubusercontent.com/13130705/160029304-f376fcd2-ad9e-4c1b-90b7-f7436d7bce0b.gif" alt="thwack on iTerm2">
 
 ## Why is this useful?
 
