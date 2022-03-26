@@ -41,7 +41,7 @@ jobs:
 
     runs-on: ${{ matrix.os }}
     steps:
-      - run: sudo apt-get install --yes --no-install-recommends libx11-xcb-dev libxcb-shape0-dev libxcb-xfixes0-dev musl-tools gcc-aarch64-linux-gnu
+      - run: sudo apt-get install --yes --no-install-recommends libx11-xcb-dev libxcb-shape0-dev libxcb-xfixes0-dev musl-tools gcc-aarch64-linux-gnu gcc-arm-linux-gnueabihf
         if: matrix.os == 'ubuntu-latest'
 
       - uses: actions/checkout@v3
