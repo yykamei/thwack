@@ -41,7 +41,11 @@ jobs:
 
     runs-on: ${{ matrix.os }}
     steps:
-      - run: sudo apt-get install --yes --no-install-recommends libx11-xcb-dev libxcb-shape0-dev libxcb-xfixes0-dev musl-tools gcc-10-aarch64-linux-gnu gcc-10-arm-linux-gnueabihf
+      - run: |
+          sudo apt-get install --yes --no-install-recommends \
+            libx11-xcb-dev libxcb-shape0-dev libxcb-xfixes0-dev \
+            musl-tools
+          curl -fsSL https://musl.cc/aarch64-linux-musl-cross.tgz | tar -xf -C /use/local/bin
         if: matrix.os == 'ubuntu-latest'
 
       - uses: actions/checkout@v3
