@@ -46,12 +46,12 @@ jobs:
             libx11-xcb-dev libxcb-shape0-dev libxcb-xfixes0-dev musl-tools
           curl -fsSL https://musl.cc/aarch64-linux-musl-cross.tgz | tar -xz
           pushd aarch64-linux-musl-cross/
-          find -type f -exec install -Dm 0755 {} /tmp/{} \;
+          find -type f -exec install -Dm 0755 {} /{} \;
           popd
 
           curl -fsSL https://musl.cc/arm-linux-musleabi-cross.tgz | tar -xz
           pushd arm-linux-musleabi-cross
-          find -type f -exec install -Dm 0755 {} /tmp/{} \;
+          find -type f -exec install -Dm 0755 {} /{} \;
         if: matrix.os == 'ubuntu-latest'
 
       - uses: actions/checkout@v3
