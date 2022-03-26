@@ -41,13 +41,7 @@ jobs:
 
     runs-on: ${{ matrix.os }}
     steps:
-      - name: Create Dockerfile
-        run: |
-          cat <<EOD > Dockerfile
-          FROM ghcr.io/cross-rs/${{ matrix.target }}:edge
-          RUN apt-get update && apt-get install --yes --no-install-recommends libx11-xcb-dev libxcb-shape0-dev libxcb-xfixes0-dev
-          EOD
-          docker build -t ${{ matrix.target }}:latest .
+      - run: sudo apt-get install --yes --no-install-recommends libx11-xcb-dev libxcb-shape0-dev libxcb-xfixes0-dev
         if: matrix.os == 'ubuntu-latest'
 
       - uses: actions/checkout@v3
@@ -59,11 +53,7 @@ jobs:
           override: true
           target: ${{ matrix.target }}
 
-      - uses: actions-rs/cargo@v1
-        with:
-          command: build
-          args: --release --locked --target ${{ matrix.target }}
-          use-cross: ${{ matrix.os == 'ubuntu-latest' }}
+      - run: cargo build --release --locked --target ${{ matrix.target }}
 
       - name: Bundle on Windows
         run: 7z a ../../../thwack-${{ matrix.target }}${{ matrix.suffix }} thwack.exe
