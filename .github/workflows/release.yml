@@ -55,7 +55,7 @@ jobs:
           pushd arm-linux-musleabi-cross
           find -type f -exec sudo install -Dm 0755 {} /{} \;
           popd
-          arm-linux-musleabihf-gcc --version
+          arm-linux-musleabi-gcc --version
         if: matrix.os == 'ubuntu-latest'
 
       - uses: actions/checkout@v3
