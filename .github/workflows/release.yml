@@ -43,7 +43,7 @@ jobs:
     steps:
       - run: |
           sudo apt-get install --yes --no-install-recommends \
-            libx11-xcb-dev libxcb-shape0-dev libxcb-xfixes0-dev musl-tools build-essential
+            libx11-xcb-dev libxcb-shape0-dev libxcb-xfixes0-dev musl-tools
 
           curl -fsSL https://musl.cc/aarch64-linux-musl-cross.tgz | tar -xz
           pushd aarch64-linux-musl-cross/
