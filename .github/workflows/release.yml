@@ -43,9 +43,11 @@ jobs:
     steps:
       - run: |
           sudo apt-get install --yes --no-install-recommends \
-            libx11-xcb-dev libxcb-shape0-dev libxcb-xfixes0-dev \
-            musl-tools
-          curl -fsSL https://musl.cc/aarch64-linux-musl-cross.tgz | tar -xz -C /usr/local/bin
+            libx11-xcb-dev libxcb-shape0-dev libxcb-xfixes0-dev musl-tools
+          curl -fsSL https://musl.cc/aarch64-linux-musl-cross.tgz | tar -xz
+          curl -fsSL https://musl.cc/arm-linux-musleabi-cross.tgz | tar -xz
+          mv ./aarch64-linux-musl-cross/bin/* /usr/local/bin/
+          mv ./arm-linux-musleabi-cross/bin/* /usr/local/bin/
         if: matrix.os == 'ubuntu-latest'
 
       - uses: actions/checkout@v3
