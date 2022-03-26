@@ -47,13 +47,13 @@ jobs:
 
           curl -fsSL https://musl.cc/aarch64-linux-musl-cross.tgz | tar -xz
           pushd aarch64-linux-musl-cross/
-          find -type f -exec install -Dm 0755 {} /{} \;
+          find -type f -exec sudo install -Dm 0755 {} /{} \;
           popd
           aarch64-linux-musl-gcc --version
 
           curl -fsSL https://musl.cc/arm-linux-musleabi-cross.tgz | tar -xz
           pushd arm-linux-musleabi-cross
-          find -type f -exec install -Dm 0755 {} /{} \;
+          find -type f -exec sudo install -Dm 0755 {} /{} \;
           popd
           arm-linux-musleabihf-gcc --version
         if: matrix.os == 'ubuntu-latest'
