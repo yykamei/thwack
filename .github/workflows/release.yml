@@ -23,9 +23,11 @@ jobs:
           - target: aarch64-unknown-linux-musl
             os: ubuntu-latest
             suffix: .tar.gz
+            muslcc: aarch64-linux-musl
           - target: arm-unknown-linux-musleabihf
             os: ubuntu-latest
             suffix: .tar.gz
+            muslcc: arm-linux-musleabi
           - target: x86_64-apple-darwin
             os: macOS-latest
             suffix: .tar.gz
@@ -44,19 +46,16 @@ jobs:
       - run: |
           sudo apt-get install --yes --no-install-recommends \
             libx11-xcb-dev libxcb-shape0-dev libxcb-xfixes0-dev musl-tools
-
-          curl -fsSL https://musl.cc/aarch64-linux-musl-cross.tgz | tar -xz
-          pushd aarch64-linux-musl-cross/
-          find -type f -exec sudo install -Dm 0755 {} /{} \;
-          popd
-          aarch64-linux-musl-gcc --version
-
-          curl -fsSL https://musl.cc/arm-linux-musleabi-cross.tgz | tar -xz
-          pushd arm-linux-musleabi-cross
-          find -type f -exec sudo install -Dm 0755 {} /{} \;
-          popd
-          arm-linux-musleabi-gcc --version
         if: matrix.os == 'ubuntu-latest'
+
+      - name: Install cross compiling musl-based toolchains
+        run: |
+          curl -fsSL https://musl.cc/${{ matrix.muslcc }}-cross.tgz | tar -xz
+          cd ${{ matrix.muslcc }}-cross
+          find -type f -exec sudo install -Dm 0755 {} /{} \;
+          cd /usr/local/bin
+          ln -sf $(find /libexec/gcc/arm-linux-musleabi/ -name cc1) .
+        if: matrix.muslcc
 
       - uses: actions/checkout@v3
 
