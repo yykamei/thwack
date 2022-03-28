@@ -43,7 +43,7 @@ jobs:
 
     runs-on: ${{ matrix.os }}
     steps:
-      - run: apt-get update && apt-get install --yes --no-install-recommends libx11-xcb-dev libxcb-shape0-dev libxcb-xfixes0-dev musl-tools
+      - run: sudo apt-get update && sudo apt-get install --yes --no-install-recommends libx11-xcb-dev libxcb-shape0-dev libxcb-xfixes0-dev musl-tools
         if: matrix.os == 'ubuntu-latest'
 
       - name: Create Dockerfile
