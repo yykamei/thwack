@@ -53,7 +53,8 @@ jobs:
           RUN dpkg --add-architecture ${{ matrix.cross-arch }}
           RUN apt-get update && \
               apt-get install --yes --no-install-recommends \
-                libx11-xcb-dev:${{ matrix.cross-arch }} \
+                libxcb1-dev:${{ matrix.cross-arch }} \
+                libxcb-render0-dev:${{ matrix.cross-arch }} \
                 libxcb-shape0-dev:${{ matrix.cross-arch }} \
                 libxcb-xfixes0-dev:${{ matrix.cross-arch }} \
                 ;
