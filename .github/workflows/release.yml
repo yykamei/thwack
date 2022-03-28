@@ -23,11 +23,11 @@ jobs:
           - target: aarch64-unknown-linux-musl
             os: ubuntu-latest
             suffix: .tar.gz
-            cross: 'true'
+            cross-arch: 'arm64'
           - target: arm-unknown-linux-musleabihf
             os: ubuntu-latest
             suffix: .tar.gz
-            cross: 'true'
+            cross-arch: 'armhf'
           - target: x86_64-apple-darwin
             os: macOS-latest
             suffix: .tar.gz
@@ -50,10 +50,11 @@ jobs:
         run: |
           cat <<EOD > Dockerfile
           FROM ghcr.io/cross-rs/${{ matrix.target }}:main
+          RUN dpkg --add-architecture ${{ matrix.cross-arch }}
           RUN apt-get update && apt-get install --yes --no-install-recommends libx11-xcb-dev libxcb-shape0-dev libxcb-xfixes0-dev
           EOD
           docker build -t ${{ matrix.target }}:main .
-        if: matrix.cross == 'true'
+        if: matrix.cross-arch
 
       - uses: actions/checkout@v3
 
@@ -68,7 +69,7 @@ jobs:
         with:
           command: build
           args: --release --locked --target ${{ matrix.target }}
-          use-cross: ${{ matrix.cross == 'true' }}
+          use-cross: ${{ matrix.cross-arch }}
 
       - name: Bundle on Windows
         run: 7z a ../../../thwack-${{ matrix.target }}${{ matrix.suffix }} thwack.exe
