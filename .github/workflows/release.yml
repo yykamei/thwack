@@ -69,7 +69,7 @@ jobs:
         with:
           command: build
           args: --release --locked --target ${{ matrix.target }}
-          use-cross: ${{ matrix.cross-arch }}
+          use-cross: ${{ !!matrix.cross-arch }}
 
       - name: Bundle on Windows
         run: 7z a ../../../thwack-${{ matrix.target }}${{ matrix.suffix }} thwack.exe
