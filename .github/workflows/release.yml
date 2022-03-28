@@ -51,7 +51,12 @@ jobs:
           cat <<EOD > Dockerfile
           FROM ghcr.io/cross-rs/${{ matrix.target }}:main
           RUN dpkg --add-architecture ${{ matrix.cross-arch }}
-          RUN apt-get update && apt-get install --yes --no-install-recommends libx11-xcb-dev libxcb-shape0-dev libxcb-xfixes0-dev
+          RUN apt-get update && \
+              apt-get install --yes --no-install-recommends \
+                libx11-xcb-dev:${{ matrix.cross-arch }} \
+                libxcb-shape0-dev:${{ matrix.cross-arch }} \
+                libxcb-xfixes0-dev:${{ matrix.cross-arch }} \
+                ;
           EOD
           docker build -t ${{ matrix.target }}:main .
         if: matrix.cross-arch
