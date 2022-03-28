@@ -68,7 +68,7 @@ jobs:
         with:
           command: build
           args: --release --locked --target ${{ matrix.target }}
-          use-cross: matrix.os == 'true'
+          use-cross: matrix.cross == 'true'
 
       - name: Bundle on Windows
         run: 7z a ../../../thwack-${{ matrix.target }}${{ matrix.suffix }} thwack.exe
