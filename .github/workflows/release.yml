@@ -52,7 +52,7 @@ jobs:
         run: |
           curl -fsSL https://musl.cc/${{ matrix.muslcc }}-cross.tgz | tar -xz
           cd ${{ matrix.muslcc }}-cross
-          find -type f -exec sudo install -Dm 0755 {} /{} \;
+          find . -type f -exec sudo install -Dm 0755 {} /{} \;
           cd /usr/local/bin
           ln -sf $(find /libexec/gcc/arm-linux-musleabi/ -name cc1) .
         if: matrix.muslcc
