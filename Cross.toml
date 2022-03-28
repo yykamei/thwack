@@ -1,0 +1,8 @@
+[target.x86_64-unknown-linux-musl]
+image = "x86_64-unknown-linux-musl:main"
+
+[target.aarch64-unknown-linux-musl]
+image = "aarch64-unknown-linux-musl:main"
+
+[target.arm-unknown-linux-musleabihf]
+image = "arm-unknown-linux-musleabihf:main"

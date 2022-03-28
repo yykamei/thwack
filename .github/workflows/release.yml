@@ -20,12 +20,15 @@ jobs:
           - target: x86_64-unknown-linux-musl
             os: ubuntu-latest
             suffix: .tar.gz
+            cross: 'true'
           - target: aarch64-unknown-linux-musl
             os: ubuntu-latest
             suffix: .tar.gz
+            cross: 'true'
           - target: arm-unknown-linux-musleabihf
             os: ubuntu-latest
             suffix: .tar.gz
+            cross: 'true'
           - target: x86_64-apple-darwin
             os: macOS-latest
             suffix: .tar.gz
@@ -41,8 +44,14 @@ jobs:
 
     runs-on: ${{ matrix.os }}
     steps:
-      - run: sudo apt-get install libx11-xcb-dev libxcb-shape0-dev libxcb-xfixes0-dev
-        if: matrix.os == 'ubuntu-latest'
+      - name: Create Dockerfile
+        run: |
+          cat <<EOD > Dockerfile
+          FROM ghcr.io/cross-rs/${{ matrix.target }}:main
+          RUN apt-get update && apt-get install --yes --no-install-recommends libx11-xcb-dev libxcb-shape0-dev libxcb-xfixes0-dev
+          EOD
+          docker build -t ${{ matrix.target }}:main
+        if: matrix.cross == 'true'
 
       - uses: actions/checkout@v3
 
@@ -57,7 +66,7 @@ jobs:
         with:
           command: build
           args: --release --locked --target ${{ matrix.target }}
-          use-cross: ${{ matrix.os == 'ubuntu-latest' }}
+          use-cross: matrix.cross == 'true'
 
       - name: Bundle on Windows
         run: 7z a ../../../thwack-${{ matrix.target }}${{ matrix.suffix }} thwack.exe
