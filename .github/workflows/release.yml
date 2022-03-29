@@ -20,12 +20,6 @@ jobs:
           - target: x86_64-unknown-linux-musl
             os: ubuntu-latest
             suffix: .tar.gz
-          - target: aarch64-unknown-linux-musl
-            os: ubuntu-latest
-            suffix: .tar.gz
-          - target: arm-unknown-linux-musleabihf
-            os: ubuntu-latest
-            suffix: .tar.gz
           - target: x86_64-apple-darwin
             os: macOS-latest
             suffix: .tar.gz
@@ -41,7 +35,7 @@ jobs:
 
     runs-on: ${{ matrix.os }}
     steps:
-      - run: sudo apt-get install libx11-xcb-dev libxcb-shape0-dev libxcb-xfixes0-dev
+      - run: sudo apt-get install --yes --no-install-recommends libx11-xcb-dev libxcb-shape0-dev libxcb-xfixes0-dev musl-tools
         if: matrix.os == 'ubuntu-latest'
 
       - uses: actions/checkout@v3
@@ -57,7 +51,6 @@ jobs:
         with:
           command: build
           args: --release --locked --target ${{ matrix.target }}
-          use-cross: ${{ matrix.os == 'ubuntu-latest' }}
 
       - name: Bundle on Windows
         run: 7z a ../../../thwack-${{ matrix.target }}${{ matrix.suffix }} thwack.exe
