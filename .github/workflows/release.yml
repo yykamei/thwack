@@ -53,12 +53,10 @@ jobs:
           RUN dpkg --add-architecture ${{ matrix.cross-arch }}
           RUN apt-get update && \
               apt-get install --yes --no-install-recommends \
-                libxcb1-dev:${{ matrix.cross-arch }} \
-                libxcb-render0-dev:${{ matrix.cross-arch }} \
-                libxcb-shape0-dev:${{ matrix.cross-arch }} \
                 libxcb-xfixes0-dev:${{ matrix.cross-arch }} \
+                libxcb-composite0-dev:${{ matrix.cross-arch }} \
+                libxcb-damage0-dev:${{ matrix.cross-arch }} \
                 ;
-          ENV LIBRARY_PATH=/usr/lib/aarch64-linux-gnu:/usr/lib/arm-linux-gnueabihf
           EOD
           docker build -t ${{ matrix.target }}:main .
         if: matrix.cross-arch
