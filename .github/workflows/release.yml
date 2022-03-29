@@ -53,6 +53,7 @@ jobs:
           RUN dpkg --add-architecture ${{ matrix.cross-arch }}
           RUN apt-get update && \
               apt-get install --yes --no-install-recommends \
+                libc6-dev:${{ matrix.cross-arch }} \
                 libxcb-xfixes0-dev:${{ matrix.cross-arch }} \
                 libxcb-composite0-dev:${{ matrix.cross-arch }} \
                 libxcb-damage0-dev:${{ matrix.cross-arch }} \
