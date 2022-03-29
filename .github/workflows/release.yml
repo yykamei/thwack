@@ -53,13 +53,14 @@ jobs:
           RUN dpkg --add-architecture ${{ matrix.cross-arch }}
           RUN apt-get update && \
               apt-get install --yes --no-install-recommends \
-                libc6-dev:${{ matrix.cross-arch }} \
                 libxcb-xfixes0-dev:${{ matrix.cross-arch }} \
                 libxcb-composite0-dev:${{ matrix.cross-arch }} \
                 libxcb-damage0-dev:${{ matrix.cross-arch }} \
                 ;
           ENV CARGO_TARGET_AARCH64_UNKNOWN_LINUX_MUSL_RUSTFLAGS="-L /usr/lib/aarch64-linux-gnu ${CARGO_TARGET_AARCH64_UNKNOWN_LINUX_MUSL_RUSTFLAGS}"
+          ENV CARGO_TARGET_AARCH64_UNKNOWN_LINUX_MUSL_RUSTFLAGS="-C link-args=-Wl,-rpath-link,/usr/lib/aarch64-linux-gnu ${CARGO_TARGET_AARCH64_UNKNOWN_LINUX_MUSL_RUSTFLAGS}"
           ENV CARGO_TARGET_ARM_UNKNOWN_LINUX_MUSLEABIHF_RUSTFLAGS="-L /usr/lib/arm-linux-gnueabihf ${CARGO_TARGET_ARM_UNKNOWN_LINUX_MUSLEABIHF_RUSTFLAGS}"
+          ENV CARGO_TARGET_ARM_UNKNOWN_LINUX_MUSLEABIHF_RUSTFLAGS="-C link-args=-Wl,-rpath-link,/usr/lib/arm-linux-gnueabihf ${CARGO_TARGET_ARM_UNKNOWN_LINUX_MUSLEABIHF_RUSTFLAGS}"
           EOD
           docker build -t ${{ matrix.target }}:main .
         if: matrix.cross-arch
