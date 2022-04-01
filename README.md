@@ -41,14 +41,14 @@ Run `thwack --help` for more options.
 
 ## Shortcuts
 
-| Action | Shortcuts |
-| ------ | --------- |
-| Move selection up   | `Ctrl+p` or `⬆️` |
-| Move selection down | `Ctrl+n` or `⬇️` |
-| Execute command with selection | `Enter` |
-| Copy relative path of selection | `Ctrl+d` |
-| Copy absolute path of selection | `Ctrl+y` |
-| Exit | `Esc` or `Ctrl+c` |
+| Action                          | Shortcuts         |
+| ------------------------------- | ----------------- |
+| Move selection up               | `Ctrl+p` or `⬆️`  |
+| Move selection down             | `Ctrl+n` or `⬇️`  |
+| Execute command with selection  | `Enter`           |
+| Copy relative path of selection | `Ctrl+d`          |
+| Copy absolute path of selection | `Ctrl+y`          |
+| Exit                            | `Esc` or `Ctrl+c` |
 
 ## Contributing
 
