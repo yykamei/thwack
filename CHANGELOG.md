@@ -16,6 +16,7 @@
 
 **Merged pull requests:**
 
+- Update README.md [\#249](https://github.com/yykamei/thwack/pull/249) ([yykamei](https://github.com/yykamei))
 - Bump log from 0.4.14 to 0.4.16 [\#241](https://github.com/yykamei/thwack/pull/241) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Refactor cli.rs to handle mutable variables within a struct [\#239](https://github.com/yykamei/thwack/pull/239) ([yykamei](https://github.com/yykamei))
 - Bump libc from 0.2.120 to 0.2.121 [\#237](https://github.com/yykamei/thwack/pull/237) ([dependabot[bot]](https://github.com/apps/dependabot))
