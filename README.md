@@ -3,7 +3,7 @@
 <a href="https://github.com/yykamei/thwack/actions/workflows/ci.yml"><img alt="GitHub Actions workflow status" src="https://github.com/yykamei/thwack/actions/workflows/ci.yml/badge.svg"></a>
 <a href="https://crates.io/crates/thwack"><img alt="Crates.io" src="https://img.shields.io/crates/v/thwack"></a>
 
-thwack is the Command-line utility similar to ["Go to file" on GitHub](https://docs.github.com/en/github/searching-for-information-on-github/searching-on-github/finding-files-on-github).
+thwack is a Command-line utility similar to ["Go to file" on GitHub](https://docs.github.com/en/github/searching-for-information-on-github/searching-on-github/finding-files-on-github).
 You can search for a file in a directory and invoke an arbitrary command on it.
 
 <img width="480" src="https://user-images.githubusercontent.com/13130705/160029304-f376fcd2-ad9e-4c1b-90b7-f7436d7bce0b.gif" alt="thwack on iTerm2">
@@ -12,7 +12,7 @@ You can search for a file in a directory and invoke an arbitrary command on it.
 
 In many cases, we know the name of a file when we want to open it, but we may not be sure where it's located.
 In this case, we can search it with our file explorer.
-However, if we're in the terminal console, it's cumbersome to switch to another application.
+However, if we're in a terminal console, it's cumbersome to switch to another application.
 There might be few command-line tools to support this functionality,
 but they require us to combine some commands with pipes to get things done.
 
@@ -48,6 +48,7 @@ Run `thwack --help` for more options.
 | Execute command with selection | `Enter` |
 | Copy relative path of selection | `Ctrl+d` |
 | Copy absolute path of selection | `Ctrl+y` |
+| Exit | `Esc` or `Ctrl+c` |
 
 ## Contributing
 
