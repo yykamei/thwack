@@ -278,7 +278,6 @@ impl<'a, W: Write, T: Terminal, TE: TerminalEvent> Runner<'a, W, T, TE> {
         let mut paths = Vec::with_capacity(100); // TODO: Tune this capacity later.
 
         for path in Finder::new(&self.starting_point, &self.query, self.repo.as_ref())? {
-            // TODO: Shouldn't we stop iteration when some paths returns Err?
             match path {
                 Ok(path) => paths.push(path),
                 Err(e) => log::error!("Failed to get the path: {}", e),
