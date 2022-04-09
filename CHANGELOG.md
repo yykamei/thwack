@@ -6,6 +6,7 @@
 
 **Merged pull requests:**
 
+- Remove resolved TODO comment [\#256](https://github.com/yykamei/thwack/pull/256) ([yykamei](https://github.com/yykamei))
 - Bump libc from 0.2.121 to 0.2.122 [\#254](https://github.com/yykamei/thwack/pull/254) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump crossterm from 0.23.1 to 0.23.2 [\#252](https://github.com/yykamei/thwack/pull/252) ([dependabot[bot]](https://github.com/apps/dependabot))
 
