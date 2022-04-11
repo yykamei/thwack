@@ -116,7 +116,7 @@ jobs:
           RELEASE_TITLE: Release v${{ github.event.inputs.version }}
           APPLY: ${{ github.event.inputs.apply }}
 
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v3
 
       - name: Calculate checksums
         run: |
