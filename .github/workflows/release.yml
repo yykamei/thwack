@@ -62,7 +62,7 @@ jobs:
         if: matrix.os != 'windows-latest'
         working-directory: target/${{ matrix.target }}/release
 
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: Artifact-thwack-${{ matrix.target }}${{ matrix.suffix }}
           path: thwack-${{ matrix.target }}${{ matrix.suffix }}
