@@ -6,6 +6,7 @@
 
 **Merged pull requests:**
 
+- Bump libc from 0.2.123 to 0.2.124 [\#263](https://github.com/yykamei/thwack/pull/263) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump libc from 0.2.122 to 0.2.123 [\#261](https://github.com/yykamei/thwack/pull/261) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump actions/download-artifact from 2 to 3 [\#259](https://github.com/yykamei/thwack/pull/259) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump actions/upload-artifact from 2 to 3 [\#258](https://github.com/yykamei/thwack/pull/258) ([dependabot[bot]](https://github.com/apps/dependabot))
