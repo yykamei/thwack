@@ -83,27 +83,18 @@ jobs:
           profile: minimal
           override: true
 
-      - uses: ruby/setup-ruby@v1
+      - uses: yykamei/actions-update-changelog@main
         with:
-          ruby-version: 3
-
-      - run: gem install github_changelog_generator
-
-      - name: Update CHANGELOG.md
-        run: ./scripts/update_changelog.sh
-        env:
-          CHANGELOG_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          FUTURE_RELEASE: v${{ github.event.inputs.version }}
+          future-release: v${{ github.event.inputs.version }}
 
       - name: Bump the package version
         run: |
           sed -i -e "s/^version = .*$/version = \"${{ github.event.inputs.version }}\"/" Cargo.toml
           cargo build
 
-      - name: git-push(1)
-        run: ./scripts/git_push.sh
-        env:
-          COMMIT_MESSAGE: Bump to ${{ github.event.inputs.version }}
+      - uses: yykamei/actions-git-push@main
+        with:
+          commit-message: Bump to ${{ github.event.inputs.version }}
         if: github.event.inputs.apply == 'true'
 
       - name: Create a GitHub release and publish the crate on crates.io
