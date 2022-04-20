@@ -9,28 +9,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: ruby/setup-ruby@v1
+      - uses: yykamei/actions-date@main
+        id: date
+      - uses: yykamei/actions-update-changelog@main
+      - uses: yykamei/actions-git-push@main
         with:
-          ruby-version: 3
-      - run: gem install github_changelog_generator
-      - name: Update CHANGELOG.md
-        run: ./scripts/update_changelog.sh
-        env:
-          CHANGELOG_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: git-push(1)
-        run: ./scripts/git_push.sh
-        env:
-          COMMIT_MESSAGE: Update CHANGELOG.md
-          BRANCH: update-changelog
-      - name: gh-pr-create(1)
-        run: |
-          cat <<BODY | ./scripts/gh_pr_create.sh
-          *This pull request was automatically created to make CHANGELOG.md the latest*.
+          commit-message: Update CHANGELOG.md
+          branch: update-changelog-${{ steps.date.outputs.date }}
+      - uses: yykamei/actions-gh-pr-create@main
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: update-changelog-${{ steps.date.outputs.date }}
+          title: Update CHANGELOG.md
+          label: chore
+          body: |
+            *This pull request was automatically created to make CHANGELOG.md the latest*.
 
-          Check the files changes and merge if the changes make sense.
-          BODY
-        env:
-          BRANCH: update-changelog
-          TITLE: Update CHANGELOG.md
-          LABEL: chore
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            Check the files changes and merge if the changes make sense.
