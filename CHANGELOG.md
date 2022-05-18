@@ -6,6 +6,7 @@
 
 **Merged pull requests:**
 
+- Bump libc from 0.2.125 to 0.2.126 [\#272](https://github.com/yykamei/thwack/pull/272) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump log from 0.4.16 to 0.4.17 [\#270](https://github.com/yykamei/thwack/pull/270) ([dependabot[bot]](https://github.com/apps/dependabot))
 
 ## [v0.7.2](https://github.com/yykamei/thwack/tree/v0.7.2) (2022-05-02)
