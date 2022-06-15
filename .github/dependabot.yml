@@ -6,6 +6,8 @@ updates:
       interval: daily
       time: "12:20"
       timezone: Asia/Tokyo
+    allow:
+      - dependency-type: all
   - package-ecosystem: github-actions
     directory: "/"
     schedule:
