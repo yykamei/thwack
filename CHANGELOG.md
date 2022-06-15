@@ -7,6 +7,7 @@
 **Merged pull requests:**
 
 - Bump libz-sys from 1.1.3 to 1.1.8 [\#278](https://github.com/yykamei/thwack/pull/278) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump mio from 0.8.2 to 0.8.3 [\#276](https://github.com/yykamei/thwack/pull/276) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump git2 from 0.14.2 to 0.14.4 [\#274](https://github.com/yykamei/thwack/pull/274) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump libc from 0.2.125 to 0.2.126 [\#272](https://github.com/yykamei/thwack/pull/272) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump log from 0.4.16 to 0.4.17 [\#270](https://github.com/yykamei/thwack/pull/270) ([dependabot[bot]](https://github.com/apps/dependabot))
