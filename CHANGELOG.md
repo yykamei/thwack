@@ -6,6 +6,7 @@
 
 **Merged pull requests:**
 
+- Bump signal-hook from 0.3.13 to 0.3.14 [\#284](https://github.com/yykamei/thwack/pull/284) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump unicode-xid from 0.2.2 to 0.2.3 [\#283](https://github.com/yykamei/thwack/pull/283) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump redox\_syscall from 0.2.10 to 0.2.13 [\#282](https://github.com/yykamei/thwack/pull/282) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump pkg-config from 0.3.24 to 0.3.25 [\#281](https://github.com/yykamei/thwack/pull/281) ([dependabot[bot]](https://github.com/apps/dependabot))
