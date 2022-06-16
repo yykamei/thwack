@@ -6,6 +6,8 @@
 
 **Merged pull requests:**
 
+- Bump memchr from 2.4.1 to 2.5.0 [\#299](https://github.com/yykamei/thwack/pull/299) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump proc-macro2 from 1.0.36 to 1.0.39 [\#286](https://github.com/yykamei/thwack/pull/286) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump unicode-bidi from 0.3.7 to 0.3.8 [\#285](https://github.com/yykamei/thwack/pull/285) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump signal-hook from 0.3.13 to 0.3.14 [\#284](https://github.com/yykamei/thwack/pull/284) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump unicode-xid from 0.2.2 to 0.2.3 [\#283](https://github.com/yykamei/thwack/pull/283) ([dependabot[bot]](https://github.com/apps/dependabot))
