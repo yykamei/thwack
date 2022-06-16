@@ -8,6 +8,7 @@
 
 - Bump redox\_syscall from 0.2.10 to 0.2.13 [\#282](https://github.com/yykamei/thwack/pull/282) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump pkg-config from 0.3.24 to 0.3.25 [\#281](https://github.com/yykamei/thwack/pull/281) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump lock\_api from 0.4.6 to 0.4.7 [\#279](https://github.com/yykamei/thwack/pull/279) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump libz-sys from 1.1.3 to 1.1.8 [\#278](https://github.com/yykamei/thwack/pull/278) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump quote from 1.0.15 to 1.0.18 [\#277](https://github.com/yykamei/thwack/pull/277) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump mio from 0.8.2 to 0.8.3 [\#276](https://github.com/yykamei/thwack/pull/276) ([dependabot[bot]](https://github.com/apps/dependabot))
