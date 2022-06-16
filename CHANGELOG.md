@@ -6,6 +6,9 @@
 
 **Merged pull requests:**
 
+- Bump smithay-client-toolkit from 0.15.3 to 0.15.4 [\#302](https://github.com/yykamei/thwack/pull/302) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump parking\_lot\_core from 0.9.1 to 0.9.3 [\#301](https://github.com/yykamei/thwack/pull/301) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump tinyvec from 1.5.1 to 1.6.0 [\#300](https://github.com/yykamei/thwack/pull/300) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump memchr from 2.4.1 to 2.5.0 [\#299](https://github.com/yykamei/thwack/pull/299) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump proc-macro2 from 1.0.36 to 1.0.39 [\#286](https://github.com/yykamei/thwack/pull/286) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump unicode-bidi from 0.3.7 to 0.3.8 [\#285](https://github.com/yykamei/thwack/pull/285) ([dependabot[bot]](https://github.com/apps/dependabot))
