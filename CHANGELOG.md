@@ -1,21 +1,5 @@
 # Changelog
 
-## [Unreleased](https://github.com/yykamei/thwack/tree/HEAD)
-
-[Full Changelog](https://github.com/yykamei/thwack/compare/v0.7.2...HEAD)
-
-**Merged pull requests:**
-
-- Bump redox\_syscall from 0.2.10 to 0.2.13 [\#282](https://github.com/yykamei/thwack/pull/282) ([dependabot[bot]](https://github.com/apps/dependabot))
-- Bump pkg-config from 0.3.24 to 0.3.25 [\#281](https://github.com/yykamei/thwack/pull/281) ([dependabot[bot]](https://github.com/apps/dependabot))
-- Bump lock\_api from 0.4.6 to 0.4.7 [\#279](https://github.com/yykamei/thwack/pull/279) ([dependabot[bot]](https://github.com/apps/dependabot))
-- Bump libz-sys from 1.1.3 to 1.1.8 [\#278](https://github.com/yykamei/thwack/pull/278) ([dependabot[bot]](https://github.com/apps/dependabot))
-- Bump quote from 1.0.15 to 1.0.18 [\#277](https://github.com/yykamei/thwack/pull/277) ([dependabot[bot]](https://github.com/apps/dependabot))
-- Bump mio from 0.8.2 to 0.8.3 [\#276](https://github.com/yykamei/thwack/pull/276) ([dependabot[bot]](https://github.com/apps/dependabot))
-- Bump git2 from 0.14.2 to 0.14.4 [\#274](https://github.com/yykamei/thwack/pull/274) ([dependabot[bot]](https://github.com/apps/dependabot))
-- Bump libc from 0.2.125 to 0.2.126 [\#272](https://github.com/yykamei/thwack/pull/272) ([dependabot[bot]](https://github.com/apps/dependabot))
-- Bump log from 0.4.16 to 0.4.17 [\#270](https://github.com/yykamei/thwack/pull/270) ([dependabot[bot]](https://github.com/apps/dependabot))
-
 ## [v0.7.2](https://github.com/yykamei/thwack/tree/v0.7.2) (2022-05-02)
 
 [Full Changelog](https://github.com/yykamei/thwack/compare/v0.7.1...v0.7.2)
