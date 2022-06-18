@@ -6,6 +6,7 @@
 
 **Merged pull requests:**
 
+- Bump copypasta from 0.7.1 to 0.8.1 [\#315](https://github.com/yykamei/thwack/pull/315) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump parking\_lot from 0.12.0 to 0.12.1 [\#305](https://github.com/yykamei/thwack/pull/305) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump nom from 7.1.0 to 7.1.1 [\#304](https://github.com/yykamei/thwack/pull/304) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump once\_cell from 1.10.0 to 1.12.0 [\#303](https://github.com/yykamei/thwack/pull/303) ([dependabot[bot]](https://github.com/apps/dependabot))
