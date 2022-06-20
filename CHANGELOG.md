@@ -1,5 +1,13 @@
 # Changelog
 
+## [Unreleased](https://github.com/yykamei/thwack/tree/HEAD)
+
+[Full Changelog](https://github.com/yykamei/thwack/compare/v0.7.3...HEAD)
+
+**Merged pull requests:**
+
+- Bump proc-macro2 from 1.0.39 to 1.0.40 [\#320](https://github.com/yykamei/thwack/pull/320) ([dependabot[bot]](https://github.com/apps/dependabot))
+
 ## [v0.7.3](https://github.com/yykamei/thwack/tree/v0.7.3) (2022-06-18)
 
 [Full Changelog](https://github.com/yykamei/thwack/compare/v0.7.2...v0.7.3)
