@@ -6,6 +6,7 @@
 
 **Merged pull requests:**
 
+- Bump smithay-clipboard from 0.6.5 to 0.6.6 [\#324](https://github.com/yykamei/thwack/pull/324) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump proc-macro2 from 1.0.39 to 1.0.40 [\#320](https://github.com/yykamei/thwack/pull/320) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump quote from 1.0.18 to 1.0.20 [\#319](https://github.com/yykamei/thwack/pull/319) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump mio from 0.8.3 to 0.8.4 [\#318](https://github.com/yykamei/thwack/pull/318) ([dependabot[bot]](https://github.com/apps/dependabot))
