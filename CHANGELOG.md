@@ -6,6 +6,7 @@
 
 **Merged pull requests:**
 
+- Bump unicode-normalization from 0.1.19 to 0.1.20 [\#327](https://github.com/yykamei/thwack/pull/327) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump smithay-clipboard from 0.6.5 to 0.6.6 [\#324](https://github.com/yykamei/thwack/pull/324) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump proc-macro2 from 1.0.39 to 1.0.40 [\#320](https://github.com/yykamei/thwack/pull/320) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump quote from 1.0.18 to 1.0.20 [\#319](https://github.com/yykamei/thwack/pull/319) ([dependabot[bot]](https://github.com/apps/dependabot))
