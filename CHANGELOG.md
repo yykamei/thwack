@@ -6,6 +6,7 @@
 
 **Merged pull requests:**
 
+- Bump smallvec from 1.8.1 to 1.9.0 [\#330](https://github.com/yykamei/thwack/pull/330) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump unicode-normalization from 0.1.19 to 0.1.20 [\#327](https://github.com/yykamei/thwack/pull/327) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump smallvec from 1.8.0 to 1.8.1 [\#326](https://github.com/yykamei/thwack/pull/326) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump smithay-clipboard from 0.6.5 to 0.6.6 [\#324](https://github.com/yykamei/thwack/pull/324) ([dependabot[bot]](https://github.com/apps/dependabot))
