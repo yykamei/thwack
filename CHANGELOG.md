@@ -6,6 +6,7 @@
 
 **Merged pull requests:**
 
+- Bump unicode-ident from 1.0.1 to 1.0.2 [\#339](https://github.com/yykamei/thwack/pull/339) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump memmap2 from 0.5.4 to 0.5.5 [\#337](https://github.com/yykamei/thwack/pull/337) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump once\_cell from 1.12.0 to 1.13.0 [\#335](https://github.com/yykamei/thwack/pull/335) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump unicode-normalization from 0.1.20 to 0.1.21 [\#333](https://github.com/yykamei/thwack/pull/333) ([dependabot[bot]](https://github.com/apps/dependabot))
