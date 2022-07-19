@@ -4,6 +4,10 @@
 
 [Full Changelog](https://github.com/yykamei/thwack/compare/v0.7.3...HEAD)
 
+**Fixed bugs:**
+
+- Fix to consider the resize of terminal [\#342](https://github.com/yykamei/thwack/pull/342) ([yykamei](https://github.com/yykamei))
+
 **Merged pull requests:**
 
 - Bump unicode-ident from 1.0.1 to 1.0.2 [\#339](https://github.com/yykamei/thwack/pull/339) ([dependabot[bot]](https://github.com/apps/dependabot))
