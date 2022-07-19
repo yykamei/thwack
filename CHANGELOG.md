@@ -1,8 +1,8 @@
 # Changelog
 
-## [Unreleased](https://github.com/yykamei/thwack/tree/HEAD)
+## [v0.7.4](https://github.com/yykamei/thwack/tree/v0.7.4) (2022-07-19)
 
-[Full Changelog](https://github.com/yykamei/thwack/compare/v0.7.3...HEAD)
+[Full Changelog](https://github.com/yykamei/thwack/compare/v0.7.3...v0.7.4)
 
 **Fixed bugs:**
 
