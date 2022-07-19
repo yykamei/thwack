@@ -394,7 +394,7 @@ impl<'a, W: Write, T: Terminal> Writer<'a, W, T> {
             }
         };
         if let Some(ref s) = selected {
-            queue!(self.stdout, cursor::MoveToRow(self.max_rows - 1))?;
+            queue!(self.stdout, cursor::MoveToRow(self.max_rows - 2))?;
             self.status_line(s)?;
         } else {
             queue!(self.stdout, cursor::MoveToRow(self.max_rows))?;
