@@ -251,6 +251,7 @@ impl<'a, W: Write, T: Terminal, TE: TerminalEvent> Runner<'a, W, T, TE> {
                 } else if let Event::Resize(c, r) = ev {
                     self.max_columns = c;
                     self.max_rows = r;
+                    self.writer.resize(r, c);
                     self.selection = if self.selection > r {
                         self.paths_rows(r) - 1
                     } else {
@@ -345,6 +346,13 @@ impl<'a, W: Write, T: Terminal> Writer<'a, W, T> {
             max_rows,
             max_path_width: (max_columns - 2).into(), // The prefix "> " requires 2 columns.
         }
+    }
+
+    fn resize(&mut self, max_rows: u16, max_columns: u16) -> &Self {
+        self.max_rows = max_rows;
+        self.max_columns = max_columns;
+        self.max_path_width = (max_columns - 2).into(); // The prefix "> " requires 2 columns.
+        self
     }
 
     fn output(&mut self, query: &str, selection: u16, paths: &[MatchedPath]) -> Result<()> {

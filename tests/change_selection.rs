@@ -23,7 +23,6 @@ fn cannot_move_up_because_selection_reaches_to_top() {
     event.add(Some(Event::Key(KeyCode::Esc.into())));
     let mut buffer = buf!();
     let result = entrypoint(args, &mut buffer, MockTerminal, event);
-    println!("{:?}", result);
     assert!(result.is_ok());
     assert_eq!(
         buffer.normalize_path(),
