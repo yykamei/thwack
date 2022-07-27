@@ -6,6 +6,7 @@
 
 **Merged pull requests:**
 
+- Bump redox\_syscall from 0.2.15 to 0.2.16 [\#351](https://github.com/yykamei/thwack/pull/351) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump proc-macro2 from 1.0.40 to 1.0.42 [\#349](https://github.com/yykamei/thwack/pull/349) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump redox\_syscall from 0.2.13 to 0.2.15 [\#346](https://github.com/yykamei/thwack/pull/346) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump fastrand from 1.7.0 to 1.8.0 [\#345](https://github.com/yykamei/thwack/pull/345) ([dependabot[bot]](https://github.com/apps/dependabot))
