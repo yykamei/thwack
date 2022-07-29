@@ -6,6 +6,7 @@
 
 **Merged pull requests:**
 
+- Bump git2 from 0.14.4 to 0.15.0 [\#353](https://github.com/yykamei/thwack/pull/353) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump redox\_syscall from 0.2.15 to 0.2.16 [\#351](https://github.com/yykamei/thwack/pull/351) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump proc-macro2 from 1.0.40 to 1.0.42 [\#349](https://github.com/yykamei/thwack/pull/349) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump redox\_syscall from 0.2.13 to 0.2.15 [\#346](https://github.com/yykamei/thwack/pull/346) ([dependabot[bot]](https://github.com/apps/dependabot))
