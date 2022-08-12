@@ -6,6 +6,8 @@
 
 **Merged pull requests:**
 
+- Bump libc from 0.2.129 to 0.2.131 [\#370](https://github.com/yykamei/thwack/pull/370) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump memmap2 from 0.5.5 to 0.5.6 [\#369](https://github.com/yykamei/thwack/pull/369) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump libc from 0.2.127 to 0.2.129 [\#366](https://github.com/yykamei/thwack/pull/366) ([dependabot[bot]](https://github.com/apps/dependabot))
 
 ## [v0.7.5](https://github.com/yykamei/thwack/tree/v0.7.5) (2022-08-07)
