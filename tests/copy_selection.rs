@@ -1,7 +1,7 @@
-use copypasta::{ClipboardContext, ClipboardProvider};
 use std::ffi::OsString;
 
-use crossterm::event::{Event, KeyCode, KeyEvent, KeyModifiers};
+use copypasta::{ClipboardContext, ClipboardProvider};
+use crossterm::event::{Event, KeyCode, KeyEvent, KeyEventKind, KeyEventState, KeyModifiers};
 
 use helper::{create_tree, MockTerminal, MockTerminalEvent};
 use thwack::entrypoint;
@@ -23,6 +23,8 @@ fn copy_with_absolute_path() {
     event.add(Some(Event::Key(KeyEvent {
         code: KeyCode::Char('d'),
         modifiers: KeyModifiers::CONTROL,
+        kind: KeyEventKind::Press,
+        state: KeyEventState::NONE,
     })));
     event.add(Some(Event::Key(KeyCode::Esc.into())));
     let mut buffer = buf!();

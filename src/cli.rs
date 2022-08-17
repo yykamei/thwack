@@ -6,6 +6,7 @@ use std::time::Duration;
 use std::{env, ptr};
 
 use copypasta::{ClipboardContext, ClipboardProvider};
+use crossterm::event::{KeyEventKind, KeyEventState};
 use crossterm::{
     cursor,
     event::{Event, KeyCode, KeyEvent, KeyModifiers},
@@ -30,6 +31,8 @@ macro_rules! ctrl {
         Event::Key(KeyEvent {
             code: KeyCode::Char($char),
             modifiers: KeyModifiers::CONTROL,
+            kind: KeyEventKind::Press,
+            state: KeyEventState::NONE,
         })
     };
 }
@@ -69,6 +72,8 @@ macro_rules! char_extracted {
         Event::Key(KeyEvent {
             code: KeyCode::Char($var),
             modifiers: KeyModifiers::NONE | KeyModifiers::SHIFT,
+            kind: KeyEventKind::Press,
+            state: KeyEventState::NONE,
         })
     };
 }
