@@ -7,6 +7,7 @@
 **Merged pull requests:**
 
 - Bump once\_cell from 1.13.0 to 1.13.1 [\#376](https://github.com/yykamei/thwack/pull/376) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump crossterm from 0.24.0 to 0.25.0 [\#368](https://github.com/yykamei/thwack/pull/368) ([dependabot[bot]](https://github.com/apps/dependabot))
 
 ## [v0.7.6](https://github.com/yykamei/thwack/tree/v0.7.6) (2022-08-17)
 
