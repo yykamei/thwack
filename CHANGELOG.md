@@ -6,6 +6,7 @@
 
 **Merged pull requests:**
 
+- Bump wayland-scanner from 0.29.4 to 0.29.5 [\#381](https://github.com/yykamei/thwack/pull/381) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump once\_cell from 1.13.0 to 1.13.1 [\#376](https://github.com/yykamei/thwack/pull/376) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump crossterm from 0.24.0 to 0.25.0 [\#368](https://github.com/yykamei/thwack/pull/368) ([dependabot[bot]](https://github.com/apps/dependabot))
 
