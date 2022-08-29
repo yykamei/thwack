@@ -1,5 +1,13 @@
 # Changelog
 
+## [Unreleased](https://github.com/yykamei/thwack/tree/HEAD)
+
+[Full Changelog](https://github.com/yykamei/thwack/compare/v0.7.7...HEAD)
+
+**Merged pull requests:**
+
+- Bump lock\_api from 0.4.7 to 0.4.8 [\#389](https://github.com/yykamei/thwack/pull/389) ([dependabot[bot]](https://github.com/apps/dependabot))
+
 ## [v0.7.7](https://github.com/yykamei/thwack/tree/v0.7.7) (2022-08-27)
 
 [Full Changelog](https://github.com/yykamei/thwack/compare/v0.7.6...v0.7.7)
