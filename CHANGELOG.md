@@ -6,6 +6,7 @@
 
 **Merged pull requests:**
 
+- Bump nix from 0.24.1 to 0.24.2 [\#395](https://github.com/yykamei/thwack/pull/395) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump wayland-cursor from 0.29.4 to 0.29.5 [\#391](https://github.com/yykamei/thwack/pull/391) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump wayland-protocols from 0.29.4 to 0.29.5 [\#390](https://github.com/yykamei/thwack/pull/390) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump lock\_api from 0.4.7 to 0.4.8 [\#389](https://github.com/yykamei/thwack/pull/389) ([dependabot[bot]](https://github.com/apps/dependabot))
