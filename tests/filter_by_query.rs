@@ -2,7 +2,7 @@ use std::ffi::OsString;
 
 use crossterm::event::{Event, KeyCode};
 
-use helper::{create_tree, MockTerminal, MockTerminalEvent};
+use helper::{create_tree, MockTerminal};
 use thwack::entrypoint;
 
 mod helper;
@@ -16,10 +16,10 @@ fn show_all_as_many_as_the_size_of_terminal_without_query() {
         dir.path().to_str().unwrap(),
         "--status-line=relative"
     ];
-    let mut event = MockTerminalEvent::new();
-    event.add(Some(Event::Key(KeyCode::Esc.into())));
+    let mut terminal = MockTerminal::new();
+    terminal.add_event(Some(Event::Key(KeyCode::Esc.into())));
     let mut buffer = buf!();
-    let result = entrypoint(args, &mut buffer, MockTerminal, event);
+    let result = entrypoint(args, &mut buffer, terminal);
     assert!(result.is_ok());
     assert_eq!(
         buffer.normalize_path(),
@@ -61,10 +61,10 @@ fn show_filtered_paths_with_query() {
         "--status-line=relative",
         "browser",
     ];
-    let mut event = MockTerminalEvent::new();
-    event.add(Some(Event::Key(KeyCode::Esc.into())));
+    let mut terminal = MockTerminal::new();
+    terminal.add_event(Some(Event::Key(KeyCode::Esc.into())));
     let mut buffer = buf!();
-    let result = entrypoint(args, &mut buffer, MockTerminal, event);
+    let result = entrypoint(args, &mut buffer, terminal);
     assert!(result.is_ok());
     assert_eq!(
         buffer.normalize_path(),
@@ -89,18 +89,18 @@ fn show_filtered_paths_with_query_interactively() {
         dir.path().to_str().unwrap(),
         "--status-line=relative",
     ];
-    let mut event = MockTerminalEvent::new();
-    event.add(Some(Event::Key(KeyCode::Char('b').into())));
-    event.add(Some(Event::Key(KeyCode::Char('r').into())));
-    event.add(Some(Event::Key(KeyCode::Char('o').into())));
-    event.add(Some(Event::Key(KeyCode::Char('w').into())));
-    event.add(Some(Event::Key(KeyCode::Char('s').into())));
-    event.add(Some(Event::Key(KeyCode::Char('e').into())));
-    event.add(Some(Event::Key(KeyCode::Char('r').into())));
-    event.add(None);
-    event.add(Some(Event::Key(KeyCode::Esc.into())));
+    let mut terminal = MockTerminal::new();
+    terminal.add_event(Some(Event::Key(KeyCode::Char('b').into())));
+    terminal.add_event(Some(Event::Key(KeyCode::Char('r').into())));
+    terminal.add_event(Some(Event::Key(KeyCode::Char('o').into())));
+    terminal.add_event(Some(Event::Key(KeyCode::Char('w').into())));
+    terminal.add_event(Some(Event::Key(KeyCode::Char('s').into())));
+    terminal.add_event(Some(Event::Key(KeyCode::Char('e').into())));
+    terminal.add_event(Some(Event::Key(KeyCode::Char('r').into())));
+    terminal.add_event(None);
+    terminal.add_event(Some(Event::Key(KeyCode::Esc.into())));
     let mut buffer = buf!();
-    let result = entrypoint(args, &mut buffer, MockTerminal, event);
+    let result = entrypoint(args, &mut buffer, terminal);
     assert!(result.is_ok());
     assert_eq!(
         buffer.normalize_path(),
@@ -302,15 +302,15 @@ fn show_filtered_paths_with_query_interactively_including_backspace() {
         dir.path().to_str().unwrap(),
         "--status-line=relative",
     ];
-    let mut event = MockTerminalEvent::new();
-    event.add(Some(Event::Key(KeyCode::Char('B').into())));
-    event.add(Some(Event::Key(KeyCode::Char('r').into())));
-    event.add(None);
-    event.add(Some(Event::Key(KeyCode::Backspace.into())));
-    event.add(None);
-    event.add(Some(Event::Key(KeyCode::Esc.into())));
+    let mut terminal = MockTerminal::new();
+    terminal.add_event(Some(Event::Key(KeyCode::Char('B').into())));
+    terminal.add_event(Some(Event::Key(KeyCode::Char('r').into())));
+    terminal.add_event(None);
+    terminal.add_event(Some(Event::Key(KeyCode::Backspace.into())));
+    terminal.add_event(None);
+    terminal.add_event(Some(Event::Key(KeyCode::Esc.into())));
     let mut buffer = buf!();
-    let result = entrypoint(args, &mut buffer, MockTerminal, event);
+    let result = entrypoint(args, &mut buffer, terminal);
     assert!(result.is_ok());
     assert_eq!(
         buffer.normalize_path(),

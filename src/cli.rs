@@ -23,7 +23,7 @@ use crate::matched_path::MatchedPath;
 use crate::preferences::Preferences;
 use crate::starting_point::StartingPoint;
 use crate::status_line::StatusLine;
-use crate::terminal::{Terminal, TerminalEvent};
+use crate::terminal::Terminal;
 use crate::{logger, Error};
 
 macro_rules! ctrl {
@@ -84,11 +84,10 @@ pub fn safe_exit(code: i32, stdout: Stdout, stderr: Stderr) {
     exit(code)
 }
 
-pub fn entrypoint<A: Iterator<Item = OsString>, W: Write, T: Terminal, TE: TerminalEvent>(
+pub fn entrypoint<A: Iterator<Item = OsString>, W: Write, T: Terminal>(
     args: A,
     stdout: &mut W,
     terminal: T,
-    event: TE,
 ) -> Result<()> {
     let preferences = Args::new(args, env::vars_os()).parse()?;
 
@@ -110,7 +109,7 @@ pub fn entrypoint<A: Iterator<Item = OsString>, W: Write, T: Terminal, TE: Termi
         return Ok(());
     }
 
-    let mut runner = Runner::new(&preferences, stdout, terminal, event)?;
+    let mut runner = Runner::new(&preferences, stdout, &terminal)?;
     runner.start()
 }
 
@@ -128,9 +127,9 @@ enum State<'a> {
     Invoke(&'a MatchedPath),
 }
 
-struct Runner<'a, W: Write, T: Terminal, TE: TerminalEvent> {
+struct Runner<'a, W: Write, T: Terminal> {
     preferences: &'a Preferences,
-    event: TE,
+    terminal: &'a T,
     repo: Option<Repository>,
     clipboard: Option<ClipboardContext>,
     max_columns: u16,
@@ -143,13 +142,8 @@ struct Runner<'a, W: Write, T: Terminal, TE: TerminalEvent> {
     writer: Writer<'a, W, T>,
 }
 
-impl<'a, W: Write, T: Terminal, TE: TerminalEvent> Runner<'a, W, T, TE> {
-    fn new(
-        preferences: &'a Preferences,
-        stdout: &'a mut W,
-        terminal: T,
-        event: TE,
-    ) -> Result<Self> {
+impl<'a, W: Write, T: Terminal> Runner<'a, W, T> {
+    fn new(preferences: &'a Preferences, stdout: &'a mut W, terminal: &'a T) -> Result<Self> {
         let repo = if preferences.gitignore {
             match Repository::discover(&preferences.starting_point) {
                 Ok(r) => Some(r),
@@ -178,7 +172,7 @@ impl<'a, W: Write, T: Terminal, TE: TerminalEvent> Runner<'a, W, T, TE> {
 
         Ok(Self {
             preferences,
-            event,
+            terminal,
             repo,
             clipboard,
             max_columns,
@@ -216,8 +210,8 @@ impl<'a, W: Write, T: Terminal, TE: TerminalEvent> Runner<'a, W, T, TE> {
                 _ => (),
             }
 
-            if self.event.poll(Duration::from_millis(300))? {
-                let ev = self.event.read()?;
+            if self.terminal.poll(Duration::from_millis(300))? {
+                let ev = self.terminal.read()?;
                 log::trace!("Event={:?}", ev);
                 if ev == ctrl!('c') || ev == esc!() {
                     break;
@@ -329,7 +323,7 @@ impl<'a, W: Write, T: Terminal, TE: TerminalEvent> Runner<'a, W, T, TE> {
 struct Writer<'a, W: Write, T: Terminal> {
     preferences: &'a Preferences,
     stdout: &'a mut W,
-    terminal: T,
+    terminal: &'a T,
     max_columns: u16,
     max_rows: u16,
     max_path_width: usize,
@@ -339,7 +333,7 @@ impl<'a, W: Write, T: Terminal> Writer<'a, W, T> {
     fn new(
         preferences: &'a Preferences,
         stdout: &'a mut W,
-        terminal: T,
+        terminal: &'a T,
         max_columns: u16,
         max_rows: u16,
     ) -> Self {

@@ -22,17 +22,13 @@ pub trait Terminal {
         let _ = terminal::disable_raw_mode()?;
         Ok(())
     }
-}
 
-/// TerminalEvent is a wrapper of crossterm::event.
-/// This is intended for mocking terminal-specific functions.
-pub trait TerminalEvent {
     fn poll(&self, timeout: Duration) -> Result<bool> {
         let b = event::poll(timeout)?;
         Ok(b)
     }
 
-    fn read(&mut self) -> Result<Event> {
+    fn read(&self) -> Result<Event> {
         let e = event::read()?;
         Ok(e)
     }
@@ -40,8 +36,4 @@ pub trait TerminalEvent {
 
 pub struct DefaultTerminal;
 
-pub struct DefaultTerminalEvent;
-
 impl Terminal for DefaultTerminal {}
-
-impl TerminalEvent for DefaultTerminalEvent {}

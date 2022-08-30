@@ -2,7 +2,7 @@ use std::ffi::OsString;
 
 use crossterm::event::{Event, KeyCode};
 
-use helper::{create_tree, MockTerminal, MockTerminalEvent};
+use helper::{create_tree, MockTerminal};
 use thwack::entrypoint;
 
 mod helper;
@@ -16,13 +16,13 @@ fn cannot_move_up_because_selection_reaches_to_top() {
         dir.path().to_str().unwrap(),
         "--status-line=relative"
     ];
-    let mut event = MockTerminalEvent::new();
-    event.add(Some(Event::Key(KeyCode::Up.into())));
-    event.add(Some(Event::Key(KeyCode::Up.into())));
-    event.add(Some(Event::Key(KeyCode::Up.into())));
-    event.add(Some(Event::Key(KeyCode::Esc.into())));
+    let mut terminal = MockTerminal::new();
+    terminal.add_event(Some(Event::Key(KeyCode::Up.into())));
+    terminal.add_event(Some(Event::Key(KeyCode::Up.into())));
+    terminal.add_event(Some(Event::Key(KeyCode::Up.into())));
+    terminal.add_event(Some(Event::Key(KeyCode::Esc.into())));
     let mut buffer = buf!();
-    let result = entrypoint(args, &mut buffer, MockTerminal, event);
+    let result = entrypoint(args, &mut buffer, terminal);
     assert!(result.is_ok());
     assert_eq!(
         buffer.normalize_path(),
@@ -130,20 +130,20 @@ fn cannot_move_down_because_selection_reaches_to_bottom() {
         dir.path().to_str().unwrap(),
         "--status-line=relative"
     ];
-    let mut event = MockTerminalEvent::new();
-    event.add(Some(Event::Key(KeyCode::Char('b').into())));
-    event.add(Some(Event::Key(KeyCode::Char('r').into())));
-    event.add(Some(Event::Key(KeyCode::Char('o').into())));
-    event.add(Some(Event::Key(KeyCode::Char('w').into())));
-    event.add(Some(Event::Key(KeyCode::Char('s').into())));
-    event.add(Some(Event::Key(KeyCode::Char('e').into())));
-    event.add(Some(Event::Key(KeyCode::Char('r').into())));
-    event.add(None);
-    event.add(Some(Event::Key(KeyCode::Down.into())));
-    event.add(Some(Event::Key(KeyCode::Down.into())));
-    event.add(Some(Event::Key(KeyCode::Esc.into())));
+    let mut terminal = MockTerminal::new();
+    terminal.add_event(Some(Event::Key(KeyCode::Char('b').into())));
+    terminal.add_event(Some(Event::Key(KeyCode::Char('r').into())));
+    terminal.add_event(Some(Event::Key(KeyCode::Char('o').into())));
+    terminal.add_event(Some(Event::Key(KeyCode::Char('w').into())));
+    terminal.add_event(Some(Event::Key(KeyCode::Char('s').into())));
+    terminal.add_event(Some(Event::Key(KeyCode::Char('e').into())));
+    terminal.add_event(Some(Event::Key(KeyCode::Char('r').into())));
+    terminal.add_event(None);
+    terminal.add_event(Some(Event::Key(KeyCode::Down.into())));
+    terminal.add_event(Some(Event::Key(KeyCode::Down.into())));
+    terminal.add_event(Some(Event::Key(KeyCode::Esc.into())));
     let mut buffer = buf!();
-    let result = entrypoint(args, &mut buffer, MockTerminal, event);
+    let result = entrypoint(args, &mut buffer, terminal);
     assert!(result.is_ok());
     assert_eq!(
         buffer.normalize_path(),

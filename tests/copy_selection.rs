@@ -3,7 +3,7 @@ use std::ffi::OsString;
 use copypasta::{ClipboardContext, ClipboardProvider};
 use crossterm::event::{Event, KeyCode, KeyEvent, KeyEventKind, KeyEventState, KeyModifiers};
 
-use helper::{create_tree, MockTerminal, MockTerminalEvent};
+use helper::{create_tree, MockTerminal};
 use thwack::entrypoint;
 
 mod helper;
@@ -18,17 +18,17 @@ fn copy_with_absolute_path() {
         dir.path().to_str().unwrap(),
         "--status-line=relative"
     ];
-    let mut event = MockTerminalEvent::new();
-    event.add(Some(Event::Key(KeyCode::Down.into())));
-    event.add(Some(Event::Key(KeyEvent {
+    let mut terminal = MockTerminal::new();
+    terminal.add_event(Some(Event::Key(KeyCode::Down.into())));
+    terminal.add_event(Some(Event::Key(KeyEvent {
         code: KeyCode::Char('d'),
         modifiers: KeyModifiers::CONTROL,
         kind: KeyEventKind::Press,
         state: KeyEventState::NONE,
     })));
-    event.add(Some(Event::Key(KeyCode::Esc.into())));
+    terminal.add_event(Some(Event::Key(KeyCode::Esc.into())));
     let mut buffer = buf!();
-    let result = entrypoint(args, &mut buffer, MockTerminal, event);
+    let result = entrypoint(args, &mut buffer, terminal);
     assert!(result.is_ok());
     assert_eq!(
         buffer.normalize_path(),
