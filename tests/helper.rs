@@ -11,7 +11,7 @@ use std::time::Duration;
 use crossterm::event::Event;
 use tempfile::{tempdir, TempDir};
 
-use thwack::{Result, Terminal, TerminalEvent};
+use thwack::{Result, Terminal};
 
 #[macro_export]
 macro_rules! buf {
@@ -36,9 +36,7 @@ pub struct Buffer {
     inner: Vec<u8>,
 }
 
-pub struct MockTerminal;
-
-pub struct MockTerminalEvent {
+pub struct MockTerminal {
     events: Arc<Mutex<VecDeque<Option<Event>>>>,
 }
 
@@ -132,25 +130,7 @@ impl Terminal for MockTerminal {
     fn disable_raw_mode(&self) -> Result<()> {
         Ok(())
     }
-}
 
-impl MockTerminalEvent {
-    #[allow(dead_code)]
-    pub fn new() -> Self {
-        Self {
-            events: Arc::new(Mutex::new(VecDeque::new())),
-        }
-    }
-
-    #[allow(dead_code)]
-    pub fn add(&mut self, event: Option<Event>) {
-        let data = self.events.clone();
-        let mut events = data.lock().unwrap();
-        events.push_back(event)
-    }
-}
-
-impl TerminalEvent for MockTerminalEvent {
     fn poll(&self, _timeout: Duration) -> Result<bool> {
         let data = self.events.clone();
         let mut events = data.lock().unwrap();
@@ -168,7 +148,7 @@ impl TerminalEvent for MockTerminalEvent {
         }
     }
 
-    fn read(&mut self) -> Result<Event> {
+    fn read(&self) -> Result<Event> {
         let e = self
             .events
             .clone()
@@ -178,6 +158,22 @@ impl TerminalEvent for MockTerminalEvent {
             .unwrap()
             .unwrap();
         Ok(e)
+    }
+}
+
+impl MockTerminal {
+    #[allow(dead_code)]
+    pub fn new() -> Self {
+        Self {
+            events: Arc::new(Mutex::new(VecDeque::new())),
+        }
+    }
+
+    #[allow(dead_code)]
+    pub fn add_event(&mut self, event: Option<Event>) {
+        let data = self.events.clone();
+        let mut events = data.lock().unwrap();
+        events.push_back(event)
     }
 }
 
