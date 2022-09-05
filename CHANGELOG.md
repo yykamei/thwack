@@ -6,6 +6,7 @@
 
 **Merged pull requests:**
 
+- Bump once\_cell from 1.13.1 to 1.14.0 [\#399](https://github.com/yykamei/thwack/pull/399) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Refactor terminal.rs, integrating TerminalEvent into Terminal [\#397](https://github.com/yykamei/thwack/pull/397) ([yykamei](https://github.com/yykamei))
 - Bump nix from 0.24.1 to 0.24.2 [\#395](https://github.com/yykamei/thwack/pull/395) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump wayland-cursor from 0.29.4 to 0.29.5 [\#391](https://github.com/yykamei/thwack/pull/391) ([dependabot[bot]](https://github.com/apps/dependabot))
