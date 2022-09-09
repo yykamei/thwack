@@ -6,6 +6,7 @@
 
 **Merged pull requests:**
 
+- Bump url from 2.3.0 to 2.3.1 [\#403](https://github.com/yykamei/thwack/pull/403) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump url from 2.2.2 to 2.3.0 [\#401](https://github.com/yykamei/thwack/pull/401) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump once\_cell from 1.13.1 to 1.14.0 [\#399](https://github.com/yykamei/thwack/pull/399) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Refactor terminal.rs, integrating TerminalEvent into Terminal [\#397](https://github.com/yykamei/thwack/pull/397) ([yykamei](https://github.com/yykamei))
