@@ -45,3 +45,4 @@ jobs:
           DEFAULT_BRANCH: main
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VALIDATE_RUST_CLIPPY: false
+          VALIDATE_NATURAL_LANGUAGE: false
