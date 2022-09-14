@@ -17,7 +17,7 @@ git2 = { version = "0.15.0", default-features = false }
 libc = "0.2.132"
 log = { version = "0.4.17", features = ["std"] }
 unicode-segmentation = "1.9.0"
-unicode-width = "0.1.9"
+unicode-width = "0.1.10"
 
 [dev-dependencies]
 tempfile = "3.3.0"
