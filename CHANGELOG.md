@@ -6,6 +6,7 @@
 
 **Merged pull requests:**
 
+- Bump unicode-ident from 1.0.3 to 1.0.4 [\#412](https://github.com/yykamei/thwack/pull/412) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump unicode-width from 0.1.9 to 0.1.10 [\#409](https://github.com/yykamei/thwack/pull/409) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump unicode-segmentation from 1.9.0 to 1.10.0 [\#408](https://github.com/yykamei/thwack/pull/408) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump url from 2.3.0 to 2.3.1 [\#403](https://github.com/yykamei/thwack/pull/403) ([dependabot[bot]](https://github.com/apps/dependabot))
