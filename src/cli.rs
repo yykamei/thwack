@@ -119,16 +119,17 @@ fn print_and_flush(buffer: &mut impl Write, content: &str) -> io::Result<()> {
 }
 
 #[derive(Debug)]
-enum State<'a> {
+enum State {
     Ready,
     QueryChanged,
     PathsChanged,
     SelectionChanged,
-    Invoke(&'a MatchedPath),
+    Invoke(MatchedPath),
 }
 
 struct Runner<'a, W: Write, T: Terminal> {
     preferences: &'a Preferences,
+    stdout: &'a mut W,
     terminal: &'a T,
     repo: Option<Repository>,
     clipboard: Option<ClipboardContext>,
@@ -136,10 +137,8 @@ struct Runner<'a, W: Write, T: Terminal> {
     max_rows: u16,
     starting_point: StartingPoint,
     query: String,
-    paths: Vec<MatchedPath>,
     selection: u16,
-    state: State<'a>,
-    writer: Writer<'a, W, T>,
+    state: State,
 }
 
 impl<'a, W: Write, T: Terminal> Runner<'a, W, T> {
@@ -172,6 +171,7 @@ impl<'a, W: Write, T: Terminal> Runner<'a, W, T> {
 
         Ok(Self {
             preferences,
+            stdout,
             terminal,
             repo,
             clipboard,
@@ -179,32 +179,25 @@ impl<'a, W: Write, T: Terminal> Runner<'a, W, T> {
             max_rows,
             starting_point,
             query,
-            paths: vec![],
             selection: 0,
             state: State::QueryChanged,
-            writer: Writer::new(preferences, stdout, terminal, max_columns, max_rows),
         })
     }
 
     fn start(&'a mut self) -> Result<()> {
-        self.paths = self.find_paths(self.paths_rows(self.max_rows))?;
-        self.writer.start()?;
+        let mut paths = self.find_paths(self.paths_rows(self.max_rows))?;
+        self.start_writing()?;
 
         loop {
             log::trace!("state={:?}", self.state);
             match self.state {
-                State::QueryChanged => {
-                    self.writer
-                        .output(&self.query, self.selection, self.paths.as_ref())?
-                }
+                State::QueryChanged => self.write_result(paths.as_ref())?,
                 State::PathsChanged => {
-                    self.writer
-                        .output(&self.query, self.selection, self.paths.as_ref())?;
+                    self.write_result(paths.as_ref())?;
                     self.state = State::Ready;
                 }
                 State::SelectionChanged => {
-                    self.writer
-                        .output(&self.query, self.selection, self.paths.as_ref())?;
+                    self.write_result(paths.as_ref())?;
                     self.state = State::Ready;
                 }
                 _ => (),
@@ -227,22 +220,22 @@ impl<'a, W: Write, T: Terminal> Runner<'a, W, T> {
                         self.state = State::SelectionChanged;
                     }
                 } else if ev == down!() || ev == ctrl!('n') {
-                    if (self.selection as usize) < self.paths.len() - 1 {
+                    if (self.selection as usize) < paths.len() - 1 {
                         self.selection += 1;
                         self.state = State::SelectionChanged;
                     }
                 } else if ev == enter!() {
-                    let path: &MatchedPath = self.paths.get(self.selection as usize).unwrap(); // TODO: Do not use unwrap()
-                    self.state = State::Invoke(path);
+                    let path = paths.get(self.selection as usize).unwrap(); // TODO: Do not use unwrap()
+                    self.state = State::Invoke(path.clone());
                     break;
                 } else if ev == ctrl!('y') {
-                    let path: &MatchedPath = self.paths.get(self.selection as usize).unwrap(); // TODO: Do not use unwrap()
+                    let path: &MatchedPath = paths.get(self.selection as usize).unwrap(); // TODO: Do not use unwrap()
                     if let Some(c) = self.clipboard.as_mut() {
                         c.set_contents(path.absolute().to_owned())
                             .map_err(|e| Error::clipboard(e))?;
                     }
                 } else if ev == ctrl!('d') {
-                    let path: &MatchedPath = self.paths.get(self.selection as usize).unwrap(); // TODO: Do not use unwrap()
+                    let path: &MatchedPath = paths.get(self.selection as usize).unwrap(); // TODO: Do not use unwrap()
                     if let Some(c) = self.clipboard.as_mut() {
                         c.set_contents(path.relative().to_owned())
                             .map_err(|e| Error::clipboard(e))?;
@@ -250,25 +243,24 @@ impl<'a, W: Write, T: Terminal> Runner<'a, W, T> {
                 } else if let Event::Resize(c, r) = ev {
                     self.max_columns = c;
                     self.max_rows = r;
-                    self.writer.resize(r, c);
                     self.selection = if self.selection > r {
                         self.paths_rows(r) - 1
                     } else {
                         self.selection
                     };
-                    self.paths = self.find_paths(self.paths_rows(self.max_rows))?;
+                    paths = self.find_paths(self.paths_rows(self.max_rows))?;
                     self.state = State::PathsChanged;
                 }
             } else if let State::QueryChanged = self.state {
-                self.paths = self.find_paths(self.paths_rows(self.max_rows))?;
+                paths = self.find_paths(self.paths_rows(self.max_rows))?;
                 self.state = State::PathsChanged;
                 self.selection = 0;
             }
         }
 
-        self.writer.finish()?;
+        self.finish_writing()?;
 
-        if let State::Invoke(path) = self.state {
+        if let State::Invoke(ref path) = self.state {
             self.invoke(path.absolute())?;
         }
         Ok(())
@@ -318,56 +310,25 @@ impl<'a, W: Write, T: Terminal> Runner<'a, W, T> {
             self.preferences.exec, path, errno
         )))
     }
-}
 
-struct Writer<'a, W: Write, T: Terminal> {
-    preferences: &'a Preferences,
-    stdout: &'a mut W,
-    terminal: &'a T,
-    max_columns: u16,
-    max_rows: u16,
-    max_path_width: usize,
-}
-
-impl<'a, W: Write, T: Terminal> Writer<'a, W, T> {
-    fn new(
-        preferences: &'a Preferences,
-        stdout: &'a mut W,
-        terminal: &'a T,
-        max_columns: u16,
-        max_rows: u16,
-    ) -> Self {
-        Self {
-            preferences,
-            stdout,
-            terminal,
-            max_columns,
-            max_rows,
-            max_path_width: (max_columns - 2).into(), // The prefix "> " requires 2 columns.
-        }
+    fn max_path_width(&self) -> usize {
+        (self.max_columns - 2).into()
     }
 
-    fn resize(&mut self, max_rows: u16, max_columns: u16) -> &Self {
-        self.max_rows = max_rows;
-        self.max_columns = max_columns;
-        self.max_path_width = (max_columns - 2).into(); // The prefix "> " requires 2 columns.
-        self
-    }
-
-    fn output(&mut self, query: &str, selection: u16, paths: &[MatchedPath]) -> Result<()> {
+    fn write_result(&mut self, paths: &[MatchedPath]) -> Result<()> {
         queue!(
             self.stdout,
             cursor::MoveTo(0, 0),
             Clear(ClearType::FromCursorDown),
             style::Print("Search: "),
-            style::Print(query),
+            style::Print(&self.query),
             cursor::SavePosition,
             cursor::MoveToNextLine(1),
         )?;
         let mut selected: Option<&MatchedPath> = None;
         for (idx, path) in paths.iter().enumerate() {
             let idx = idx as u16;
-            let prefix = if idx == selection {
+            let prefix = if idx == self.selection {
                 selected = Some(path);
                 "> "
             } else {
@@ -375,7 +336,7 @@ impl<'a, W: Write, T: Terminal> Writer<'a, W, T> {
             };
             queue!(self.stdout, style::Print(prefix))?;
 
-            for chunk in path.relative_chunks(self.max_path_width) {
+            for chunk in path.relative_chunks(self.max_path_width()) {
                 if chunk.matched() {
                     queue!(
                         self.stdout,
@@ -402,29 +363,29 @@ impl<'a, W: Write, T: Terminal> Writer<'a, W, T> {
         };
         if let Some(ref s) = selected {
             queue!(self.stdout, cursor::MoveToRow(self.max_rows - 2))?;
-            self.status_line(s)?;
+            self.write_status_line(s)?;
         } else {
             queue!(self.stdout, cursor::MoveToRow(self.max_rows))?;
         }
-        self.help_line()?;
+        self.write_help_line()?;
         queue!(self.stdout, cursor::RestorePosition)?;
         self.stdout.flush()?;
         Ok(())
     }
 
-    fn start(&mut self) -> Result<()> {
+    fn start_writing(&mut self) -> Result<()> {
         queue!(self.stdout, EnterAlternateScreen, style::ResetColor)?;
         self.stdout.flush()?;
         self.terminal.enable_raw_mode()?;
         log::debug!(
-            "Raw mode enabled with terminal size(columns={}, roaw={})",
+            "Raw mode enabled with terminal size(columns={}, rows={})",
             self.max_columns,
             self.max_rows
         );
         Ok(())
     }
 
-    fn finish(&mut self) -> Result<()> {
+    fn finish_writing(&mut self) -> Result<()> {
         execute!(self.stdout, LeaveAlternateScreen)?;
         self.terminal.disable_raw_mode()?;
         log::debug!(
@@ -435,7 +396,7 @@ impl<'a, W: Write, T: Terminal> Writer<'a, W, T> {
         Ok(())
     }
 
-    fn status_line(&mut self, selected: &str) -> Result<()> {
+    fn write_status_line(&mut self, selected: &str) -> Result<()> {
         queue!(
             self.stdout,
             style::SetAttribute(Attribute::Bold),
@@ -450,7 +411,7 @@ impl<'a, W: Write, T: Terminal> Writer<'a, W, T> {
         Ok(())
     }
 
-    fn help_line(&mut self) -> Result<()> {
+    fn write_help_line(&mut self) -> Result<()> {
         // TODO: This number is the same amount of columns occupied by this status line.
         if self.max_columns < 97 {
             return Ok(());
