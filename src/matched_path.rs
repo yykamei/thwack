@@ -5,7 +5,7 @@ use std::fmt::{self, Display, Formatter};
 use unicode_segmentation::UnicodeSegmentation;
 use unicode_width::UnicodeWidthStr;
 
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub(crate) struct MatchedPath {
     /// *absolute* is an absolute path/
     absolute: String,
