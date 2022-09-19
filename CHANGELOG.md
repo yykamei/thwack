@@ -6,6 +6,7 @@
 
 **Merged pull requests:**
 
+- Integrate Writer into Runner [\#417](https://github.com/yykamei/thwack/pull/417) ([yykamei](https://github.com/yykamei))
 - Bump unicode-normalization from 0.1.21 to 0.1.22 [\#415](https://github.com/yykamei/thwack/pull/415) ([dependabot[bot]](https://github.com/apps/dependabot))
 
 ## [v0.7.8](https://github.com/yykamei/thwack/tree/v0.7.8) (2022-09-15)
