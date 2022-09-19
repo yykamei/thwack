@@ -1,5 +1,13 @@
 # Changelog
 
+## [Unreleased](https://github.com/yykamei/thwack/tree/HEAD)
+
+[Full Changelog](https://github.com/yykamei/thwack/compare/v0.7.8...HEAD)
+
+**Merged pull requests:**
+
+- Bump unicode-normalization from 0.1.21 to 0.1.22 [\#415](https://github.com/yykamei/thwack/pull/415) ([dependabot[bot]](https://github.com/apps/dependabot))
+
 ## [v0.7.8](https://github.com/yykamei/thwack/tree/v0.7.8) (2022-09-15)
 
 [Full Changelog](https://github.com/yykamei/thwack/compare/v0.7.7...v0.7.8)
