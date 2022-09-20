@@ -100,7 +100,6 @@ impl ConsumedDir {
                     )));
                 }
             };
-            // TODO: Symbolic link?
             if path.is_dir() {
                 entries.push_back(Entry::Dir(path_string));
             } else {
