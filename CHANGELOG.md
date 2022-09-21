@@ -6,6 +6,7 @@
 
 **Merged pull requests:**
 
+- Remove TODO about symbolic link [\#421](https://github.com/yykamei/thwack/pull/421) ([yykamei](https://github.com/yykamei))
 - Bump libc from 0.2.132 to 0.2.133 [\#419](https://github.com/yykamei/thwack/pull/419) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Integrate Writer into Runner [\#417](https://github.com/yykamei/thwack/pull/417) ([yykamei](https://github.com/yykamei))
 - Bump unicode-normalization from 0.1.21 to 0.1.22 [\#415](https://github.com/yykamei/thwack/pull/415) ([dependabot[bot]](https://github.com/apps/dependabot))
