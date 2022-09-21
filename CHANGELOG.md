@@ -6,6 +6,7 @@
 
 **Merged pull requests:**
 
+- Bump once\_cell from 1.14.0 to 1.15.0 [\#424](https://github.com/yykamei/thwack/pull/424) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump lock\_api from 0.4.8 to 0.4.9 [\#423](https://github.com/yykamei/thwack/pull/423) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Remove TODO about symbolic link [\#421](https://github.com/yykamei/thwack/pull/421) ([yykamei](https://github.com/yykamei))
 - Bump libc from 0.2.132 to 0.2.133 [\#419](https://github.com/yykamei/thwack/pull/419) ([dependabot[bot]](https://github.com/apps/dependabot))
