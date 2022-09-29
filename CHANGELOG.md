@@ -6,6 +6,7 @@
 
 **Merged pull requests:**
 
+- Bump proc-macro2 from 1.0.44 to 1.0.46 [\#431](https://github.com/yykamei/thwack/pull/431) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump jobserver from 0.1.24 to 0.1.25 [\#428](https://github.com/yykamei/thwack/pull/428) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump proc-macro2 from 1.0.43 to 1.0.44 [\#427](https://github.com/yykamei/thwack/pull/427) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump once\_cell from 1.14.0 to 1.15.0 [\#424](https://github.com/yykamei/thwack/pull/424) ([dependabot[bot]](https://github.com/apps/dependabot))
