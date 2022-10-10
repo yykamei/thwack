@@ -6,6 +6,7 @@
 
 **Merged pull requests:**
 
+- Bump unicode-ident from 1.0.4 to 1.0.5 [\#437](https://github.com/yykamei/thwack/pull/437) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump smallvec from 1.9.0 to 1.10.0 [\#435](https://github.com/yykamei/thwack/pull/435) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump libc from 0.2.133 to 0.2.134 [\#433](https://github.com/yykamei/thwack/pull/433) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump proc-macro2 from 1.0.44 to 1.0.46 [\#431](https://github.com/yykamei/thwack/pull/431) ([dependabot[bot]](https://github.com/apps/dependabot))
