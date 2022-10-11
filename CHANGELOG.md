@@ -1,5 +1,13 @@
 # Changelog
 
+## [Unreleased](https://github.com/yykamei/thwack/tree/HEAD)
+
+[Full Changelog](https://github.com/yykamei/thwack/compare/v0.7.9...HEAD)
+
+**Merged pull requests:**
+
+- Bump libc from 0.2.134 to 0.2.135 [\#440](https://github.com/yykamei/thwack/pull/440) ([dependabot[bot]](https://github.com/apps/dependabot))
+
 ## [v0.7.9](https://github.com/yykamei/thwack/tree/v0.7.9) (2022-10-10)
 
 [Full Changelog](https://github.com/yykamei/thwack/compare/v0.7.8...v0.7.9)
