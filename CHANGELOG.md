@@ -6,6 +6,7 @@
 
 **Merged pull requests:**
 
+- Bump mio from 0.8.4 to 0.8.5 [\#447](https://github.com/yykamei/thwack/pull/447) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump parking\_lot\_core from 0.9.3 to 0.9.4 [\#444](https://github.com/yykamei/thwack/pull/444) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump proc-macro2 from 1.0.46 to 1.0.47 [\#442](https://github.com/yykamei/thwack/pull/442) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump libc from 0.2.134 to 0.2.135 [\#440](https://github.com/yykamei/thwack/pull/440) ([dependabot[bot]](https://github.com/apps/dependabot))
