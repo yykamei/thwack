@@ -1,5 +1,13 @@
 # Changelog
 
+## [Unreleased](https://github.com/yykamei/thwack/tree/HEAD)
+
+[Full Changelog](https://github.com/yykamei/thwack/compare/v0.7.10...HEAD)
+
+**Merged pull requests:**
+
+- Bump pkg-config from 0.3.25 to 0.3.26 [\#453](https://github.com/yykamei/thwack/pull/453) ([dependabot[bot]](https://github.com/apps/dependabot))
+
 ## [v0.7.10](https://github.com/yykamei/thwack/tree/v0.7.10) (2022-10-26)
 
 [Full Changelog](https://github.com/yykamei/thwack/compare/v0.7.9...v0.7.10)
