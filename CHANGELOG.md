@@ -6,6 +6,8 @@
 
 **Merged pull requests:**
 
+- Bump cc from 1.0.73 to 1.0.74 [\#456](https://github.com/yykamei/thwack/pull/456) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump once\_cell from 1.15.0 to 1.16.0 [\#455](https://github.com/yykamei/thwack/pull/455) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump pkg-config from 0.3.25 to 0.3.26 [\#453](https://github.com/yykamei/thwack/pull/453) ([dependabot[bot]](https://github.com/apps/dependabot))
 
 ## [v0.7.10](https://github.com/yykamei/thwack/tree/v0.7.10) (2022-10-26)
