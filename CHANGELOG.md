@@ -6,6 +6,7 @@
 
 **Merged pull requests:**
 
+- Bump xcb from 1.1.1 to 1.2.0 [\#461](https://github.com/yykamei/thwack/pull/461) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump scoped-tls from 1.0.0 to 1.0.1 [\#459](https://github.com/yykamei/thwack/pull/459) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump cc from 1.0.73 to 1.0.74 [\#456](https://github.com/yykamei/thwack/pull/456) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump once\_cell from 1.15.0 to 1.16.0 [\#455](https://github.com/yykamei/thwack/pull/455) ([dependabot[bot]](https://github.com/apps/dependabot))
