@@ -6,6 +6,7 @@
 
 **Merged pull requests:**
 
+- Bump libloading from 0.7.3 to 0.7.4 [\#463](https://github.com/yykamei/thwack/pull/463) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump xcb from 1.1.1 to 1.2.0 [\#461](https://github.com/yykamei/thwack/pull/461) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump scoped-tls from 1.0.0 to 1.0.1 [\#459](https://github.com/yykamei/thwack/pull/459) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump cc from 1.0.73 to 1.0.74 [\#456](https://github.com/yykamei/thwack/pull/456) ([dependabot[bot]](https://github.com/apps/dependabot))
