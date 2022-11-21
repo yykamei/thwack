@@ -6,6 +6,7 @@
 
 **Merged pull requests:**
 
+- Bump cc from 1.0.76 to 1.0.77 [\#470](https://github.com/yykamei/thwack/pull/470) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump memmap2 from 0.5.7 to 0.5.8 [\#468](https://github.com/yykamei/thwack/pull/468) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump cc from 1.0.74 to 1.0.76 [\#466](https://github.com/yykamei/thwack/pull/466) ([dependabot[bot]](https://github.com/apps/dependabot))
 
