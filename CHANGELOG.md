@@ -6,6 +6,7 @@
 
 **Merged pull requests:**
 
+- Bump libc from 0.2.137 to 0.2.138 [\#475](https://github.com/yykamei/thwack/pull/475) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump nix from 0.24.2 to 0.24.3 [\#474](https://github.com/yykamei/thwack/pull/474) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump parking\_lot\_core from 0.9.4 to 0.9.5 [\#472](https://github.com/yykamei/thwack/pull/472) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump cc from 1.0.76 to 1.0.77 [\#470](https://github.com/yykamei/thwack/pull/470) ([dependabot[bot]](https://github.com/apps/dependabot))
