@@ -6,6 +6,7 @@
 
 **Merged pull requests:**
 
+- Bump proc-macro2 from 1.0.47 to 1.0.49 [\#481](https://github.com/yykamei/thwack/pull/481) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump cc from 1.0.77 to 1.0.78 [\#479](https://github.com/yykamei/thwack/pull/479) ([dependabot[bot]](https://github.com/apps/dependabot))
 
 ## [v0.7.12](https://github.com/yykamei/thwack/tree/v0.7.12) (2022-12-05)
