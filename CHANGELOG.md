@@ -6,6 +6,7 @@
 
 **Merged pull requests:**
 
+- Bump libc from 0.2.138 to 0.2.139 [\#487](https://github.com/yykamei/thwack/pull/487) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump quote from 1.0.21 to 1.0.23 [\#483](https://github.com/yykamei/thwack/pull/483) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump unicode-ident from 1.0.5 to 1.0.6 [\#482](https://github.com/yykamei/thwack/pull/482) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump proc-macro2 from 1.0.47 to 1.0.49 [\#481](https://github.com/yykamei/thwack/pull/481) ([dependabot[bot]](https://github.com/apps/dependabot))
