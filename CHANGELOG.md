@@ -6,6 +6,7 @@
 
 **Merged pull requests:**
 
+- Bump nom from 7.1.1 to 7.1.2 [\#492](https://github.com/yykamei/thwack/pull/492) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump once\_cell from 1.16.0 to 1.17.0 [\#490](https://github.com/yykamei/thwack/pull/490) ([dependabot[bot]](https://github.com/apps/dependabot))
 
 ## [v0.7.13](https://github.com/yykamei/thwack/tree/v0.7.13) (2022-12-23)
