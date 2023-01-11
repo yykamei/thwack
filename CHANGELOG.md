@@ -6,6 +6,7 @@
 
 **Merged pull requests:**
 
+- Bump git2 from 0.15.0 to 0.16.0 [\#494](https://github.com/yykamei/thwack/pull/494) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump nom from 7.1.1 to 7.1.2 [\#492](https://github.com/yykamei/thwack/pull/492) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump once\_cell from 1.16.0 to 1.17.0 [\#490](https://github.com/yykamei/thwack/pull/490) ([dependabot[bot]](https://github.com/apps/dependabot))
 
