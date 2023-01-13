@@ -1,13 +1,5 @@
 # Changelog
 
-## [Unreleased](https://github.com/yykamei/thwack/tree/HEAD)
-
-[Full Changelog](https://github.com/yykamei/thwack/compare/v0.7.14...HEAD)
-
-**Merged pull requests:**
-
-- Bump parking\_lot\_core from 0.9.5 to 0.9.6 [\#498](https://github.com/yykamei/thwack/pull/498) ([dependabot[bot]](https://github.com/apps/dependabot))
-
 ## [v0.7.14](https://github.com/yykamei/thwack/tree/v0.7.14) (2023-01-11)
 
 [Full Changelog](https://github.com/yykamei/thwack/compare/v0.7.13...v0.7.14)
