@@ -6,6 +6,9 @@
 
 **Merged pull requests:**
 
+- Bump windows\_x86\_64\_msvc from 0.42.0 to 0.42.1 [\#503](https://github.com/yykamei/thwack/pull/503) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump windows\_x86\_64\_gnullvm from 0.42.0 to 0.42.1 [\#502](https://github.com/yykamei/thwack/pull/502) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump windows\_x86\_64\_gnu from 0.42.0 to 0.42.1 [\#500](https://github.com/yykamei/thwack/pull/500) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump parking\_lot\_core from 0.9.5 to 0.9.6 [\#498](https://github.com/yykamei/thwack/pull/498) ([dependabot[bot]](https://github.com/apps/dependabot))
 
 ## [v0.7.14](https://github.com/yykamei/thwack/tree/v0.7.14) (2023-01-11)
