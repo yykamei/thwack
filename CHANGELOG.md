@@ -6,6 +6,7 @@
 
 **Merged pull requests:**
 
+- Bump nom from 7.1.2 to 7.1.3 [\#515](https://github.com/yykamei/thwack/pull/515) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump windows\_aarch64\_msvc from 0.42.0 to 0.42.1 [\#506](https://github.com/yykamei/thwack/pull/506) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump windows\_aarch64\_gnullvm from 0.42.0 to 0.42.1 [\#505](https://github.com/yykamei/thwack/pull/505) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump windows\_i686\_gnu from 0.42.0 to 0.42.1 [\#504](https://github.com/yykamei/thwack/pull/504) ([dependabot[bot]](https://github.com/apps/dependabot))
