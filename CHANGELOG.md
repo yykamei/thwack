@@ -6,6 +6,7 @@
 
 **Merged pull requests:**
 
+- Bump git2 from 0.16.0 to 0.16.1 [\#522](https://github.com/yykamei/thwack/pull/522) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump unicode-bidi from 0.3.8 to 0.3.9 [\#519](https://github.com/yykamei/thwack/pull/519) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump proc-macro2 from 1.0.49 to 1.0.50 [\#517](https://github.com/yykamei/thwack/pull/517) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump nom from 7.1.2 to 7.1.3 [\#515](https://github.com/yykamei/thwack/pull/515) ([dependabot[bot]](https://github.com/apps/dependabot))
