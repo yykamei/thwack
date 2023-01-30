@@ -7,6 +7,7 @@
 **Merged pull requests:**
 
 - Bump cc from 1.0.78 to 1.0.79 [\#528](https://github.com/yykamei/thwack/pull/528) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump crossterm from 0.25.0 to 0.26.0 [\#527](https://github.com/yykamei/thwack/pull/527) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump unicode-bidi from 0.3.9 to 0.3.10 [\#525](https://github.com/yykamei/thwack/pull/525) ([dependabot[bot]](https://github.com/apps/dependabot))
 
 ## [v0.7.15](https://github.com/yykamei/thwack/tree/v0.7.15) (2023-01-21)
