@@ -6,6 +6,7 @@
 
 **Merged pull requests:**
 
+- Bump parking\_lot\_core from 0.9.6 to 0.9.7 [\#533](https://github.com/yykamei/thwack/pull/533) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump unicode-segmentation from 1.10.0 to 1.10.1 [\#531](https://github.com/yykamei/thwack/pull/531) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump cc from 1.0.78 to 1.0.79 [\#528](https://github.com/yykamei/thwack/pull/528) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump crossterm from 0.25.0 to 0.26.0 [\#527](https://github.com/yykamei/thwack/pull/527) ([dependabot[bot]](https://github.com/apps/dependabot))
