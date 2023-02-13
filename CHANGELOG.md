@@ -6,6 +6,7 @@
 
 **Merged pull requests:**
 
+- Bump signal-hook-registry from 1.4.0 to 1.4.1 [\#539](https://github.com/yykamei/thwack/pull/539) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump proc-macro2 from 1.0.50 to 1.0.51 [\#537](https://github.com/yykamei/thwack/pull/537) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump tinyvec\_macros from 0.1.0 to 0.1.1 [\#535](https://github.com/yykamei/thwack/pull/535) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump parking\_lot\_core from 0.9.6 to 0.9.7 [\#533](https://github.com/yykamei/thwack/pull/533) ([dependabot[bot]](https://github.com/apps/dependabot))
