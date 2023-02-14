@@ -1,5 +1,13 @@
 # Changelog
 
+## [Unreleased](https://github.com/yykamei/thwack/tree/HEAD)
+
+[Full Changelog](https://github.com/yykamei/thwack/compare/v0.7.16...HEAD)
+
+**Merged pull requests:**
+
+- Bump fastrand from 1.8.0 to 1.9.0 [\#544](https://github.com/yykamei/thwack/pull/544) ([dependabot[bot]](https://github.com/apps/dependabot))
+
 ## [v0.7.16](https://github.com/yykamei/thwack/tree/v0.7.16) (2023-02-14)
 
 [Full Changelog](https://github.com/yykamei/thwack/compare/v0.7.15...v0.7.16)
