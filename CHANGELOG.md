@@ -6,6 +6,7 @@
 
 **Merged pull requests:**
 
+- Bump once\_cell from 1.17.0 to 1.17.1 [\#547](https://github.com/yykamei/thwack/pull/547) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump fastrand from 1.8.0 to 1.9.0 [\#544](https://github.com/yykamei/thwack/pull/544) ([dependabot[bot]](https://github.com/apps/dependabot))
 
 ## [v0.7.16](https://github.com/yykamei/thwack/tree/v0.7.16) (2023-02-14)
