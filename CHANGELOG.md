@@ -6,6 +6,7 @@
 
 **Merged pull requests:**
 
+- Bump memmap2 from 0.5.8 to 0.5.9 [\#552](https://github.com/yykamei/thwack/pull/552) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump copypasta from 0.8.1 to 0.8.2 [\#550](https://github.com/yykamei/thwack/pull/550) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump once\_cell from 1.17.0 to 1.17.1 [\#547](https://github.com/yykamei/thwack/pull/547) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump mio from 0.8.5 to 0.8.6 [\#546](https://github.com/yykamei/thwack/pull/546) ([dependabot[bot]](https://github.com/apps/dependabot))
