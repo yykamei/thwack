@@ -6,6 +6,8 @@
 
 **Merged pull requests:**
 
+- Bump tempfile from 3.3.0 to 3.4.0 [\#557](https://github.com/yykamei/thwack/pull/557) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump crossterm from 0.26.0 to 0.26.1 [\#556](https://github.com/yykamei/thwack/pull/556) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump memmap2 from 0.5.9 to 0.5.10 [\#554](https://github.com/yykamei/thwack/pull/554) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump memmap2 from 0.5.8 to 0.5.9 [\#552](https://github.com/yykamei/thwack/pull/552) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump copypasta from 0.8.1 to 0.8.2 [\#550](https://github.com/yykamei/thwack/pull/550) ([dependabot[bot]](https://github.com/apps/dependabot))
