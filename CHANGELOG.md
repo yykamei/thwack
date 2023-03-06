@@ -6,6 +6,7 @@
 
 **Merged pull requests:**
 
+- Bump rustix from 0.36.8 to 0.36.9 [\#562](https://github.com/yykamei/thwack/pull/562) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump jobserver from 0.1.25 to 0.1.26 [\#560](https://github.com/yykamei/thwack/pull/560) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump tempfile from 3.3.0 to 3.4.0 [\#557](https://github.com/yykamei/thwack/pull/557) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump crossterm from 0.26.0 to 0.26.1 [\#556](https://github.com/yykamei/thwack/pull/556) ([dependabot[bot]](https://github.com/apps/dependabot))
