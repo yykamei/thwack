@@ -6,6 +6,7 @@
 
 **Merged pull requests:**
 
+- Bump io-lifetimes from 1.0.5 to 1.0.6 [\#566](https://github.com/yykamei/thwack/pull/566) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump unicode-ident from 1.0.6 to 1.0.8 [\#563](https://github.com/yykamei/thwack/pull/563) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump rustix from 0.36.8 to 0.36.9 [\#562](https://github.com/yykamei/thwack/pull/562) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump jobserver from 0.1.25 to 0.1.26 [\#560](https://github.com/yykamei/thwack/pull/560) ([dependabot[bot]](https://github.com/apps/dependabot))
