@@ -1,8 +1,8 @@
 # Changelog
 
-## [v0.7.17](https://github.com/yykamei/thwack/tree/v0.7.17) (2023-03-07)
+## [Unreleased](https://github.com/yykamei/thwack/tree/HEAD)
 
-[Full Changelog](https://github.com/yykamei/thwack/compare/v0.7.16...v0.7.17)
+[Full Changelog](https://github.com/yykamei/thwack/compare/v0.7.16...HEAD)
 
 **Merged pull requests:**
 
