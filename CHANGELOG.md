@@ -1,24 +1,5 @@
 # Changelog
 
-## [v0.7.17](https://github.com/yykamei/thwack/tree/v0.7.17) (2023-03-07)
-
-[Full Changelog](https://github.com/yykamei/thwack/compare/v0.7.16...v0.7.17)
-
-**Merged pull requests:**
-
-- Bump io-lifetimes from 1.0.5 to 1.0.6 [\#566](https://github.com/yykamei/thwack/pull/566) ([dependabot[bot]](https://github.com/apps/dependabot))
-- Bump unicode-ident from 1.0.6 to 1.0.8 [\#563](https://github.com/yykamei/thwack/pull/563) ([dependabot[bot]](https://github.com/apps/dependabot))
-- Bump rustix from 0.36.8 to 0.36.9 [\#562](https://github.com/yykamei/thwack/pull/562) ([dependabot[bot]](https://github.com/apps/dependabot))
-- Bump jobserver from 0.1.25 to 0.1.26 [\#560](https://github.com/yykamei/thwack/pull/560) ([dependabot[bot]](https://github.com/apps/dependabot))
-- Bump tempfile from 3.3.0 to 3.4.0 [\#557](https://github.com/yykamei/thwack/pull/557) ([dependabot[bot]](https://github.com/apps/dependabot))
-- Bump crossterm from 0.26.0 to 0.26.1 [\#556](https://github.com/yykamei/thwack/pull/556) ([dependabot[bot]](https://github.com/apps/dependabot))
-- Bump memmap2 from 0.5.9 to 0.5.10 [\#554](https://github.com/yykamei/thwack/pull/554) ([dependabot[bot]](https://github.com/apps/dependabot))
-- Bump memmap2 from 0.5.8 to 0.5.9 [\#552](https://github.com/yykamei/thwack/pull/552) ([dependabot[bot]](https://github.com/apps/dependabot))
-- Bump copypasta from 0.8.1 to 0.8.2 [\#550](https://github.com/yykamei/thwack/pull/550) ([dependabot[bot]](https://github.com/apps/dependabot))
-- Bump once\_cell from 1.17.0 to 1.17.1 [\#547](https://github.com/yykamei/thwack/pull/547) ([dependabot[bot]](https://github.com/apps/dependabot))
-- Bump mio from 0.8.5 to 0.8.6 [\#546](https://github.com/yykamei/thwack/pull/546) ([dependabot[bot]](https://github.com/apps/dependabot))
-- Bump fastrand from 1.8.0 to 1.9.0 [\#544](https://github.com/yykamei/thwack/pull/544) ([dependabot[bot]](https://github.com/apps/dependabot))
-
 ## [v0.7.16](https://github.com/yykamei/thwack/tree/v0.7.16) (2023-02-14)
 
 [Full Changelog](https://github.com/yykamei/thwack/compare/v0.7.15...v0.7.16)
