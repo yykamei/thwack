@@ -1,5 +1,13 @@
 # Changelog
 
+## [Unreleased](https://github.com/yykamei/thwack/tree/HEAD)
+
+[Full Changelog](https://github.com/yykamei/thwack/compare/v0.7.17...HEAD)
+
+**Merged pull requests:**
+
+- Bump unicode-bidi from 0.3.10 to 0.3.11 [\#570](https://github.com/yykamei/thwack/pull/570) ([dependabot[bot]](https://github.com/apps/dependabot))
+
 ## [v0.7.17](https://github.com/yykamei/thwack/tree/v0.7.17) (2023-03-07)
 
 [Full Changelog](https://github.com/yykamei/thwack/compare/v0.7.16...v0.7.17)
