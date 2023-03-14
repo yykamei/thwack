@@ -1,16 +1,5 @@
 # Changelog
 
-## [Unreleased](https://github.com/yykamei/thwack/tree/HEAD)
-
-[Full Changelog](https://github.com/yykamei/thwack/compare/v0.7.17...HEAD)
-
-**Merged pull requests:**
-
-- Bump quote from 1.0.23 to 1.0.25 [\#576](https://github.com/yykamei/thwack/pull/576) ([dependabot[bot]](https://github.com/apps/dependabot))
-- Bump x11-clipboard from 0.7.0 to 0.7.1 [\#573](https://github.com/yykamei/thwack/pull/573) ([dependabot[bot]](https://github.com/apps/dependabot))
-- Bump libc from 0.2.139 to 0.2.140 [\#572](https://github.com/yykamei/thwack/pull/572) ([dependabot[bot]](https://github.com/apps/dependabot))
-- Bump unicode-bidi from 0.3.10 to 0.3.11 [\#570](https://github.com/yykamei/thwack/pull/570) ([dependabot[bot]](https://github.com/apps/dependabot))
-
 ## [v0.7.17](https://github.com/yykamei/thwack/tree/v0.7.17) (2023-03-07)
 
 [Full Changelog](https://github.com/yykamei/thwack/compare/v0.7.16...v0.7.17)
