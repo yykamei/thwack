@@ -6,6 +6,7 @@
 
 **Merged pull requests:**
 
+- Bump quote from 1.0.25 to 1.0.26 [\#584](https://github.com/yykamei/thwack/pull/584) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump quote from 1.0.23 to 1.0.25 [\#576](https://github.com/yykamei/thwack/pull/576) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump x11-clipboard from 0.7.0 to 0.7.1 [\#573](https://github.com/yykamei/thwack/pull/573) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump libc from 0.2.139 to 0.2.140 [\#572](https://github.com/yykamei/thwack/pull/572) ([dependabot[bot]](https://github.com/apps/dependabot))
