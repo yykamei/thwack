@@ -6,6 +6,12 @@
 
 **Merged pull requests:**
 
+- Bump windows\_x86\_64\_msvc from 0.42.1 to 0.42.2 [\#587](https://github.com/yykamei/thwack/pull/587) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump windows-targets from 0.42.1 to 0.42.2 [\#586](https://github.com/yykamei/thwack/pull/586) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump quote from 1.0.25 to 1.0.26 [\#584](https://github.com/yykamei/thwack/pull/584) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump windows\_aarch64\_gnullvm from 0.42.1 to 0.42.2 [\#582](https://github.com/yykamei/thwack/pull/582) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump windows\_x86\_64\_gnu from 0.42.1 to 0.42.2 [\#580](https://github.com/yykamei/thwack/pull/580) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump windows\_aarch64\_msvc from 0.42.1 to 0.42.2 [\#579](https://github.com/yykamei/thwack/pull/579) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump quote from 1.0.23 to 1.0.25 [\#576](https://github.com/yykamei/thwack/pull/576) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump x11-clipboard from 0.7.0 to 0.7.1 [\#573](https://github.com/yykamei/thwack/pull/573) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump libc from 0.2.139 to 0.2.140 [\#572](https://github.com/yykamei/thwack/pull/572) ([dependabot[bot]](https://github.com/apps/dependabot))
