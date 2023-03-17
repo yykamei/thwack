@@ -6,6 +6,7 @@
 
 **Merged pull requests:**
 
+- Bump io-lifetimes from 1.0.6 to 1.0.7 [\#596](https://github.com/yykamei/thwack/pull/596) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump windows\_x86\_64\_msvc from 0.42.1 to 0.42.2 [\#587](https://github.com/yykamei/thwack/pull/587) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump windows-targets from 0.42.1 to 0.42.2 [\#586](https://github.com/yykamei/thwack/pull/586) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump windows\_i686\_msvc from 0.42.1 to 0.42.2 [\#585](https://github.com/yykamei/thwack/pull/585) ([dependabot[bot]](https://github.com/apps/dependabot))
