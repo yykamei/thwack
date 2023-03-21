@@ -6,6 +6,9 @@
 
 **Merged pull requests:**
 
+- Bump io-lifetimes from 1.0.8 to 1.0.9 [\#606](https://github.com/yykamei/thwack/pull/606) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump unicode-bidi from 0.3.12 to 0.3.13 [\#605](https://github.com/yykamei/thwack/pull/605) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump rustix from 0.36.10 to 0.36.11 [\#604](https://github.com/yykamei/thwack/pull/604) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump unicode-bidi from 0.3.11 to 0.3.12 [\#600](https://github.com/yykamei/thwack/pull/600) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump rustix from 0.36.9 to 0.36.10 [\#599](https://github.com/yykamei/thwack/pull/599) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump io-lifetimes from 1.0.7 to 1.0.8 [\#598](https://github.com/yykamei/thwack/pull/598) ([dependabot[bot]](https://github.com/apps/dependabot))
