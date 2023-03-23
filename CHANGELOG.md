@@ -6,6 +6,7 @@
 
 **Merged pull requests:**
 
+- Bump proc-macro2 from 1.0.52 to 1.0.53 [\#610](https://github.com/yykamei/thwack/pull/610) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump io-lifetimes from 1.0.8 to 1.0.9 [\#606](https://github.com/yykamei/thwack/pull/606) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump unicode-bidi from 0.3.12 to 0.3.13 [\#605](https://github.com/yykamei/thwack/pull/605) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump rustix from 0.36.10 to 0.36.11 [\#604](https://github.com/yykamei/thwack/pull/604) ([dependabot[bot]](https://github.com/apps/dependabot))
