@@ -1,33 +1,5 @@
 # Changelog
 
-## [v0.7.18](https://github.com/yykamei/thwack/tree/v0.7.18) (2023-03-27)
-
-[Full Changelog](https://github.com/yykamei/thwack/compare/v0.7.17...v0.7.18)
-
-**Merged pull requests:**
-
-- Bump proc-macro2 from 1.0.53 to 1.0.54 [\#612](https://github.com/yykamei/thwack/pull/612) ([dependabot[bot]](https://github.com/apps/dependabot))
-- Bump proc-macro2 from 1.0.52 to 1.0.53 [\#610](https://github.com/yykamei/thwack/pull/610) ([dependabot[bot]](https://github.com/apps/dependabot))
-- Bump io-lifetimes from 1.0.8 to 1.0.9 [\#606](https://github.com/yykamei/thwack/pull/606) ([dependabot[bot]](https://github.com/apps/dependabot))
-- Bump unicode-bidi from 0.3.12 to 0.3.13 [\#605](https://github.com/yykamei/thwack/pull/605) ([dependabot[bot]](https://github.com/apps/dependabot))
-- Bump rustix from 0.36.10 to 0.36.11 [\#604](https://github.com/yykamei/thwack/pull/604) ([dependabot[bot]](https://github.com/apps/dependabot))
-- Bump unicode-bidi from 0.3.11 to 0.3.12 [\#600](https://github.com/yykamei/thwack/pull/600) ([dependabot[bot]](https://github.com/apps/dependabot))
-- Bump rustix from 0.36.9 to 0.36.10 [\#599](https://github.com/yykamei/thwack/pull/599) ([dependabot[bot]](https://github.com/apps/dependabot))
-- Bump io-lifetimes from 1.0.7 to 1.0.8 [\#598](https://github.com/yykamei/thwack/pull/598) ([dependabot[bot]](https://github.com/apps/dependabot))
-- Bump io-lifetimes from 1.0.6 to 1.0.7 [\#596](https://github.com/yykamei/thwack/pull/596) ([dependabot[bot]](https://github.com/apps/dependabot))
-- Bump windows\_x86\_64\_msvc from 0.42.1 to 0.42.2 [\#587](https://github.com/yykamei/thwack/pull/587) ([dependabot[bot]](https://github.com/apps/dependabot))
-- Bump windows-targets from 0.42.1 to 0.42.2 [\#586](https://github.com/yykamei/thwack/pull/586) ([dependabot[bot]](https://github.com/apps/dependabot))
-- Bump windows\_i686\_msvc from 0.42.1 to 0.42.2 [\#585](https://github.com/yykamei/thwack/pull/585) ([dependabot[bot]](https://github.com/apps/dependabot))
-- Bump quote from 1.0.25 to 1.0.26 [\#584](https://github.com/yykamei/thwack/pull/584) ([dependabot[bot]](https://github.com/apps/dependabot))
-- Bump windows\_aarch64\_gnullvm from 0.42.1 to 0.42.2 [\#582](https://github.com/yykamei/thwack/pull/582) ([dependabot[bot]](https://github.com/apps/dependabot))
-- Bump windows\_i686\_gnu from 0.42.1 to 0.42.2 [\#581](https://github.com/yykamei/thwack/pull/581) ([dependabot[bot]](https://github.com/apps/dependabot))
-- Bump windows\_x86\_64\_gnu from 0.42.1 to 0.42.2 [\#580](https://github.com/yykamei/thwack/pull/580) ([dependabot[bot]](https://github.com/apps/dependabot))
-- Bump windows\_aarch64\_msvc from 0.42.1 to 0.42.2 [\#579](https://github.com/yykamei/thwack/pull/579) ([dependabot[bot]](https://github.com/apps/dependabot))
-- Bump quote from 1.0.23 to 1.0.25 [\#576](https://github.com/yykamei/thwack/pull/576) ([dependabot[bot]](https://github.com/apps/dependabot))
-- Bump x11-clipboard from 0.7.0 to 0.7.1 [\#573](https://github.com/yykamei/thwack/pull/573) ([dependabot[bot]](https://github.com/apps/dependabot))
-- Bump libc from 0.2.139 to 0.2.140 [\#572](https://github.com/yykamei/thwack/pull/572) ([dependabot[bot]](https://github.com/apps/dependabot))
-- Bump unicode-bidi from 0.3.10 to 0.3.11 [\#570](https://github.com/yykamei/thwack/pull/570) ([dependabot[bot]](https://github.com/apps/dependabot))
-
 ## [v0.7.17](https://github.com/yykamei/thwack/tree/v0.7.17) (2023-03-07)
 
 [Full Changelog](https://github.com/yykamei/thwack/compare/v0.7.16...v0.7.17)
