@@ -83,10 +83,6 @@ jobs:
           profile: minimal
           override: true
 
-      - uses: yykamei/actions-update-changelog@main
-        with:
-          future-release: v${{ github.event.inputs.version }}
-
       - name: Bump the package version
         run: |
           sed -i -e "s/^version = .*$/version = \"${{ github.event.inputs.version }}\"/" Cargo.toml
@@ -103,8 +99,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
           VERSION: ${{ github.event.inputs.version }}
-          FUTURE_RELEASE: v${{ github.event.inputs.version }}
-          RELEASE_TITLE: Release v${{ github.event.inputs.version }}
           APPLY: ${{ github.event.inputs.apply }}
 
       - uses: actions/download-artifact@v3
