@@ -13,7 +13,7 @@ version = "0.7.18"
 [dependencies]
 copypasta = "0.8.2"
 crossterm = "0.26.1"
-git2 = { version = "0.16.1", default-features = false }
+git2 = { version = "0.17.0", default-features = false }
 libc = "0.2.140"
 log = { version = "0.4.17", features = ["std"] }
 unicode-segmentation = "1.10.1"
