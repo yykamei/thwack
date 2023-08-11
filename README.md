@@ -31,7 +31,7 @@ Note we consider providing easier ways to install thwack. This should be used wi
 ## Getting Started
 
 Just run this command and type the name of the file you'd like to find.
-By hitting the Enter key on the file you wanted in the list of the results, you can exeucte an arbitrary command on it.
+By hitting the Enter key on the file you wanted in the list of the results, you can execute an arbitrary command on it.
 
 ```console
 thwack
