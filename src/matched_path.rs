@@ -20,10 +20,10 @@ pub(crate) struct MatchedPath {
     /// *depth* is the number of path separator.
     depth: usize,
 
-    /// *absolute_positions* is a vector containing the matched indicies of *absolute*.
+    /// *absolute_positions* is a vector containing the matched indices of *absolute*.
     absolute_positions: Vec<usize>,
 
-    /// *relative_positions* is a vector containing the matched indicies of *relative*.
+    /// *relative_positions* is a vector containing the matched indices of *relative*.
     relative_positions: Vec<usize>,
 }
 
