@@ -1,5 +1,7 @@
 use std::ffi::OsString;
 
+use pretty_assertions::assert_eq;
+
 use helper::MockTerminal;
 use thwack::entrypoint;
 

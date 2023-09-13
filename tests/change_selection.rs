@@ -1,6 +1,7 @@
 use std::ffi::OsString;
 
 use crossterm::event::{Event, KeyCode};
+use pretty_assertions::assert_eq;
 
 use helper::{create_tree, MockTerminal};
 use thwack::entrypoint;

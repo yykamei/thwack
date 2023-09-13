@@ -125,6 +125,7 @@ mod tests {
     use std::io::Write;
 
     use git2::{Repository, Signature};
+    use pretty_assertions::assert_eq;
     use tempfile::{tempdir, TempDir};
 
     use super::*;
