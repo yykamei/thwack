@@ -46,6 +46,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VALIDATE_RUST_CLIPPY: false
           VALIDATE_NATURAL_LANGUAGE: false
+
   dependency-review:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
