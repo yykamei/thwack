@@ -242,6 +242,8 @@ fn normalize_query(query: &str) -> &str {
 
 #[cfg(test)]
 mod tests {
+    use pretty_assertions::assert_eq;
+
     use super::*;
 
     fn new(query: &str, starting_point: &str, absolute: &str) -> MatchedPath {

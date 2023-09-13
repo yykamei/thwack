@@ -187,6 +187,8 @@ impl<A: Iterator<Item = OsString>> Args<A> {
 
 #[cfg(test)]
 mod tests {
+    use pretty_assertions::assert_eq;
+
     use super::*;
 
     macro_rules! args {

@@ -62,6 +62,8 @@ mod tests {
 
     use tempfile::tempdir;
 
+    use pretty_assertions::assert_eq;
+
     use super::*;
 
     #[test]
@@ -73,7 +75,7 @@ mod tests {
         log::debug!("d!");
         assert_eq!(
             &fs::read_to_string(&path).unwrap(),
-            "[INFO] [thwack::logger::tests:72] test\n[DEBUG] [thwack::logger::tests:73] d!\n"
+            "[INFO] [thwack::logger::tests:74] test\n[DEBUG] [thwack::logger::tests:75] d!\n"
         );
     }
 }

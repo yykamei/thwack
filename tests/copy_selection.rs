@@ -2,6 +2,7 @@ use std::ffi::OsString;
 
 use copypasta::{ClipboardContext, ClipboardProvider};
 use crossterm::event::{Event, KeyCode, KeyEvent, KeyEventKind, KeyEventState, KeyModifiers};
+use pretty_assertions::assert_eq;
 
 use helper::{create_tree, MockTerminal};
 use thwack::entrypoint;
