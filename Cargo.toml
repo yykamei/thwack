@@ -17,7 +17,7 @@ git2 = { version = "0.18.0", default-features = false }
 libc = "0.2.148"
 log = { version = "0.4.20", features = ["std"] }
 unicode-segmentation = "1.10.1"
-unicode-width = "0.1.10"
+unicode-width = "0.1.11"
 
 [dev-dependencies]
 pretty_assertions = "1.4.0"
