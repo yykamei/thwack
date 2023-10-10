@@ -13,7 +13,7 @@ jobs:
         os: [ubuntu-latest, macOS-latest, windows-latest]
         rust: [stable, nightly]
     steps:
-      - run: sudo apt-get install --yes --no-install-recommends libx11-xcb-dev libxcb-shape0-dev libxcb-xfixes0-dev
+      - run: sudo apt-get update --yes && sudo apt-get install --yes --no-install-recommends libx11-xcb-dev libxcb-shape0-dev libxcb-xfixes0-dev
         if: matrix.os == 'ubuntu-latest'
 
       - uses: actions/checkout@v4
@@ -52,4 +52,3 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/dependency-review-action@v3
-
