@@ -101,7 +101,7 @@ jobs:
           VERSION: ${{ github.event.inputs.version }}
           APPLY: ${{ github.event.inputs.apply }}
 
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
 
       - name: Calculate checksums
         run: |
