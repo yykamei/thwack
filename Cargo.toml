@@ -21,4 +21,4 @@ unicode-width = "0.1.11"
 
 [dev-dependencies]
 pretty_assertions = "1.4.0"
-tempfile = "3.9.0"
+tempfile = "3.10.0"
