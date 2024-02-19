@@ -12,6 +12,9 @@ jobs:
       matrix:
         os: [ubuntu-latest, macOS-latest, windows-latest]
         rust: [stable, nightly]
+    permissions:
+      contents: read
+
     steps:
       - run: sudo apt-get update --yes && sudo apt-get install --yes --no-install-recommends libx11-xcb-dev libxcb-shape0-dev libxcb-xfixes0-dev
         if: matrix.os == 'ubuntu-latest'
@@ -35,6 +38,11 @@ jobs:
 
   lint:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: read
+      statuses: write # To report GitHub Actions status checks
+
     steps:
       - uses: actions/checkout@v4
         with:
@@ -50,5 +58,7 @@ jobs:
   dependency-review:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/dependency-review-action@v4
