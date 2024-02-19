@@ -10,6 +10,6 @@ cargo package --list --allow-dirty
 gh release list
 
 if [[ "$APPLY" == "true" ]]; then
-  gh release create "v$VERSION" --generate-notes
-  cargo publish
+	gh release create "v$VERSION" --generate-notes
+	cargo publish
 fi
