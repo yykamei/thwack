@@ -8,6 +8,8 @@ on:
       apply:
         description: apply. Specify whether the atcual release should be performed or not
         type: boolean
+permissions:
+  contents: read
 jobs:
   build:
     strategy:
