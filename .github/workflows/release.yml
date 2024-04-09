@@ -1,4 +1,5 @@
 name: Release
+run-name: Release v${{ inputs.version }}
 on:
   workflow_dispatch:
     inputs:
@@ -8,8 +9,7 @@ on:
       apply:
         description: apply. Specify whether the atcual release should be performed or not
         type: boolean
-permissions:
-  contents: read
+permissions: {}
 jobs:
   build:
     strategy:
@@ -74,14 +74,18 @@ jobs:
   release:
     runs-on: ubuntu-latest
     needs: build
-    permissions:
-      contents: write
     steps:
       - run: sudo apt-get update --yes && sudo apt-get install --yes --no-install-recommends libx11-xcb-dev libxcb-shape0-dev libxcb-xfixes0-dev
 
+      - uses: actions/create-github-app-token@v1
+        id: app-token
+        with:
+          app-id: ${{ vars.APP_ID }}
+          private-key: ${{ secrets.PRIVATE_KEY }}
+
       - uses: actions/checkout@v4
         with:
-          token: ${{ secrets.PAT_FOR_RELEASE }}
+          token: ${{ steps.app-token.outputs.token }}
 
       - uses: actions-rs/toolchain@v1
         with:
@@ -91,21 +95,21 @@ jobs:
 
       - name: Bump the package version
         run: |
-          sed -i -e "s/^version = .*$/version = \"${{ github.event.inputs.version }}\"/" Cargo.toml
+          sed -i -e "s/^version = .*$/version = \"${{ inputs.version }}\"/" Cargo.toml
           cargo build
 
       - uses: yykamei/actions-git-push@main
         with:
-          commit-message: Bump to ${{ github.event.inputs.version }}
-        if: github.event.inputs.apply == 'true'
+          commit-message: Bump to ${{ inputs.version }}
+        if: inputs.apply == 'true'
 
       - name: Create a GitHub release and publish the crate on crates.io
         run: ./scripts/release.sh
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
-          VERSION: ${{ github.event.inputs.version }}
-          APPLY: ${{ github.event.inputs.apply }}
+          VERSION: ${{ inputs.version }}
+          APPLY: ${{ inputs.apply }}
 
       - uses: actions/download-artifact@v4
 
@@ -115,7 +119,7 @@ jobs:
           for f in thwack-*; do sha256sum "$f" | awk '{print $1}' > "${f}.sha256"; done
 
       - name: Upload assets to the release
-        if: github.event.inputs.apply == 'true'
-        run: gh release upload "v${{ github.event.inputs.version }}" thwack-*
+        if: inputs.apply == 'true'
+        run: gh release upload "v${{ inputs.version }}" thwack-*
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
