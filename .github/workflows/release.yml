@@ -49,10 +49,17 @@ jobs:
           toolchain: stable
           target: ${{ matrix.target }}
 
-      - uses: actions-rs/cargo@v1
-        with:
-          command: build
-          args: --release --locked --target ${{ matrix.target }}
+      - name: Install cross
+        if: matrix.os == 'ubuntu-latest'
+        uses: taiki-e/install-action@cross
+
+      - name: Build with Cargo
+        if: matrix.os != 'ubuntu-latest'
+        run: cargo build --release --locked --target ${{ matrix.target }}
+
+      - name: Build with Cross
+        if: matrix.os == 'ubuntu-latest'
+        run: cross build --release --locked --target ${{ matrix.target }}
 
       - name: Bundle on Windows
         run: 7z a ../../../thwack-${{ matrix.target }}${{ matrix.suffix }} thwack.exe
