@@ -1,5 +1,5 @@
 name: Release
-run-name: Release v${{ inputs.version }}
+run-name: Release v${{ inputs.version }} with apply=${{ inputs.apply }}
 on:
   workflow_dispatch:
     inputs:
