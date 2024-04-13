@@ -104,7 +104,7 @@ jobs:
       - uses: yykamei/actions-git-push@main
         with:
           commit-message: Bump to ${{ inputs.version }}
-        if: inputs.apply == 'true'
+        if: inputs.apply
 
       - name: Create a GitHub release and publish the crate on crates.io
         run: ./scripts/release.sh
@@ -122,7 +122,7 @@ jobs:
           for f in thwack-*; do sha256sum "$f" | awk '{print $1}' > "${f}.sha256"; done
 
       - name: Upload assets to the release
-        if: inputs.apply == 'true'
+        if: inputs.apply
         run: gh release upload "v${{ inputs.version }}" thwack-*
         env:
           GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
