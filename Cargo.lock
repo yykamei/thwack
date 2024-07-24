@@ -618,7 +618,7 @@ dependencies = [
 
 [[package]]
 name = "thwack"
-version = "0.8.25"
+version = "0.8.26"
 dependencies = [
  "copypasta",
  "crossterm",
