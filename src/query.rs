@@ -9,7 +9,10 @@ pub(crate) struct Query {
 impl Query {
     pub(crate) fn new(value: &str) -> Self {
         let value = value.graphemes(true).collect::<Vec<&str>>();
-        let value = value.iter().map(|&s| s.to_string()).collect::<Vec<String>>();
+        let value = value
+            .iter()
+            .map(|&s| s.to_string())
+            .collect::<Vec<String>>();
         let idx = value.len();
 
         Self { value, idx }
