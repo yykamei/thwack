@@ -18,6 +18,10 @@ impl Query {
         Self { value, idx }
     }
 
+    pub(crate) fn to_string(&self) -> String {
+        self.value.join("")
+    }
+
     pub(crate) fn push(&mut self, s: &str) {
         self.value.insert(self.idx, s.to_string());
         self.idx += 1;
@@ -94,5 +98,16 @@ mod tests {
         query.push("😇");
         assert_eq!(query.value, vec!["😇", "👩‍🔬", "!", "a", "?"]);
         assert_eq!(query.idx, 1);
+    }
+
+    #[test]
+    fn test_to_string() {
+        let query = Query::new("Super cool query");
+        assert_eq!(
+            query.value,
+            vec!["S", "u", "p", "e", "r", " ", "c", "o", "o", "l", " ", "q", "u", "e", "r", "y"]
+        );
+        assert_eq!(query.idx, 16);
+        assert_eq!(query.to_string(), "Super cool query");
     }
 }
