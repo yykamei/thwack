@@ -27,6 +27,7 @@ impl Candidates {
             query,
             repo,
         )?;
+        paths.sort();
         Ok(Self { paths })
     }
 
@@ -151,11 +152,15 @@ mod tests {
         let query = Query::new("");
         let repo = Repository::open(dir.path()).unwrap();
         let candidates = Candidates::new(&starting_point, &query, Some(&repo)).unwrap();
-        let result = candidates.take(3);
-        // TODO: This sort is not expected.
+        let result: Vec<String> = candidates
+            .take(3)
+            .iter()
+            .map(|p| p.relative())
+            .map(|m| format!("{}", m).replace('\\', "/"))
+            .collect();
         assert_eq!(
-            result.iter().map(|p| p.relative()).collect::<Vec<&str>>(),
-            &[".config/bar.toml", ".config/ok.toml", ".env.local"]
+            result,
+            &[".browserslistrc", ".config/bar.toml", ".config/ok.toml"]
         );
     }
 
@@ -166,12 +171,13 @@ mod tests {
         let query = Query::new("bar");
         let repo = Repository::open(dir.path()).unwrap();
         let candidates = Candidates::new(&starting_point, &query, Some(&repo)).unwrap();
-        let result = candidates.take(5);
-        // TODO: This sort is not expected.
-        assert_eq!(
-            result.iter().map(|p| p.relative()).collect::<Vec<&str>>(),
-            &[".config/bar.toml", "lib/bar.js"]
-        );
+        let result: Vec<String> = candidates
+            .take(5)
+            .iter()
+            .map(|p| p.relative())
+            .map(|m| format!("{}", m).replace('\\', "/"))
+            .collect();
+        assert_eq!(result, &[".config/bar.toml", "lib/bar.js"]);
     }
 
     #[test]
@@ -180,8 +186,13 @@ mod tests {
         let starting_point = StartingPoint::new(dir.path()).unwrap();
         let query = Query::new("");
         let candidates = Candidates::new(&starting_point, &query, None).unwrap();
-        let result: Vec<&str> = candidates.take(100).iter().map(|p| p.relative()).collect();
-        assert!(result.contains(&"log.txt"));
-        assert!(result.contains(&".git/config"));
+        let result: Vec<String> = candidates
+            .take(100)
+            .iter()
+            .map(|p| p.relative())
+            .map(|m| format!("{}", m).replace('\\', "/"))
+            .collect();
+        assert!(result.contains(&"log.txt".to_string()));
+        assert!(result.contains(&".git/config".to_string()));
     }
 }
