@@ -4,6 +4,7 @@ pub use error::{Error, ErrorKind, Result};
 pub use terminal::{DefaultTerminal, Terminal};
 
 mod args;
+mod candidates;
 mod cli;
 mod error;
 mod finder;
