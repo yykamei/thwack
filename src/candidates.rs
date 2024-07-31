@@ -11,10 +11,12 @@ use crate::Result;
 
 pub(crate) struct Candidates {
     paths: Vec<MatchedPath>,
+    visible_paths_length: usize,
+    selected: Option<usize>,
 }
 
 impl Candidates {
-    fn new(
+    pub(crate) fn new(
         starting_point: &StartingPoint,
         query: &Query,
         repo: Option<&Repository>,
@@ -28,11 +30,47 @@ impl Candidates {
             repo,
         )?;
         paths.sort();
-        Ok(Self { paths })
+        Ok(Self {
+            paths,
+            visible_paths_length: 0,
+            selected: None,
+        })
     }
 
-    fn take(&self, n: usize) -> &[MatchedPath] {
-        &self.paths[..min(n, self.paths.len())]
+    pub(crate) fn visible_paths_length(mut self, length: usize) -> Self {
+        self.visible_paths_length = length;
+        self.selected = None;
+        self
+    }
+
+    pub(crate) fn take(&self) -> &[MatchedPath] {
+        &self.paths[..min(self.visible_paths_length, self.paths.len())]
+    }
+
+    pub(crate) fn move_down(&mut self) {
+        let limit = min(self.visible_paths_length, self.paths.len());
+        if limit == 0 {
+            return;
+        }
+        if let Some(selected) = self.selected {
+            if selected < limit - 1 {
+                self.selected = Some(selected + 1);
+            }
+        } else {
+            self.selected = Some(0);
+        }
+    }
+
+    pub(crate) fn move_up(&mut self) {
+        let limit = min(self.visible_paths_length, self.paths.len());
+        if limit == 0 {
+            return;
+        }
+        if let Some(selected) = self.selected {
+            if selected > 0 {
+                self.selected = Some(selected - 1);
+            }
+        }
     }
 }
 
@@ -153,7 +191,8 @@ mod tests {
         let repo = Repository::open(dir.path()).unwrap();
         let candidates = Candidates::new(&starting_point, &query, Some(&repo)).unwrap();
         let result: Vec<String> = candidates
-            .take(3)
+            .visible_paths_length(3)
+            .take()
             .iter()
             .map(|p| p.relative())
             .map(|m| format!("{}", m).replace('\\', "/"))
@@ -172,7 +211,8 @@ mod tests {
         let repo = Repository::open(dir.path()).unwrap();
         let candidates = Candidates::new(&starting_point, &query, Some(&repo)).unwrap();
         let result: Vec<String> = candidates
-            .take(5)
+            .visible_paths_length(5)
+            .take()
             .iter()
             .map(|p| p.relative())
             .map(|m| format!("{}", m).replace('\\', "/"))
@@ -187,12 +227,69 @@ mod tests {
         let query = Query::new("");
         let candidates = Candidates::new(&starting_point, &query, None).unwrap();
         let result: Vec<String> = candidates
-            .take(100)
+            .visible_paths_length(100)
+            .take()
             .iter()
             .map(|p| p.relative())
             .map(|m| format!("{}", m).replace('\\', "/"))
             .collect();
         assert!(result.contains(&"log.txt".to_string()));
         assert!(result.contains(&".git/config".to_string()));
+    }
+
+    #[test]
+    fn test_move_down() {
+        let dir = create_tree().unwrap();
+        let starting_point = StartingPoint::new(dir.path()).unwrap();
+        let query = Query::new("");
+        let repo = Repository::open(dir.path()).unwrap();
+        let mut candidates = Candidates::new(&starting_point, &query, Some(&repo))
+            .unwrap()
+            .visible_paths_length(3);
+        assert_eq!(candidates.selected, None);
+        candidates.move_down();
+        assert_eq!(candidates.selected, Some(0));
+        candidates.move_down();
+        assert_eq!(candidates.selected, Some(1));
+        candidates.move_down();
+        assert_eq!(candidates.selected, Some(2));
+        candidates.move_down();
+        assert_eq!(candidates.selected, Some(2));
+
+        let mut candidates = candidates.visible_paths_length(0);
+        candidates.move_down();
+        assert_eq!(candidates.selected, None);
+        candidates.move_down();
+        assert_eq!(candidates.selected, None);
+    }
+
+    #[test]
+    fn test_move_up() {
+        let dir = create_tree().unwrap();
+        let starting_point = StartingPoint::new(dir.path()).unwrap();
+        let query = Query::new("");
+        let repo = Repository::open(dir.path()).unwrap();
+        let mut candidates = Candidates::new(&starting_point, &query, Some(&repo))
+            .unwrap()
+            .visible_paths_length(3);
+        assert_eq!(candidates.selected, None);
+        candidates.move_up();
+        assert_eq!(candidates.selected, None);
+        candidates.move_down();
+        candidates.move_down();
+        candidates.move_down();
+        assert_eq!(candidates.selected, Some(2));
+        candidates.move_up();
+        assert_eq!(candidates.selected, Some(1));
+        candidates.move_up();
+        assert_eq!(candidates.selected, Some(0));
+        candidates.move_up();
+        assert_eq!(candidates.selected, Some(0));
+
+        let mut candidates = candidates.visible_paths_length(0);
+        candidates.move_up();
+        assert_eq!(candidates.selected, None);
+        candidates.move_up();
+        assert_eq!(candidates.selected, None);
     }
 }
