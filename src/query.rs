@@ -1,6 +1,7 @@
 use unicode_segmentation::UnicodeSegmentation;
 
 /// A Query is a container that saves the current query and the cursor position.
+#[derive(Debug, Default)]
 pub(crate) struct Query {
     value: Vec<String>,
     idx: usize,

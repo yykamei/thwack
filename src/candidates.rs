@@ -9,6 +9,7 @@ use crate::query::Query;
 use crate::starting_point::StartingPoint;
 use crate::Result;
 
+#[derive(Debug, Default)]
 pub(crate) struct Candidates {
     paths: Vec<MatchedPath>,
     visible_paths_length: usize,
