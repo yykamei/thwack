@@ -21,7 +21,7 @@ impl Query {
         Self { value, idx }
     }
 
-    pub(crate) fn push(&mut self, s: &str) {
+    pub(crate) fn push<S: ToString>(&mut self, s: S) {
         self.value.insert(self.idx, s.to_string());
         self.idx += 1;
     }
