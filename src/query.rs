@@ -1,3 +1,5 @@
+use std::fmt;
+
 use unicode_segmentation::UnicodeSegmentation;
 
 /// A Query is a container that saves the current query and the cursor position.
@@ -9,18 +11,14 @@ pub(crate) struct Query {
 
 impl Query {
     pub(crate) fn new(value: &str) -> Self {
-        let value = value.graphemes(true).collect::<Vec<&str>>();
-        let value = value
-            .iter()
-            .map(|&s| s.to_string())
-            .collect::<Vec<String>>();
+        let value: Vec<String> = value
+            .graphemes(true)
+            .into_iter()
+            .map(|s| s.to_string())
+            .collect();
         let idx = value.len();
 
         Self { value, idx }
-    }
-
-    pub(crate) fn to_string(&self) -> String {
-        self.value.join("")
     }
 
     pub(crate) fn push(&mut self, s: &str) {
@@ -45,6 +43,12 @@ impl Query {
         if self.idx < self.value.len() {
             self.idx += 1;
         }
+    }
+}
+
+impl fmt::Display for Query {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        fmt::Display::fmt(self.value.join("").as_str(), f)
     }
 }
 
