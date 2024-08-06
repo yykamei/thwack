@@ -21,6 +21,7 @@ use crate::error::Result;
 use crate::finder::Finder;
 use crate::matched_path::MatchedPath;
 use crate::preferences::Preferences;
+use crate::query::Query;
 use crate::starting_point::StartingPoint;
 use crate::status_line::StatusLine;
 use crate::terminal::Terminal;
@@ -136,7 +137,7 @@ struct Runner<'a, W: Write, T: Terminal> {
     max_columns: u16,
     max_rows: u16,
     starting_point: StartingPoint,
-    query: String,
+    query: Query,
     selection: u16,
     state: State,
 }
@@ -167,7 +168,7 @@ impl<'a, W: Write, T: Terminal> Runner<'a, W, T> {
         };
         let (max_columns, max_rows) = terminal.size()?;
         let starting_point = StartingPoint::new(&preferences.starting_point)?;
-        let query = preferences.query.clone();
+        let query = Query::new(&preferences.query);
 
         Ok(Self {
             preferences,
@@ -269,7 +270,11 @@ impl<'a, W: Write, T: Terminal> Runner<'a, W, T> {
     fn find_paths(&self, limit: impl Into<usize>) -> Result<Vec<MatchedPath>> {
         let mut paths = Vec::with_capacity(100); // TODO: Tune this capacity later.
 
-        for path in Finder::new(&self.starting_point, &self.query, self.repo.as_ref())? {
+        for path in Finder::new(
+            &self.starting_point,
+            &self.query.to_string(),
+            self.repo.as_ref(),
+        )? {
             match path {
                 Ok(path) => paths.push(path),
                 Err(e) => log::error!("Failed to get the path: {}", e),
