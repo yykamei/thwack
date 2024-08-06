@@ -21,11 +21,11 @@ use crate::error::Result;
 use crate::finder::Finder;
 use crate::matched_path::MatchedPath;
 use crate::preferences::Preferences;
+use crate::query::Query;
 use crate::starting_point::StartingPoint;
 use crate::status_line::StatusLine;
 use crate::terminal::Terminal;
 use crate::{logger, Error};
-use crate::query::Query;
 
 macro_rules! ctrl {
     ($char:expr) => {
@@ -270,7 +270,11 @@ impl<'a, W: Write, T: Terminal> Runner<'a, W, T> {
     fn find_paths(&self, limit: impl Into<usize>) -> Result<Vec<MatchedPath>> {
         let mut paths = Vec::with_capacity(100); // TODO: Tune this capacity later.
 
-        for path in Finder::new(&self.starting_point, &self.query.to_string(), self.repo.as_ref())? {
+        for path in Finder::new(
+            &self.starting_point,
+            &self.query.to_string(),
+            self.repo.as_ref(),
+        )? {
             match path {
                 Ok(path) => paths.push(path),
                 Err(e) => log::error!("Failed to get the path: {}", e),
