@@ -1,6 +1,7 @@
 use std::fmt;
 
 use unicode_segmentation::UnicodeSegmentation;
+use unicode_width::UnicodeWidthStr;
 
 /// A Query is a container that saves the current query and the cursor position.
 #[derive(Debug, Default)]
@@ -21,28 +22,43 @@ impl Query {
         Self { value, idx }
     }
 
-    pub(crate) fn push<S: ToString>(&mut self, s: S) {
+    pub(crate) fn push<S: ToString>(&mut self, s: S) -> usize {
         self.value.insert(self.idx, s.to_string());
         self.idx += 1;
+        get_cjk_width(&s.to_string())
     }
 
-    pub(crate) fn pop(&mut self) {
+    pub(crate) fn pop(&mut self) -> usize {
         if self.idx > 0 {
-            self.value.remove(self.idx - 1);
+            let popped = self.value.remove(self.idx - 1);
             self.idx -= 1;
+            return get_cjk_width(&popped);
         }
+        0
     }
 
-    pub(crate) fn move_left(&mut self) {
+    pub(crate) fn move_left(&mut self) -> usize {
         if self.idx > 0 {
+            let char_before_move = self
+                .value
+                .get(self.idx - 1)
+                .expect("Unexpected out of bounds");
             self.idx -= 1;
+            return get_cjk_width(char_before_move);
         }
+        0
     }
 
-    pub(crate) fn move_right(&mut self) {
+    pub(crate) fn move_right(&mut self) -> usize {
         if self.idx < self.value.len() {
             self.idx += 1;
+            let char_after_move = self
+                .value
+                .get(self.idx - 1)
+                .expect("Unexpected out of bounds");
+            return get_cjk_width(char_after_move);
         }
+        0
     }
 }
 
@@ -50,6 +66,14 @@ impl fmt::Display for Query {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         fmt::Display::fmt(self.value.join("").as_str(), f)
     }
+}
+
+fn get_cjk_width(s: &str) -> usize {
+    return if s.width_cjk() == 1 {
+        1
+    } else {
+        2 // 2 is the width of a CJK character. Some unicode emojis have more than 2 width, but most terminal handle such characters as 2 width.
+    };
 }
 
 #[cfg(test)]
@@ -62,45 +86,49 @@ mod tests {
         assert_eq!(query.value, vec!["👩‍🔬", "!"]);
         assert_eq!(query.idx, 2);
 
-        query.push("💇‍♂️");
-        query.push("a");
-        query.push("b");
+        assert_eq!(query.push("💇‍♂️"), 2);
+        assert_eq!(query.push("a"), 1);
+        assert_eq!(query.push("b"), 1);
         assert_eq!(query.value, vec!["👩‍🔬", "!", "💇‍♂️", "a", "b"]);
         assert_eq!(query.idx, 5);
 
-        query.pop();
+        assert_eq!(query.pop(), 1);
         assert_eq!(query.value, vec!["👩‍🔬", "!", "💇‍♂️", "a"]);
         assert_eq!(query.idx, 4);
 
-        query.move_left();
+        assert_eq!(query.move_left(), 1);
         assert_eq!(query.idx, 3);
 
-        query.pop();
+        assert_eq!(query.pop(), 2);
         assert_eq!(query.value, vec!["👩‍🔬", "!", "a"]);
         assert_eq!(query.idx, 2);
 
-        query.move_right();
-        query.move_right();
-        query.move_right();
+        assert_eq!(query.move_left(), 1);
+        assert_eq!(query.move_left(), 2);
+        assert_eq!(query.move_right(), 2);
+        assert_eq!(query.move_right(), 1);
+        assert_eq!(query.move_right(), 1);
+        assert_eq!(query.move_right(), 0);
+        assert_eq!(query.move_right(), 0);
         assert_eq!(query.idx, 3);
 
-        query.push("?");
+        assert_eq!(query.push("?"), 1);
         assert_eq!(query.value, vec!["👩‍🔬", "!", "a", "?"]);
         assert_eq!(query.idx, 4);
 
-        query.move_left();
-        query.move_left();
-        query.move_left();
-        query.move_left();
-        query.move_left();
-        query.move_left();
+        assert_eq!(query.move_left(), 1);
+        assert_eq!(query.move_left(), 1);
+        assert_eq!(query.move_left(), 1);
+        assert_eq!(query.move_left(), 2);
+        assert_eq!(query.move_left(), 0);
+        assert_eq!(query.move_left(), 0);
         assert_eq!(query.idx, 0);
 
-        query.pop();
+        assert_eq!(query.pop(), 0);
         assert_eq!(query.value, vec!["👩‍🔬", "!", "a", "?"]);
         assert_eq!(query.idx, 0);
 
-        query.push("😇");
+        assert_eq!(query.push("😇"), 2);
         assert_eq!(query.value, vec!["😇", "👩‍🔬", "!", "a", "?"]);
         assert_eq!(query.idx, 1);
     }
