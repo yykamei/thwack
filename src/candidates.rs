@@ -47,6 +47,13 @@ impl Candidates {
         &self.paths[..min(self.visible_paths_length, self.paths.len())]
     }
 
+    pub(crate) fn selected(&self) -> Option<&MatchedPath> {
+        if let Some(selected) = self.selected {
+            return self.paths.get(selected);
+        }
+        None
+    }
+
     pub(crate) fn move_down(&mut self) {
         let limit = min(self.visible_paths_length, self.paths.len());
         if limit == 0 {
@@ -289,5 +296,25 @@ mod tests {
         assert_eq!(candidates.selected, None);
         candidates.move_up();
         assert_eq!(candidates.selected, None);
+    }
+
+    #[test]
+    fn test_selected() {
+        let dir = create_tree().unwrap();
+        let starting_point = StartingPoint::new(dir.path()).unwrap();
+        let query = Query::new("");
+        let repo = Repository::open(dir.path()).unwrap();
+        let mut candidates = Candidates::new(&starting_point, &query, Some(&repo)).unwrap();
+        candidates.visible_paths_length(3);
+        assert_eq!(candidates.selected(), None);
+
+        candidates.move_down();
+        assert_eq!(candidates.selected().unwrap().relative(), ".browserslistrc");
+
+        candidates.move_down();
+        assert_eq!(candidates.selected().unwrap().relative(), ".config/bar.toml");
+
+        candidates.move_up();
+        assert_eq!(candidates.selected().unwrap().relative(), ".browserslistrc");
     }
 }
