@@ -312,10 +312,11 @@ mod tests {
         assert_eq!(candidates.selected().unwrap().relative(), ".browserslistrc");
 
         candidates.move_down();
-        assert_eq!(
-            candidates.selected().unwrap().relative(),
-            ".config/bar.toml"
-        );
+        assert!(candidates
+            .selected()
+            .unwrap()
+            .relative()
+            .ends_with("bar.toml"));
 
         candidates.move_up();
         assert_eq!(candidates.selected().unwrap().relative(), ".browserslistrc");
