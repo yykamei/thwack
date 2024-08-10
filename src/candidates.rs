@@ -38,10 +38,9 @@ impl Candidates {
         })
     }
 
-    pub(crate) fn visible_paths_length(mut self, length: usize) -> Self {
+    pub(crate) fn visible_paths_length(&mut self, length: usize) {
         self.visible_paths_length = length;
         self.selected = None;
-        self
     }
 
     pub(crate) fn take(&self) -> &[MatchedPath] {
@@ -121,7 +120,7 @@ fn git_ignore(repo: Option<&Repository>, path: &PathBuf) -> bool {
 
 #[cfg(test)]
 mod tests {
-    use std::fs::{create_dir_all, File};
+    use std::fs::{canonicalize, create_dir_all, File};
     use std::io;
     use std::io::Write;
 
@@ -190,9 +189,9 @@ mod tests {
         let starting_point = StartingPoint::new(dir.path()).unwrap();
         let query = Query::new("");
         let repo = Repository::open(dir.path()).unwrap();
-        let candidates = Candidates::new(&starting_point, &query, Some(&repo)).unwrap();
+        let mut candidates = Candidates::new(&starting_point, &query, Some(&repo)).unwrap();
+        candidates.visible_paths_length(3);
         let result: Vec<String> = candidates
-            .visible_paths_length(3)
             .take()
             .iter()
             .map(|p| p.relative())
@@ -210,9 +209,9 @@ mod tests {
         let starting_point = StartingPoint::new(dir.path()).unwrap();
         let query = Query::new("bar");
         let repo = Repository::open(dir.path()).unwrap();
-        let candidates = Candidates::new(&starting_point, &query, Some(&repo)).unwrap();
+        let mut candidates = Candidates::new(&starting_point, &query, Some(&repo)).unwrap();
+        candidates.visible_paths_length(5);
         let result: Vec<String> = candidates
-            .visible_paths_length(5)
             .take()
             .iter()
             .map(|p| p.relative())
@@ -226,9 +225,9 @@ mod tests {
         let dir = create_tree().unwrap();
         let starting_point = StartingPoint::new(dir.path()).unwrap();
         let query = Query::new("");
-        let candidates = Candidates::new(&starting_point, &query, None).unwrap();
+        let mut candidates = Candidates::new(&starting_point, &query, None).unwrap();
+        candidates.visible_paths_length(100);
         let result: Vec<String> = candidates
-            .visible_paths_length(100)
             .take()
             .iter()
             .map(|p| p.relative())
@@ -244,9 +243,8 @@ mod tests {
         let starting_point = StartingPoint::new(dir.path()).unwrap();
         let query = Query::new("");
         let repo = Repository::open(dir.path()).unwrap();
-        let mut candidates = Candidates::new(&starting_point, &query, Some(&repo))
-            .unwrap()
-            .visible_paths_length(3);
+        let mut candidates = Candidates::new(&starting_point, &query, Some(&repo)).unwrap();
+        candidates.visible_paths_length(3);
         assert_eq!(candidates.selected, None);
         candidates.move_down();
         assert_eq!(candidates.selected, Some(0));
@@ -257,7 +255,7 @@ mod tests {
         candidates.move_down();
         assert_eq!(candidates.selected, Some(2));
 
-        let mut candidates = candidates.visible_paths_length(0);
+        candidates.visible_paths_length(0);
         candidates.move_down();
         assert_eq!(candidates.selected, None);
         candidates.move_down();
@@ -270,9 +268,8 @@ mod tests {
         let starting_point = StartingPoint::new(dir.path()).unwrap();
         let query = Query::new("");
         let repo = Repository::open(dir.path()).unwrap();
-        let mut candidates = Candidates::new(&starting_point, &query, Some(&repo))
-            .unwrap()
-            .visible_paths_length(3);
+        let mut candidates = Candidates::new(&starting_point, &query, Some(&repo)).unwrap();
+        candidates.visible_paths_length(3);
         assert_eq!(candidates.selected, None);
         candidates.move_up();
         assert_eq!(candidates.selected, None);
@@ -287,7 +284,7 @@ mod tests {
         candidates.move_up();
         assert_eq!(candidates.selected, Some(0));
 
-        let mut candidates = candidates.visible_paths_length(0);
+        candidates.visible_paths_length(0);
         candidates.move_up();
         assert_eq!(candidates.selected, None);
         candidates.move_up();
