@@ -31,10 +31,9 @@ impl Candidates {
         )?;
         paths.sort();
         paths.truncate(visible_paths_length);
-        Ok(Self {
-            paths,
-            selected: None,
-        })
+        let selected = if paths.is_empty() { None } else { Some(0) };
+
+        Ok(Self { paths, selected })
     }
 
     pub(crate) fn paths(&self) -> &[MatchedPath] {
