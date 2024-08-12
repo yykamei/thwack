@@ -127,7 +127,7 @@ fn git_ignore(repo: Option<&Repository>, path: &PathBuf) -> bool {
 
 #[cfg(test)]
 mod tests {
-    use std::fs::{canonicalize, create_dir_all, File};
+    use std::fs::{create_dir_all, File};
     use std::io;
     use std::io::Write;
 
