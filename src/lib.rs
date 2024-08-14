@@ -8,6 +8,7 @@ mod candidates;
 mod cli;
 mod error;
 mod finder;
+mod invoke;
 mod logger;
 mod matched_path;
 mod preferences;
