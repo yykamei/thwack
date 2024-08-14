@@ -37,6 +37,10 @@ impl Candidates {
         })
     }
 
+    pub(crate) fn paths(&self) -> &[MatchedPath] {
+        &self.paths
+    }
+
     pub(crate) fn selected(&self) -> Option<&MatchedPath> {
         if let Some(s) = self.selected {
             return self.paths.get(s);
@@ -304,5 +308,24 @@ mod tests {
 
         candidates.move_up();
         assert_eq!(candidates.selected().unwrap().relative(), ".browserslistrc");
+    }
+
+    #[test]
+    fn test_paths() {
+        let dir = create_tree().unwrap();
+        let starting_point = StartingPoint::new(dir.path()).unwrap();
+        let query = Query::new("");
+        let repo = Repository::open(dir.path()).unwrap();
+        let candidates = Candidates::new(3, &starting_point, &query, Some(&repo)).unwrap();
+        let result: Vec<String> = candidates
+            .paths()
+            .iter()
+            .map(|p| p.relative())
+            .map(|m| format!("{}", m).replace('\\', "/"))
+            .collect();
+        assert_eq!(
+            result,
+            &[".browserslistrc", ".config/bar.toml", ".config/ok.toml"]
+        );
     }
 }

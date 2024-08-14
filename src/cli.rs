@@ -19,6 +19,7 @@ use git2::Repository;
 use crate::args::{Args, HELP};
 use crate::error::Result;
 use crate::finder::Finder;
+use crate::invoke::{invoke, Libc};
 use crate::matched_path::MatchedPath;
 use crate::preferences::Preferences;
 use crate::query::Query;
@@ -262,7 +263,7 @@ impl<'a, W: Write, T: Terminal> Runner<'a, W, T> {
         self.finish_writing()?;
 
         if let State::Invoke(ref path) = self.state {
-            self.invoke(path.absolute())?;
+            invoke(&Libc, self.preferences, path.absolute())?;
         }
         Ok(())
     }
@@ -291,29 +292,6 @@ impl<'a, W: Write, T: Terminal> Runner<'a, W, T> {
             StatusLine::None => row.into() - 2,
             _ => row.into() - 3,
         }
-    }
-
-    /// Invoke the specified command with the selected path.
-    fn invoke(&self, path: &str) -> Result<()> {
-        // TODO: This function is not tested because execvp(3) replaces the current process with a new process, which means tests will stop.
-
-        let mut cstrings: Vec<CString> = Vec::with_capacity(10); // TODO: Why is it 10?
-        for arg in self.preferences.exec.split_whitespace() {
-            cstrings.push(CString::new(arg)?);
-        }
-        cstrings.push(CString::new(path)?);
-        let argv: Vec<*const c_char> = cstrings
-            .iter()
-            .map(|c| c.as_ptr())
-            .chain(std::iter::once(ptr::null()))
-            .collect();
-
-        let errno = unsafe { libc::execvp(cstrings[0].as_ptr(), argv.as_ptr()) };
-
-        Err(Error::exec(&format!(
-            "`{} {}` failed and returned {}",
-            self.preferences.exec, path, errno
-        )))
     }
 
     fn max_path_width(&self) -> usize {
