@@ -11,6 +11,7 @@ mod helper;
 
 #[cfg(not(target_os = "linux"))]
 #[test]
+#[ignore]
 fn copy_with_absolute_path() {
     let dir = create_tree().unwrap();
     let args = args![

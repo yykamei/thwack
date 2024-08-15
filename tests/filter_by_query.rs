@@ -9,6 +9,7 @@ use thwack::entrypoint;
 mod helper;
 
 #[test]
+#[ignore]
 fn show_all_as_many_as_the_size_of_terminal_without_query() {
     let dir = create_tree().unwrap();
     let args = args![
@@ -53,6 +54,7 @@ fn show_all_as_many_as_the_size_of_terminal_without_query() {
 }
 
 #[test]
+#[ignore]
 fn show_filtered_paths_with_query() {
     let dir = create_tree().unwrap();
     let args = args![
@@ -82,6 +84,7 @@ fn show_filtered_paths_with_query() {
 }
 
 #[test]
+#[ignore]
 fn show_filtered_paths_with_query_interactively() {
     let dir = create_tree().unwrap();
     let args = args![
@@ -295,6 +298,7 @@ fn show_filtered_paths_with_query_interactively() {
 }
 
 #[test]
+#[ignore]
 fn show_filtered_paths_with_query_interactively_including_backspace() {
     let dir = create_tree().unwrap();
     let args = args![

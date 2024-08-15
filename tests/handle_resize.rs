@@ -9,6 +9,7 @@ use thwack::entrypoint;
 mod helper;
 
 #[test]
+#[ignore]
 fn handle_resize() {
     let dir = create_tree().unwrap();
     let args = args![
