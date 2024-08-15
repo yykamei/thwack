@@ -13,6 +13,7 @@ mod logger;
 mod matched_path;
 mod preferences;
 mod query;
+mod screen;
 mod starting_point;
 mod status_line;
 mod terminal;

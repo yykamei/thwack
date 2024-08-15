@@ -31,10 +31,9 @@ impl Candidates {
         )?;
         paths.sort();
         paths.truncate(visible_paths_length);
-        Ok(Self {
-            paths,
-            selected: None,
-        })
+        let selected = if paths.is_empty() { None } else { Some(0) };
+
+        Ok(Self { paths, selected })
     }
 
     pub(crate) fn paths(&self) -> &[MatchedPath] {
@@ -242,11 +241,11 @@ mod tests {
         let query = Query::new("");
         let repo = Repository::open(dir.path()).unwrap();
         let mut candidates = Candidates::new(3, &starting_point, &query, Some(&repo)).unwrap();
-        assert_eq!(candidates.selected, None);
-        candidates.move_down();
         assert_eq!(candidates.selected, Some(0));
         candidates.move_down();
         assert_eq!(candidates.selected, Some(1));
+        candidates.move_down();
+        assert_eq!(candidates.selected, Some(2));
         candidates.move_down();
         assert_eq!(candidates.selected, Some(2));
         candidates.move_down();
@@ -266,9 +265,9 @@ mod tests {
         let query = Query::new("");
         let repo = Repository::open(dir.path()).unwrap();
         let mut candidates = Candidates::new(3, &starting_point, &query, Some(&repo)).unwrap();
-        assert_eq!(candidates.selected, None);
+        assert_eq!(candidates.selected, Some(0));
         candidates.move_up();
-        assert_eq!(candidates.selected, None);
+        assert_eq!(candidates.selected, Some(0));
         candidates.move_down();
         candidates.move_down();
         candidates.move_down();
@@ -294,9 +293,6 @@ mod tests {
         let query = Query::new("");
         let repo = Repository::open(dir.path()).unwrap();
         let mut candidates = Candidates::new(3, &starting_point, &query, Some(&repo)).unwrap();
-        assert_eq!(candidates.selected(), None);
-
-        candidates.move_down();
         assert_eq!(candidates.selected().unwrap().relative(), ".browserslistrc");
 
         candidates.move_down();
@@ -306,8 +302,30 @@ mod tests {
             .relative()
             .ends_with("bar.toml"));
 
+        candidates.move_down();
+        assert!(candidates
+            .selected()
+            .unwrap()
+            .relative()
+            .ends_with("ok.toml"));
+
+        candidates.move_up();
         candidates.move_up();
         assert_eq!(candidates.selected().unwrap().relative(), ".browserslistrc");
+    }
+
+    #[test]
+    fn test_selected_none_at_started() {
+        let dir = create_tree().unwrap();
+        let starting_point = StartingPoint::new(dir.path()).unwrap();
+        let query = Query::new("ABCABC!!!!!!!!!");
+        let mut candidates = Candidates::new(3, &starting_point, &query, None).unwrap();
+        assert_eq!(candidates.selected(), None);
+
+        candidates.move_down();
+        assert_eq!(candidates.selected(), None);
+
+        candidates.move_down();
     }
 
     #[test]

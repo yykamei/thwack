@@ -1,9 +1,8 @@
-use std::ffi::{CString, OsString};
+use std::env;
+use std::ffi::OsString;
 use std::io::{self, Stderr, Stdout, Write};
-use std::os::raw::c_char;
 use std::process::exit;
 use std::time::Duration;
-use std::{env, ptr};
 
 use copypasta::{ClipboardContext, ClipboardProvider};
 use crossterm::event::{KeyEventKind, KeyEventState};
@@ -23,6 +22,7 @@ use crate::invoke::{invoke, Libc};
 use crate::matched_path::MatchedPath;
 use crate::preferences::Preferences;
 use crate::query::Query;
+use crate::screen::Screen;
 use crate::starting_point::StartingPoint;
 use crate::status_line::StatusLine;
 use crate::terminal::Terminal;

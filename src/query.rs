@@ -8,6 +8,7 @@ use unicode_width::UnicodeWidthStr;
 pub(crate) struct Query {
     value: Vec<String>,
     idx: usize,
+    pub(crate) terminal_pos: usize,
 }
 
 impl Query {
@@ -18,21 +19,30 @@ impl Query {
             .map(|s| s.to_string())
             .collect();
         let idx = value.len();
+        let terminal_pos = value.iter().map(|s| get_cjk_width(s)).sum();
 
-        Self { value, idx }
+        Self {
+            value,
+            idx,
+            terminal_pos: terminal_pos,
+        }
     }
 
     pub(crate) fn push<S: ToString>(&mut self, s: S) -> usize {
         self.value.insert(self.idx, s.to_string());
         self.idx += 1;
-        get_cjk_width(&s.to_string())
+        let d = get_cjk_width(&s.to_string());
+        self.terminal_pos += d;
+        d
     }
 
     pub(crate) fn pop(&mut self) -> usize {
         if self.idx > 0 {
             let popped = self.value.remove(self.idx - 1);
             self.idx -= 1;
-            return get_cjk_width(&popped);
+            let d = get_cjk_width(&popped);
+            self.terminal_pos -= d;
+            return d;
         }
         0
     }
@@ -44,7 +54,9 @@ impl Query {
                 .get(self.idx - 1)
                 .expect("Unexpected out of bounds");
             self.idx -= 1;
-            return get_cjk_width(char_before_move);
+            let d = get_cjk_width(char_before_move);
+            self.terminal_pos -= d;
+            return d;
         }
         0
     }
@@ -56,7 +68,9 @@ impl Query {
                 .value
                 .get(self.idx - 1)
                 .expect("Unexpected out of bounds");
-            return get_cjk_width(char_after_move);
+            let d = get_cjk_width(char_after_move);
+            self.terminal_pos += d;
+            return d;
         }
         0
     }
@@ -89,23 +103,28 @@ mod tests {
         let mut query = Query::new("👩‍🔬!");
         assert_eq!(query.value, vec!["👩‍🔬", "!"]);
         assert_eq!(query.idx, 2);
+        assert_eq!(query.terminal_pos, 3);
 
         assert_eq!(query.push("💇‍♂️"), 2);
         assert_eq!(query.push("a"), 1);
         assert_eq!(query.push("b"), 1);
         assert_eq!(query.value, vec!["👩‍🔬", "!", "💇‍♂️", "a", "b"]);
         assert_eq!(query.idx, 5);
+        assert_eq!(query.terminal_pos, 7);
 
         assert_eq!(query.pop(), 1);
         assert_eq!(query.value, vec!["👩‍🔬", "!", "💇‍♂️", "a"]);
         assert_eq!(query.idx, 4);
+        assert_eq!(query.terminal_pos, 6);
 
         assert_eq!(query.move_left(), 1);
         assert_eq!(query.idx, 3);
+        assert_eq!(query.terminal_pos, 5);
 
         assert_eq!(query.pop(), 2);
         assert_eq!(query.value, vec!["👩‍🔬", "!", "a"]);
         assert_eq!(query.idx, 2);
+        assert_eq!(query.terminal_pos, 3);
 
         assert_eq!(query.move_left(), 1);
         assert_eq!(query.move_left(), 2);
@@ -115,10 +134,12 @@ mod tests {
         assert_eq!(query.move_right(), 0);
         assert_eq!(query.move_right(), 0);
         assert_eq!(query.idx, 3);
+        assert_eq!(query.terminal_pos, 4);
 
         assert_eq!(query.push("?"), 1);
         assert_eq!(query.value, vec!["👩‍🔬", "!", "a", "?"]);
         assert_eq!(query.idx, 4);
+        assert_eq!(query.terminal_pos, 5);
 
         assert_eq!(query.move_left(), 1);
         assert_eq!(query.move_left(), 1);
@@ -127,14 +148,17 @@ mod tests {
         assert_eq!(query.move_left(), 0);
         assert_eq!(query.move_left(), 0);
         assert_eq!(query.idx, 0);
+        assert_eq!(query.terminal_pos, 0);
 
         assert_eq!(query.pop(), 0);
         assert_eq!(query.value, vec!["👩‍🔬", "!", "a", "?"]);
         assert_eq!(query.idx, 0);
+        assert_eq!(query.terminal_pos, 0);
 
         assert_eq!(query.push("😇"), 2);
         assert_eq!(query.value, vec!["😇", "👩‍🔬", "!", "a", "?"]);
         assert_eq!(query.idx, 1);
+        assert_eq!(query.terminal_pos, 2);
     }
 
     #[test]
@@ -145,6 +169,7 @@ mod tests {
             vec!["S", "u", "p", "e", "r", " ", "c", "o", "o", "l", " ", "q", "u", "e", "r", "y"]
         );
         assert_eq!(query.idx, 16);
+        assert_eq!(query.terminal_pos, 16);
         assert_eq!(query.to_string(), "Super cool query");
     }
 
