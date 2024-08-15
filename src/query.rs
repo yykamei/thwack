@@ -74,10 +74,6 @@ impl Query {
         }
         0
     }
-
-    pub(crate) fn len(&self) -> usize {
-        self.value.len()
-    }
 }
 
 impl fmt::Display for Query {
@@ -171,11 +167,5 @@ mod tests {
         assert_eq!(query.idx, 16);
         assert_eq!(query.terminal_pos, 16);
         assert_eq!(query.to_string(), "Super cool query");
-    }
-
-    #[test]
-    fn test_len() {
-        let query = Query::new("😇👩‍🔬");
-        assert_eq!(query.len(), 2);
     }
 }

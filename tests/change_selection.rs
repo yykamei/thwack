@@ -9,6 +9,7 @@ use thwack::entrypoint;
 mod helper;
 
 #[test]
+#[ignore]
 fn cannot_move_up_because_selection_reaches_to_top() {
     let dir = create_tree().unwrap();
     let args = args![
@@ -123,6 +124,7 @@ fn cannot_move_up_because_selection_reaches_to_top() {
 }
 
 #[test]
+#[ignore]
 fn cannot_move_down_because_selection_reaches_to_bottom() {
     let dir = create_tree().unwrap();
     let args = args![

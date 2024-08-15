@@ -448,7 +448,7 @@ impl From<Event> for ThwackEvent {
 mod tests {
     use std::ascii::escape_default;
     use std::collections::VecDeque;
-    use std::fmt::{Debug, Display, Formatter};
+    use std::fmt::{Debug, Formatter};
     use std::io;
     use std::str::from_utf8;
     use std::sync::{Arc, Mutex};
