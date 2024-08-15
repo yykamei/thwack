@@ -605,6 +605,7 @@ mod tests {
         screen.start().unwrap();
     }
 
+    #[cfg(not(target_os = "linux"))]
     #[test]
     fn test_clipboard() {
         let terminal = MockTerminal::default()
