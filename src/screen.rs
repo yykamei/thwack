@@ -91,6 +91,28 @@ macro_rules! down {
     };
 }
 
+macro_rules! left {
+    () => {
+        KeyEvent {
+            code: KeyCode::Left,
+            modifiers: _,
+            kind: KeyEventKind::Press,
+            state: _,
+        }
+    };
+}
+
+macro_rules! right {
+    () => {
+        KeyEvent {
+            code: KeyCode::Right,
+            modifiers: _,
+            kind: KeyEventKind::Press,
+            state: _,
+        }
+    };
+}
+
 macro_rules! enter {
     () => {
         KeyEvent {
@@ -215,6 +237,14 @@ impl<'a, T: Terminal, W: Write> Screen<'a, T, W> {
                 }
                 ThwackEvent::Down => {
                     self.candidates.move_down();
+                    self.render()?;
+                }
+                ThwackEvent::Left => {
+                    self.query.move_left();
+                    self.render()?;
+                }
+                ThwackEvent::Right => {
+                    self.query.move_right();
                     self.render()?;
                 }
                 ThwackEvent::Invoke => {
@@ -417,6 +447,8 @@ enum ThwackEvent {
     QueryPop,
     Up,
     Down,
+    Left,
+    Right,
     Invoke,
     CopyAbsolutePath,
     CopyRelativePath,
@@ -433,6 +465,8 @@ impl From<Event> for ThwackEvent {
                 backspace!() => ThwackEvent::QueryPop,
                 up!() | ctrl!('p') => ThwackEvent::Up,
                 down!() | ctrl!('n') => ThwackEvent::Down,
+                left!() => ThwackEvent::Left,
+                right!() => ThwackEvent::Right,
                 enter!() => ThwackEvent::Invoke,
                 ctrl!('y') => ThwackEvent::CopyAbsolutePath,
                 ctrl!('d') => ThwackEvent::CopyRelativePath,
@@ -543,6 +577,19 @@ mod tests {
             .add_event(Event::Key(char!('b')))
             .add_event(Event::Key(char!('c')))
             .add_event(Event::Key(char!('😇')))
+            .add_event(Event::Key(KeyCode::Left.into()))
+            .add_event(Event::Key(KeyCode::Left.into()))
+            .add_event(Event::Key(KeyCode::Left.into()))
+            .add_event(Event::Key(KeyCode::Left.into()))
+            .add_event(Event::Key(KeyCode::Left.into()))
+            .add_event(Event::Key(KeyCode::Left.into()))
+            .add_event(Event::Key(KeyCode::Right.into()))
+            .add_event(Event::Key(KeyCode::Right.into()))
+            .add_event(Event::Key(KeyCode::Right.into()))
+            .add_event(Event::Key(KeyCode::Right.into()))
+            .add_event(Event::Key(KeyCode::Right.into()))
+            .add_event(Event::Key(KeyCode::Right.into()))
+            .add_event(Event::Key(KeyCode::Right.into()))
             .add_event(Event::Key(KeyCode::Backspace.into()))
             .add_event(Event::Key(KeyCode::Backspace.into()))
             .add_event(Event::Key(KeyCode::Backspace.into()))
