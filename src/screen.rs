@@ -221,7 +221,9 @@ impl<'a, T: Terminal, W: Write> Screen<'a, T, W> {
                     let path: Option<String> = match self.candidates.selected() {
                         None => None,
                         Some(p) => match self.preferences.status_line {
-                            StatusLine::None | StatusLine::Absolute => Some(p.absolute().to_string()),
+                            StatusLine::None | StatusLine::Absolute => {
+                                Some(p.absolute().to_string())
+                            }
                             StatusLine::Relative => Some(p.relative().to_string()),
                         },
                     };

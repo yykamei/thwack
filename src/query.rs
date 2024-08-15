@@ -21,7 +21,11 @@ impl Query {
         let idx = value.len();
         let terminal_pos = value.iter().map(|s| get_cjk_width(s)).sum();
 
-        Self { value, idx, terminal_pos: terminal_pos }
+        Self {
+            value,
+            idx,
+            terminal_pos: terminal_pos,
+        }
     }
 
     pub(crate) fn push<S: ToString>(&mut self, s: S) -> usize {
