@@ -604,4 +604,20 @@ mod tests {
         let mut screen = Screen::new(&preferences, &terminal, &mut buffer).unwrap();
         screen.start().unwrap();
     }
+
+    #[test]
+    fn test_clipboard() {
+        let terminal = MockTerminal::default()
+            .size(98, 20)
+            .add_event(Event::Key(ctrl!('d')))
+            .add_event(Event::Key(KeyCode::Esc.into()));
+        let mut preferences = Preferences::default();
+        preferences.query = "README.md".to_string();
+        let mut buffer = Buffer::new();
+        let mut screen = Screen::new(&preferences, &terminal, &mut buffer).unwrap();
+        screen.start().unwrap();
+
+        let mut ctx = ClipboardContext::new().unwrap();
+        assert_eq!(ctx.get_contents().unwrap(), "README.md");
+    }
 }
