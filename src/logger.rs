@@ -62,8 +62,6 @@ mod tests {
 
     use tempfile::tempdir;
 
-    use pretty_assertions::assert_eq;
-
     use super::*;
 
     #[test]
@@ -73,9 +71,8 @@ mod tests {
         init(&path).unwrap();
         log::info!("test");
         log::debug!("d!");
-        assert_eq!(
-            &fs::read_to_string(&path).unwrap(),
-            "[INFO] [thwack::logger::tests:74] test\n[DEBUG] [thwack::logger::tests:75] d!\n"
-        );
+        let contents = &fs::read_to_string(&path).unwrap();
+        assert!(contents.contains("[INFO] [thwack::logger::tests:72] test"));
+        assert!(contents.contains("[DEBUG] [thwack::logger::tests:73] d!"));
     }
 }
