@@ -462,7 +462,7 @@ impl From<Event> for ThwackEvent {
             Event::Key(event) => match event {
                 ctrl!('c') | esc!() => ThwackEvent::Quit,
                 char!(c) => ThwackEvent::QueryPush(c),
-                backspace!() => ThwackEvent::QueryPop,
+                backspace!() | ctrl!('h') => ThwackEvent::QueryPop,
                 up!() | ctrl!('p') => ThwackEvent::Up,
                 down!() | ctrl!('n') => ThwackEvent::Down,
                 left!() => ThwackEvent::Left,
@@ -593,6 +593,7 @@ mod tests {
             .add_event(Event::Key(KeyCode::Backspace.into()))
             .add_event(Event::Key(KeyCode::Backspace.into()))
             .add_event(Event::Key(KeyCode::Backspace.into()))
+            .add_event(Event::Key(ctrl!('h')))
             .add_event(Event::Key(KeyCode::Up.into()))
             .add_event(Event::Key(KeyCode::Up.into()))
             .add_event(Event::Key(KeyCode::Down.into()))
