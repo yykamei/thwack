@@ -16,3 +16,4 @@ mod screen;
 mod starting_point;
 mod status_line;
 mod terminal;
+mod tree;
