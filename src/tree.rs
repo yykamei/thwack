@@ -60,7 +60,7 @@ fn git_ignore(repo: Option<&Repository>, path: &PathBuf) -> bool {
 }
 
 #[cfg(test)]
-mod tests {
+pub mod tests {
     use super::*;
     use git2::Signature;
     use std::fs::create_dir_all;
@@ -69,7 +69,7 @@ mod tests {
     use std::io::Write;
     use tempfile::{tempdir, TempDir};
 
-    fn create_tree() -> io::Result<TempDir> {
+    pub fn create_files(with_git: bool) -> io::Result<TempDir> {
         let tmp = tempdir()?;
         create_dir_all(tmp.path().join("src/a/b/c"))?;
         create_dir_all(tmp.path().join("lib/a/b/c"))?;
@@ -105,13 +105,13 @@ mod tests {
         let _ = File::create(tmp.path().join("tsconfig.json"))?;
         let _ = File::create(tmp.path().join("☕.txt"))?;
         // Prepare the Git repository
-        let repo = Repository::init(tmp.path()).unwrap();
-        let signature = Signature::now("test", "test@example.com").unwrap();
-        let tree = repo
-            .find_tree(repo.index().unwrap().write_tree().unwrap())
-            .unwrap();
-        let _ = repo
-            .commit(
+        if with_git {
+            let repo = Repository::init(tmp.path()).unwrap();
+            let signature = Signature::now("test", "test@example.com").unwrap();
+            let tree = repo
+                .find_tree(repo.index().unwrap().write_tree().unwrap())
+                .unwrap();
+            repo.commit(
                 Some("HEAD"),
                 &signature,
                 &signature,
@@ -120,12 +120,13 @@ mod tests {
                 &[],
             )
             .unwrap();
+        }
         Ok(tmp)
     }
 
     #[test]
     fn new() {
-        let dir = create_tree().unwrap();
+        let dir = create_files(true).unwrap();
         let repo = Repository::open(dir.path()).unwrap();
         let tree = Tree::new(dir.path(), Some(&repo)).unwrap();
         for path in tree.iter() {
