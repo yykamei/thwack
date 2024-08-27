@@ -16,6 +16,7 @@ use crate::preferences::Preferences;
 use crate::query::Query;
 use crate::starting_point::StartingPoint;
 use crate::status_line::StatusLine;
+use crate::tree::Tree;
 use crate::{Error, Terminal};
 
 macro_rules! ctrl {
@@ -129,6 +130,7 @@ pub(crate) struct Screen<'a, T: Terminal, W: Write> {
     query: Query,
     starting_point: StartingPoint,
     repo: Option<Repository>,
+    tree: Tree,
     candidates: Candidates,
     clipboard: Option<ClipboardContext>,
     terminal: &'a T,
@@ -158,7 +160,8 @@ impl<'a, T: Terminal, W: Write> Screen<'a, T, W> {
         } else {
             None
         };
-        let candidates = Candidates::new(visible, &starting_point, &query, repo.as_ref())?;
+        let tree = Tree::new(starting_point.as_ref(), repo.as_ref())?;
+        let candidates = Candidates::new(visible, &starting_point, &tree, &query)?;
         let clipboard = match ClipboardContext::new().map_err(|e| Error::clipboard(e)) {
             Ok(c) => Some(c),
             Err(e) => {
@@ -172,6 +175,7 @@ impl<'a, T: Terminal, W: Write> Screen<'a, T, W> {
             query,
             starting_point,
             repo,
+            tree,
             candidates,
             clipboard,
             terminal,
@@ -216,8 +220,8 @@ impl<'a, T: Terminal, W: Write> Screen<'a, T, W> {
                     self.candidates = Candidates::new(
                         visible_paths_length(self.terminal, &self.preferences)?,
                         &self.starting_point,
+                        &self.tree,
                         &self.query,
-                        self.repo.as_ref(),
                     )?;
                     self.render()?;
                 }
@@ -226,8 +230,8 @@ impl<'a, T: Terminal, W: Write> Screen<'a, T, W> {
                     self.candidates = Candidates::new(
                         visible_paths_length(self.terminal, &self.preferences)?,
                         &self.starting_point,
+                        &self.tree,
                         &self.query,
-                        self.repo.as_ref(),
                     )?;
                     self.render()?;
                 }
@@ -281,8 +285,8 @@ impl<'a, T: Terminal, W: Write> Screen<'a, T, W> {
                     self.candidates = Candidates::new(
                         visible_paths_length(self.terminal, &self.preferences)?,
                         &self.starting_point,
+                        &self.tree,
                         &self.query,
-                        self.repo.as_ref(),
                     )?;
                     self.render()?;
                 }
