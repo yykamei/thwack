@@ -33,10 +33,8 @@ fn extract_paths<P: AsRef<Path>>(
         }
         if path.is_dir() {
             extract_paths(paths, &path, repo)?;
-        } else {
-            if let Some(absolute) = path.to_str() {
-                paths.push(absolute.to_string());
-            }
+        } else if let Some(absolute) = path.to_str() {
+            paths.push(absolute.to_string());
         }
     }
     Ok(())

@@ -163,7 +163,7 @@ impl MatchLevel {
                 MatchLevel::Approximate
             };
         }
-        if query == relative || relative.contains(normalize_query(&format!("/{}", query))) {
+        if query == relative || relative.contains(&normalize_query(&format!("/{}", query))) {
             MatchLevel::Exact
         } else if relative.contains(&query) {
             MatchLevel::Partial
