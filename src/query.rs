@@ -24,7 +24,7 @@ impl Query {
         Self {
             value,
             idx,
-            terminal_pos: terminal_pos,
+            terminal_pos,
         }
     }
 
