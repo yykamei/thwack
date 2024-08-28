@@ -154,7 +154,7 @@ impl MatchLevel {
         }
 
         let query = query.to_lowercase();
-        let relative = relative.to_lowercase();
+        let relative = normalize_query(relative).to_lowercase();
 
         if query.starts_with(&['/', '\\'][..]) {
             return if relative.contains(&query) {
@@ -312,6 +312,17 @@ mod tests {
                 relative: String::from("abc/abc/abc.txt"),
                 absolute_positions: vec![9, 10, 11, 12, 13, 14, 15],
                 relative_positions: vec![8, 9, 10, 11, 12, 13, 14],
+                depth: 2,
+                level: MatchLevel::Exact,
+            },
+        );
+        assert_eq!(
+            new("/abc.txt", "/", "/abc/abc/abc.txt"),
+            MatchedPath {
+                absolute: String::from("/abc/abc/abc.txt"),
+                relative: String::from("abc/abc/abc.txt"),
+                absolute_positions: vec![8, 9, 10, 11, 12, 13, 14, 15],
+                relative_positions: vec![7, 8, 9, 10, 11, 12, 13, 14],
                 depth: 2,
                 level: MatchLevel::Exact,
             },
