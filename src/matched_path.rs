@@ -1,7 +1,6 @@
 use std::cmp::Ordering;
 use std::collections::VecDeque;
 use std::fmt::{self, Display, Formatter};
-
 use unicode_segmentation::UnicodeSegmentation;
 use unicode_width::UnicodeWidthStr;
 
@@ -16,6 +15,9 @@ pub(crate) struct MatchedPath {
     ///          because `starting_point` sometimes differs from the current working directory,
     ///          in which this program is run.
     relative: String,
+
+    /// *level* indicates the `MatchedPath` is exactly contained, partial contained, or approximately contained in the `relative`.
+    level: MatchLevel,
 
     /// *depth* is the number of path separator.
     depth: usize,
@@ -40,10 +42,12 @@ impl MatchedPath {
         let depth = depth_from(relative);
         let absolute_positions = positions_from(query, absolute)?;
         let relative_positions = positions_from(query, relative)?;
+        let level = MatchLevel::new(query, relative);
         Some(Self {
             absolute: absolute.to_string(),
             relative: relative.to_string(),
             depth,
+            level,
             absolute_positions,
             relative_positions,
         })
@@ -105,8 +109,14 @@ impl Display for MatchedPath {
 
 impl Ord for MatchedPath {
     fn cmp(&self, other: &Self) -> Ordering {
-        match self.distance().cmp(&other.distance()) {
-            Ordering::Equal => self.relative.cmp(&other.relative),
+        match self.level.cmp(&other.level) {
+            Ordering::Equal => match self.distance().cmp(&other.distance()) {
+                Ordering::Equal => match self.depth.cmp(&other.depth) {
+                    Ordering::Equal => self.relative.cmp(&other.relative),
+                    any => any,
+                },
+                any => any,
+            },
             any => any,
         }
     }
@@ -127,6 +137,39 @@ impl Chunk {
 impl Display for Chunk {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         Display::fmt(&self.value, f)
+    }
+}
+
+#[derive(Copy, Clone, Debug, PartialEq, PartialOrd, Eq, Ord)]
+enum MatchLevel {
+    Exact,
+    Partial,
+    Approximate,
+}
+
+impl MatchLevel {
+    fn new(query: &str, relative: &str) -> Self {
+        if query.is_empty() {
+            return MatchLevel::Approximate;
+        }
+
+        let query = query.to_lowercase();
+        let relative = relative.to_lowercase();
+
+        if query.starts_with(&['/', '\\'][..]) {
+            return if relative.contains(&query) {
+                MatchLevel::Exact
+            } else {
+                MatchLevel::Approximate
+            };
+        }
+        if query == relative || relative.contains(normalize_query(&format!("/{}", query))) {
+            MatchLevel::Exact
+        } else if relative.contains(&query) {
+            MatchLevel::Partial
+        } else {
+            MatchLevel::Approximate
+        }
     }
 }
 
@@ -270,6 +313,7 @@ mod tests {
                 absolute_positions: vec![9, 10, 11, 12, 13, 14, 15],
                 relative_positions: vec![8, 9, 10, 11, 12, 13, 14],
                 depth: 2,
+                level: MatchLevel::Exact,
             },
         );
         assert_eq!(
@@ -280,6 +324,7 @@ mod tests {
                 absolute_positions: vec![],
                 relative_positions: vec![],
                 depth: 2,
+                level: MatchLevel::Approximate,
             },
         );
         assert_eq!(
@@ -290,6 +335,7 @@ mod tests {
                 absolute_positions: vec![9, 10, 11],
                 relative_positions: vec![8, 9, 10],
                 depth: 2,
+                level: MatchLevel::Exact,
             },
         );
         assert_eq!(
@@ -304,6 +350,7 @@ mod tests {
                 absolute_positions: vec![20, 21, 28],
                 relative_positions: vec![7, 8, 15],
                 depth: 1,
+                level: MatchLevel::Approximate,
             },
         );
         assert_eq!(
@@ -314,6 +361,7 @@ mod tests {
                 absolute_positions: vec![8, 9, 10, 16, 22],
                 relative_positions: vec![0, 1, 2, 8, 14],
                 depth: 2,
+                level: MatchLevel::Approximate,
             },
         );
         assert_eq!(
@@ -324,6 +372,7 @@ mod tests {
                 absolute_positions: vec![6, 10, 13],
                 relative_positions: vec![5, 9, 12],
                 depth: 1,
+                level: MatchLevel::Approximate,
             },
         );
     }
@@ -633,8 +682,8 @@ mod tests {
             given,
             vec![
                 new("abc.txt", "/home", "/home/abc.txt"),
-                new("abc.txt", "/home", "/home/abc/src/abc.txt"),
                 new("abc.txt", "/home", "/home/src/abc.txt"),
+                new("abc.txt", "/home", "/home/abc/src/abc.txt"),
                 new("abc.txt", "/home", "/home/src/n1/n2/abc.txt"),
                 new("abc.txt", "/home", "/home/lib/abc!.txt"),
                 new("abc.txt", "/home", "/home/src/n1/n2/Foo-aXbc.txt"),
