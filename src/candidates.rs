@@ -90,10 +90,7 @@ mod tests {
             .map(|p| p.relative())
             .map(|m| format!("{}", m).replace('\\', "/"))
             .collect();
-        assert_eq!(
-            result,
-            &[".browserslistrc", ".config/bar.toml", ".config/ok.toml"]
-        );
+        assert_eq!(result, &[".browserslistrc", ".editorconfig", ".env"]);
     }
 
     #[test]
@@ -203,14 +200,10 @@ mod tests {
             .selected()
             .unwrap()
             .relative()
-            .ends_with("bar.toml"));
+            .ends_with(".editorconfig"));
 
         candidates.move_down();
-        assert!(candidates
-            .selected()
-            .unwrap()
-            .relative()
-            .ends_with("ok.toml"));
+        assert!(candidates.selected().unwrap().relative().ends_with(".env"));
 
         candidates.move_up();
         candidates.move_up();
@@ -248,9 +241,6 @@ mod tests {
             .map(|p| p.relative())
             .map(|m| format!("{}", m).replace('\\', "/"))
             .collect();
-        assert_eq!(
-            result,
-            &[".browserslistrc", ".config/bar.toml", ".config/ok.toml"]
-        );
+        assert_eq!(result, &[".browserslistrc", ".editorconfig", ".env"]);
     }
 }
