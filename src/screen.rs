@@ -290,6 +290,17 @@ impl<'a, T: Terminal, W: Write> Screen<'a, T, W> {
                     )?;
                     self.render()?;
                 }
+                ThwackEvent::Reload => {
+                    self.tree = Tree::new(self.starting_point.as_ref(), self.repo.as_ref())?;
+                    self.candidates = Candidates::new(
+                        visible_paths_length(self.terminal, &self.preferences)?,
+                        &self.starting_point,
+                        &self.tree,
+                        &self.query,
+                    )?;
+                    // TODO: Feedback to the user when the tree is reloaded.
+                    self.render()?;
+                }
                 ThwackEvent::None => {}
             }
         }
@@ -457,6 +468,7 @@ enum ThwackEvent {
     CopyAbsolutePath,
     CopyRelativePath,
     TerminalResize,
+    Reload,
     None,
 }
 
@@ -474,6 +486,7 @@ impl From<Event> for ThwackEvent {
                 enter!() => ThwackEvent::Invoke,
                 ctrl!('y') => ThwackEvent::CopyAbsolutePath,
                 ctrl!('d') => ThwackEvent::CopyRelativePath,
+                ctrl!('r') => ThwackEvent::Reload,
                 _ => ThwackEvent::None,
             },
             Event::Resize(_, _) => ThwackEvent::TerminalResize,
