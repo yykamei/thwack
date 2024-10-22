@@ -483,7 +483,7 @@ mod tests {
             new("👩‍🔬🗑", "C:\\", "C:\\Documents\\👩‍🔬\\🦑\\abcde\\🗑🌍.txt").absolute_chunks(24),
             vec![
                 Chunk {
-                    value: String::from("..."),
+                    value: String::from("...s\\"),
                     matched: false
                 },
                 Chunk {
@@ -635,7 +635,15 @@ mod tests {
             new("👩‍🔬☕", "C:\\", "C:\\Documents\\👩‍🔬\\🦑\\abcde\\☕🌍.txt").relative_chunks(24),
             vec![
                 Chunk {
-                    value: String::from("...\\🦑\\abcde\\"),
+                    value: String::from("...\\"),
+                    matched: false,
+                },
+                Chunk {
+                    value: String::from("👩‍🔬"),
+                    matched: true,
+                },
+                Chunk {
+                    value: String::from("\\🦑\\abcde\\"),
                     matched: false,
                 },
                 Chunk {
