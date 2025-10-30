@@ -210,7 +210,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "39cab71617ae0d63f51a36d69f866391735b51691dbda63cf6f96d042b63efeb"
 dependencies = [
  "libc",
- "windows-sys",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -494,14 +494,14 @@ dependencies = [
 
 [[package]]
 name = "mio"
-version = "1.0.4"
+version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "78bed444cc8a2160f01cbcf811ef18cac863ad68ae8ca62092e8db51d51c761c"
+checksum = "69d83b0086dc8ecf3ce9ae2874b2d1290252e2a30720bea58a5c6639b0092873"
 dependencies = [
  "libc",
  "log",
  "wasi",
- "windows-sys",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -662,7 +662,7 @@ dependencies = [
  "pin-project-lite",
  "rustix 0.38.44",
  "tracing",
- "windows-sys",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -736,7 +736,7 @@ dependencies = [
  "errno",
  "libc",
  "linux-raw-sys 0.4.15",
- "windows-sys",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -749,7 +749,7 @@ dependencies = [
  "errno",
  "libc",
  "linux-raw-sys 0.9.2",
- "windows-sys",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -916,7 +916,7 @@ dependencies = [
  "getrandom",
  "once_cell",
  "rustix 1.0.2",
- "windows-sys",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -1168,6 +1168,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1e38bc4d79ed67fd075bcc251a1c39b32a1776bbe92e5bef1f0bf1f8c531853b"
 dependencies = [
  "windows-targets",
+]
+
+[[package]]
+name = "windows-sys"
+version = "0.61.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ae137229bcbd6cdf0f7b80a31df61766145077ddf49416a728b02cb3921ff3fc"
+dependencies = [
+ "windows-link",
 ]
 
 [[package]]
