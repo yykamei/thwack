@@ -7,7 +7,7 @@ on:
         description: version. The next release version (without prefix v)
         required: true
       apply:
-        description: apply. Specify whether the atcual release should be performed or not
+        description: apply. Specify whether the actual release should be performed or not
         type: boolean
 permissions: {}
 jobs:
@@ -71,7 +71,7 @@ jobs:
         if: matrix.os != 'windows-latest'
         working-directory: target/${{ matrix.target }}/release
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 #v5.0.0
         with:
           name: Artifact-thwack-${{ matrix.target }}${{ matrix.suffix }}
           path: thwack-${{ matrix.target }}${{ matrix.suffix }}
@@ -82,7 +82,7 @@ jobs:
     steps:
       - run: sudo apt-get update --yes && sudo apt-get install --yes --no-install-recommends libx11-xcb-dev libxcb-shape0-dev libxcb-xfixes0-dev
 
-      - uses: actions/create-github-app-token@v1
+      - uses: actions/create-github-app-token@29824e69f54612133e76f7eaac726eef6c875baf # v2.2.1
         id: app-token
         with:
           app-id: ${{ vars.APP_ID }}
@@ -101,7 +101,7 @@ jobs:
           sed -i -e "s/^version = .*$/version = \"${{ inputs.version }}\"/" Cargo.toml
           cargo build
 
-      - uses: yykamei/actions-git-push@main
+      - uses: yykamei/actions-git-push@8ae8cff5a3dc70f40645250bd9e59e2979a2543c
         with:
           commit-message: Bump to ${{ inputs.version }}
         if: inputs.apply
@@ -114,7 +114,7 @@ jobs:
           VERSION: ${{ inputs.version }}
           APPLY: ${{ inputs.apply }}
 
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6.0.0
 
       - name: Calculate checksums
         run: |
