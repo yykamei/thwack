@@ -61,11 +61,11 @@ fn git_ignore(repo: Option<&Repository>, path: &PathBuf) -> bool {
 pub mod tests {
     use super::*;
     use git2::Signature;
-    use std::fs::create_dir_all;
     use std::fs::File;
+    use std::fs::create_dir_all;
     use std::io;
     use std::io::Write;
-    use tempfile::{tempdir, TempDir};
+    use tempfile::{TempDir, tempdir};
 
     pub fn create_files(with_git: bool) -> io::Result<TempDir> {
         let tmp = tempdir()?;

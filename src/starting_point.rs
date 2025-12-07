@@ -56,7 +56,10 @@ mod tests {
     fn new_fail_with_non_existent_dir() {
         let result = StartingPoint::new("non_existent_dir");
         assert!(result.is_err());
-        assert_eq!(format!("{}", result.unwrap_err()), "The specified starting point \"non_existent_dir\" cannot be normalized. Perhaps, it might not exist or cannot be read.");
+        assert_eq!(
+            format!("{}", result.unwrap_err()),
+            "The specified starting point \"non_existent_dir\" cannot be normalized. Perhaps, it might not exist or cannot be read."
+        );
     }
 
     #[test]
