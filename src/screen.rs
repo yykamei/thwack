@@ -11,7 +11,7 @@ use log::{debug, info, trace, warn};
 
 use crate::candidates::Candidates;
 use crate::error::Result;
-use crate::invoke::{invoke, Libc};
+use crate::invoke::{Libc, invoke};
 use crate::preferences::Preferences;
 use crate::query::Query;
 use crate::starting_point::StartingPoint;

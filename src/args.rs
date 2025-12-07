@@ -517,7 +517,9 @@ mod tests {
                 .parse()
                 .unwrap_err()
                 .message,
-            format!("The argument of \"--status-line\" must be one of \"absolute\", \"relative\", or \"none\": \"unknown\" was given."),
+            format!(
+                "The argument of \"--status-line\" must be one of \"absolute\", \"relative\", or \"none\": \"unknown\" was given."
+            ),
         );
         assert_eq!(
             Args::new(args!["program", "--status-line"], [].into_iter())

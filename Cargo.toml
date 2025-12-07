@@ -6,7 +6,7 @@ homepage = "https://github.com/yykamei/thwack"
 repository = "https://github.com/yykamei/thwack"
 license = "MIT OR Apache-2.0"
 categories = ["command-line-utilities"]
-edition = "2021"
+edition = "2024"
 rust-version = "1.91.1"
 version = "0.10.5"
 

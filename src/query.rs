@@ -162,7 +162,9 @@ mod tests {
         let query = Query::new("Super cool query");
         assert_eq!(
             query.value,
-            vec!["S", "u", "p", "e", "r", " ", "c", "o", "o", "l", " ", "q", "u", "e", "r", "y"]
+            vec![
+                "S", "u", "p", "e", "r", " ", "c", "o", "o", "l", " ", "q", "u", "e", "r", "y"
+            ]
         );
         assert_eq!(query.idx, 16);
         assert_eq!(query.terminal_pos, 16);

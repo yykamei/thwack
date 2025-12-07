@@ -3,7 +3,7 @@ use std::io::{self, Write};
 use std::path::Path;
 use std::sync::Mutex;
 
-use log::{set_boxed_logger, set_max_level, LevelFilter, Log, Metadata, Record};
+use log::{LevelFilter, Log, Metadata, Record, set_boxed_logger, set_max_level};
 
 pub(crate) fn init<P: AsRef<Path>>(path: P) -> io::Result<()> {
     let logger = Logger::new(path)?;

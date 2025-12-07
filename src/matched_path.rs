@@ -190,11 +190,7 @@ fn depth_from(relative: &str) -> usize {
     relative.graphemes(true).fold(
         0,
         |acc, c| {
-            if c == "/" || c == "\\" {
-                acc + 1
-            } else {
-                acc
-            }
+            if c == "/" || c == "\\" { acc + 1 } else { acc }
         },
     )
 }

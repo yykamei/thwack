@@ -1,8 +1,8 @@
+use crate::Result;
 use crate::matched_path::MatchedPath;
 use crate::query::Query;
 use crate::starting_point::StartingPoint;
 use crate::tree::Tree;
-use crate::Result;
 
 #[derive(Debug)]
 pub(crate) struct Candidates {
@@ -196,11 +196,13 @@ mod tests {
         assert_eq!(candidates.selected().unwrap().relative(), ".browserslistrc");
 
         candidates.move_down();
-        assert!(candidates
-            .selected()
-            .unwrap()
-            .relative()
-            .ends_with(".editorconfig"));
+        assert!(
+            candidates
+                .selected()
+                .unwrap()
+                .relative()
+                .ends_with(".editorconfig")
+        );
 
         candidates.move_down();
         assert!(candidates.selected().unwrap().relative().ends_with(".env"));
