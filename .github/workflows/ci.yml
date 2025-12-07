@@ -22,6 +22,8 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
 
       - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        with:
+          persist-credentials: false
 
       - uses: dtolnay/rust-toolchain@0b1efabc08b657293548b77fb76cc02d26091c7e
         with:
@@ -58,6 +60,7 @@ jobs:
           VALIDATE_RUST_2021: false
           VALIDATE_RUST_CLIPPY: false
           VALIDATE_NATURAL_LANGUAGE: false
+          VALIDATE_BIOME_FORMAT: false
 
   dependency-review:
     if: github.event_name == 'pull_request'
@@ -66,5 +69,7 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        with:
+          persist-credentials: false
 
       - uses: actions/dependency-review-action@3c4e3dcb1aa7874d2c16be7d79418e9b7efd6261 # v4.8.2
