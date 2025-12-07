@@ -21,14 +21,13 @@ updates:
           - "windows_x86_64_gnu"
           - "windows_x86_64_gnullvm"
           - "windows_x86_64_msvc"
+    cooldown:
+      default-days: 3
   - package-ecosystem: github-actions
     directory: "/"
     schedule:
       interval: daily
       time: "12:20"
       timezone: Asia/Tokyo
-    ignore:
-      - dependency-name: "*"
-        update-types:
-          - "version-update:semver-minor"
-          - "version-update:semver-patch"
+    cooldown:
+      default-days: 5
