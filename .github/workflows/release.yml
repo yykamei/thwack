@@ -101,8 +101,10 @@ jobs:
 
       - name: Bump the package version
         run: |
-          sed -i -e "s/^version = .*$/version = \"${{ inputs.version }}\"/" Cargo.toml
+          sed -i -e "s/^version = .*$/version = \"${INPUTS_VERSION}\"/" Cargo.toml
           cargo build
+        env:
+          INPUTS_VERSION: ${{ inputs.version }}
 
       - uses: yykamei/actions-git-push@8ae8cff5a3dc70f40645250bd9e59e2979a2543c
         with:
@@ -126,6 +128,7 @@ jobs:
 
       - name: Upload assets to the release
         if: inputs.apply
-        run: gh release upload "v${{ inputs.version }}" thwack-*
+        run: gh release upload "v${INPUTS_VERSION}" thwack-*
         env:
           GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
+          INPUTS_VERSION: ${{ inputs.version }}
