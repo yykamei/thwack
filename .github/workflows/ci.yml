@@ -21,7 +21,7 @@ jobs:
       - run: sudo apt-get update --yes && sudo apt-get install --yes --no-install-recommends libx11-xcb-dev libxcb-shape0-dev libxcb-xfixes0-dev
         if: matrix.os == 'ubuntu-latest'
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
 
       - uses: dtolnay/rust-toolchain@master
         with:
@@ -44,7 +44,7 @@ jobs:
       statuses: write # To report GitHub Actions status checks
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
         with:
           fetch-depth: 0
 
@@ -61,4 +61,6 @@ jobs:
     permissions:
       contents: read
     steps:
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+
       - uses: actions/dependency-review-action@v4
