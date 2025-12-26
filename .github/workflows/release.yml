@@ -53,7 +53,7 @@ jobs:
 
       - name: Install cross
         if: matrix.os == 'ubuntu-latest'
-        uses: taiki-e/install-action@dffcc4dd22f40f81140c10e7529f6d98c0728621 # cross
+        run: cargo install cross
 
       - name: Build with Cargo
         if: matrix.os != 'ubuntu-latest'
