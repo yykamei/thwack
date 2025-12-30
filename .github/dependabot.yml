@@ -22,7 +22,7 @@ updates:
           - "windows_x86_64_gnullvm"
           - "windows_x86_64_msvc"
     cooldown:
-      default-days: 5
+      default-days: 7
   - package-ecosystem: github-actions
     directory: "/"
     schedule:
@@ -30,4 +30,4 @@ updates:
       time: "12:20"
       timezone: Asia/Tokyo
     cooldown:
-      default-days: 5
+      default-days: 7
