@@ -1,0 +1,12 @@
+rules:
+  superfluous-actions:
+    ignore:
+      # dtolnay/rust-toolchain is used intentionally for toolchain version
+      # selection, component installation, and cross-compilation targets
+      - ci.yml
+      - release.yml
+  secrets-outside-env:
+    ignore:
+      # release.yml is workflow_dispatch-only; secrets are passed as action
+      # inputs or env vars in controlled contexts
+      - release.yml
