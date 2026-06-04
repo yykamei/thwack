@@ -15,7 +15,7 @@ copypasta = "0.10.2"
 crossterm = "0.29.0"
 git2 = { version = "0.21.0", default-features = false }
 libc = "0.2.186"
-log = { version = "0.4.29", features = ["std"] }
+log = { version = "0.4.30", features = ["std"] }
 unicode-segmentation = "1.13.2"
 unicode-width = "0.2.2"
 
