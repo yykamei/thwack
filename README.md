@@ -1,3 +1,5 @@
+
+
 # thwack
 
 <a href="https://github.com/yykamei/thwack/actions/workflows/ci.yml"><img alt="GitHub Actions workflow status" src="https://github.com/yykamei/thwack/actions/workflows/ci.yml/badge.svg"></a>
@@ -25,6 +27,8 @@ If you have a Rust environment set up, you can use the `cargo install` command:
 ```console
 cargo install thwack
 ```
+
+Requires Rust 1.91.1 or later.
 
 Note we consider providing easier ways to install thwack. This should be used without the knowledge of Rust.
 
