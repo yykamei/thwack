@@ -148,6 +148,12 @@ enum MatchLevel {
 }
 
 impl MatchLevel {
+    // On Windows `normalize_query` returns an owned `String`, so the `&` is
+    // required; on other platforms it is already a `&str` and the borrow is redundant.
+    #[cfg_attr(
+        not(target_os = "windows"),
+        allow(clippy::needless_borrows_for_generic_args)
+    )]
     fn new(query: &str, relative: &str) -> Self {
         if query.is_empty() {
             return MatchLevel::Approximate;
@@ -165,7 +171,7 @@ impl MatchLevel {
         }
         if query == relative || relative.contains(&normalize_query(&format!("/{}", query))) {
             MatchLevel::Exact
-        } else if relative.contains(&query) {
+        } else if relative.contains(&normalize_query(&query)) {
             MatchLevel::Partial
         } else {
             MatchLevel::Approximate
@@ -195,13 +201,27 @@ fn depth_from(relative: &str) -> usize {
     )
 }
 
-// TODO: This should change the algorithm of calculation by `query`.
-//       For example, the `query` is `"src/"` (suffixed with `'/'`), a user is expecting items that start with `"src/"`.
 /// Calculates matched positions of `path` with `query`.
-/// This searches for characters of `query` in `path` from the right one by one.
+///
+/// First, this tries to match `query`, split by path separators into segments,
+/// against consecutive components of `path` as contiguous substrings from the
+/// leaf side. If no such match is found, this falls back to searching for
+/// characters of `query` in `path` from the right one by one.
+// On Windows `normalize_query` returns an owned `String`, so `&normalized` is
+// required; on other platforms it is already a `&str` and the borrow is redundant.
+#[cfg_attr(not(target_os = "windows"), allow(clippy::needless_borrow))]
 fn positions_from(query: &str, path: &str) -> Option<Vec<usize>> {
-    let mut positions: VecDeque<usize> = VecDeque::with_capacity(query.len());
-    for q in normalize_query(query).graphemes(true).rev() {
+    let normalized = normalize_query(query);
+    if normalized.is_empty() {
+        return Some(Vec::new());
+    }
+    if let Some(positions) = positions_from_components(&normalized, path) {
+        return Some(positions);
+    }
+    // The fallback below keeps the historical ASCII-only case folding, while
+    // the component matching above folds Unicode case via `to_lowercase`.
+    let mut positions: VecDeque<usize> = VecDeque::with_capacity(normalized.len());
+    for q in normalized.graphemes(true).rev() {
         let end = if let Some(pos) = positions.front() {
             *pos
         } else {
@@ -215,6 +235,104 @@ fn positions_from(query: &str, path: &str) -> Option<Vec<usize>> {
         positions.push_front(pos);
     }
     Some(positions.into())
+}
+
+/// Calculates matched positions of `path` with `query` by matching each
+/// segment of `query` (split by path separators) against a consecutive window
+/// of path components as a case-insensitive contiguous substring.
+///
+/// The window is searched from the leaf side, and the leftmost occurrence is
+/// preferred within each component. Any empty segment (leading or trailing,
+/// e.g. from `"src/"` or `"/src"`) is dropped, so the query matches any
+/// component containing `src` rather than being anchored to a component start.
+/// Returns `None` if `query` contains only separators or no window of
+/// components contains the query segments.
+fn positions_from_components(query: &str, path: &str) -> Option<Vec<usize>> {
+    let query_segments: Vec<&str> = split_components(query).collect();
+    let path_components: Vec<(usize, &str)> = split_components_with_start(path);
+    if query_segments.is_empty() || query_segments.len() > path_components.len() {
+        return None;
+    }
+
+    let window_count = path_components.len() - query_segments.len();
+    for window_start in (0..=window_count).rev() {
+        let mut positions = Vec::with_capacity(query.len());
+        let mut found = true;
+        for (i, segment) in query_segments.iter().enumerate() {
+            let (component_start, component) = path_components[window_start + i];
+            match find_substring(segment, component) {
+                Some((begin, end)) => {
+                    positions.extend(
+                        component
+                            .grapheme_indices(true)
+                            .filter(|(idx, _)| *idx >= begin && *idx < end)
+                            .map(|(idx, _)| component_start + idx),
+                    );
+                }
+                None => {
+                    found = false;
+                    break;
+                }
+            }
+        }
+        if found {
+            return Some(positions);
+        }
+    }
+    None
+}
+
+/// Finds the leftmost occurrence of `query` in `component` as a contiguous
+/// substring, comparing graphemes case-insensitively. Returns the byte range
+/// of the occurrence, or `None` if `query` does not appear in `component`.
+fn find_substring(query: &str, component: &str) -> Option<(usize, usize)> {
+    let query_lower: Vec<String> = query.graphemes(true).map(|g| g.to_lowercase()).collect();
+    let graphemes: Vec<(usize, &str, String)> = component
+        .grapheme_indices(true)
+        .map(|(idx, g)| (idx, g, g.to_lowercase()))
+        .collect();
+    if query_lower.len() > graphemes.len() {
+        return None;
+    }
+
+    for start in 0..=graphemes.len() - query_lower.len() {
+        let matched = query_lower
+            .iter()
+            .enumerate()
+            .all(|(i, q)| graphemes[start + i].2 == *q);
+        if matched {
+            let begin = graphemes[start].0;
+            let end = graphemes
+                .get(start + query_lower.len())
+                .map_or(component.len(), |(idx, _, _)| *idx);
+            return Some((begin, end));
+        }
+    }
+    None
+}
+
+/// Splits `path` by path separators, skipping empty components.
+fn split_components(path: &str) -> impl Iterator<Item = &str> {
+    path.split(['/', '\\']).filter(|s| !s.is_empty())
+}
+
+/// Splits `path` by path separators, yielding each non-empty component along
+/// with its byte offset in `path`.
+fn split_components_with_start(path: &str) -> Vec<(usize, &str)> {
+    let mut components = Vec::new();
+    let mut start = 0;
+    for (idx, c) in path.char_indices() {
+        if c == '/' || c == '\\' {
+            if idx > start {
+                components.push((start, &path[start..idx]));
+            }
+            start = idx + c.len_utf8();
+        }
+    }
+    if start < path.len() {
+        components.push((start, &path[start..]));
+    }
+    components
 }
 
 /// Returns the width in terminal columns
@@ -371,6 +489,117 @@ mod tests {
                 level: MatchLevel::Approximate,
             },
         );
+        assert_eq!(
+            new("err", "/", "/src/error.rs"),
+            MatchedPath {
+                absolute: String::from("/src/error.rs"),
+                relative: String::from("src/error.rs"),
+                absolute_positions: vec![5, 6, 7],
+                relative_positions: vec![4, 5, 6],
+                depth: 1,
+                level: MatchLevel::Exact,
+            },
+        );
+        assert_eq!(
+            new("ERR", "/", "/src/error.rs"),
+            MatchedPath {
+                absolute: String::from("/src/error.rs"),
+                relative: String::from("src/error.rs"),
+                absolute_positions: vec![5, 6, 7],
+                relative_positions: vec![4, 5, 6],
+                depth: 1,
+                level: MatchLevel::Exact,
+            },
+        );
+        assert_eq!(
+            new("or.r", "/", "/src/error.rs"),
+            MatchedPath {
+                absolute: String::from("/src/error.rs"),
+                relative: String::from("src/error.rs"),
+                absolute_positions: vec![8, 9, 10, 11],
+                relative_positions: vec![7, 8, 9, 10],
+                depth: 1,
+                level: MatchLevel::Partial,
+            },
+        );
+        assert_eq!(
+            new("err", "C:\\src", "C:\\src\\error.rs"),
+            MatchedPath {
+                absolute: String::from("C:\\src\\error.rs"),
+                relative: String::from("error.rs"),
+                absolute_positions: vec![7, 8, 9],
+                relative_positions: vec![0, 1, 2],
+                depth: 0,
+                level: MatchLevel::Partial,
+            },
+        );
+        assert_eq!(
+            new("err", "/", "/error/src.rs"),
+            MatchedPath {
+                absolute: String::from("/error/src.rs"),
+                relative: String::from("error/src.rs"),
+                absolute_positions: vec![1, 2, 3],
+                relative_positions: vec![0, 1, 2],
+                depth: 1,
+                level: MatchLevel::Partial,
+            },
+        );
+        assert_eq!(
+            new("err", "/", "/err-err.txt"),
+            MatchedPath {
+                absolute: String::from("/err-err.txt"),
+                relative: String::from("err-err.txt"),
+                absolute_positions: vec![1, 2, 3],
+                relative_positions: vec![0, 1, 2],
+                depth: 0,
+                level: MatchLevel::Partial,
+            },
+        );
+        assert_eq!(
+            new("src/s", "/", "/src/screen.rs"),
+            MatchedPath {
+                absolute: String::from("/src/screen.rs"),
+                relative: String::from("src/screen.rs"),
+                absolute_positions: vec![1, 2, 3, 5],
+                relative_positions: vec![0, 1, 2, 4],
+                depth: 1,
+                level: MatchLevel::Partial,
+            },
+        );
+        assert_eq!(
+            new("models/user", "/", "/src/MODELS/USER.rs"),
+            MatchedPath {
+                absolute: String::from("/src/MODELS/USER.rs"),
+                relative: String::from("src/MODELS/USER.rs"),
+                absolute_positions: vec![5, 6, 7, 8, 9, 10, 12, 13, 14, 15],
+                relative_positions: vec![4, 5, 6, 7, 8, 9, 11, 12, 13, 14],
+                depth: 2,
+                level: MatchLevel::Exact,
+            },
+        );
+        assert_eq!(
+            new("/src/err", "/", "/src/error.rs"),
+            MatchedPath {
+                absolute: String::from("/src/error.rs"),
+                relative: String::from("src/error.rs"),
+                absolute_positions: vec![1, 2, 3, 5, 6, 7],
+                relative_positions: vec![0, 1, 2, 4, 5, 6],
+                depth: 1,
+                level: MatchLevel::Approximate,
+            },
+        );
+        assert_eq!(
+            new("ac", "/", "/abc.txt"),
+            MatchedPath {
+                absolute: String::from("/abc.txt"),
+                relative: String::from("abc.txt"),
+                absolute_positions: vec![1, 3],
+                relative_positions: vec![0, 2],
+                depth: 0,
+                level: MatchLevel::Approximate,
+            },
+        );
+        assert!(MatchedPath::new("a/b/c", "/", "/a/b.txt").is_none());
     }
 
     #[test]
@@ -499,6 +728,23 @@ mod tests {
                     matched: false
                 }
             ]
+        );
+        assert_eq!(
+            new("err", "/", "/src/error.rs").absolute_chunks(30),
+            vec![
+                Chunk {
+                    value: String::from("/src/"),
+                    matched: false,
+                },
+                Chunk {
+                    value: String::from("err"),
+                    matched: true,
+                },
+                Chunk {
+                    value: String::from("or.rs"),
+                    matched: false,
+                },
+            ],
         );
     }
 
@@ -652,6 +898,48 @@ mod tests {
                 },
             ],
         );
+        assert_eq!(
+            new("err", "/", "/src/error.rs").relative_chunks(30),
+            vec![
+                Chunk {
+                    value: String::from("src/"),
+                    matched: false,
+                },
+                Chunk {
+                    value: String::from("err"),
+                    matched: true,
+                },
+                Chunk {
+                    value: String::from("or.rs"),
+                    matched: false,
+                },
+            ],
+        );
+        assert_eq!(
+            new("models/user", "/", "/src/MODELS/USER.rs").relative_chunks(30),
+            vec![
+                Chunk {
+                    value: String::from("src/"),
+                    matched: false,
+                },
+                Chunk {
+                    value: String::from("MODELS"),
+                    matched: true,
+                },
+                Chunk {
+                    value: String::from("/"),
+                    matched: false,
+                },
+                Chunk {
+                    value: String::from("USER"),
+                    matched: true,
+                },
+                Chunk {
+                    value: String::from(".rs"),
+                    matched: false,
+                },
+            ],
+        );
     }
 
     #[test]
@@ -698,5 +986,83 @@ mod tests {
                 new("abc.txt", "/home", "/home/abc/cat.txt"),
             ],
         );
+    }
+
+    #[test]
+    fn matches_contiguous_substring_of_a_component() {
+        assert_eq!(
+            positions_from_components("err", "src/error.rs"),
+            Some(vec![4, 5, 6])
+        );
+    }
+
+    #[test]
+    fn prefers_the_first_occurrence_in_a_component() {
+        assert_eq!(
+            positions_from_components("err", "err-err.txt"),
+            Some(vec![0, 1, 2])
+        );
+    }
+
+    #[test]
+    fn matches_query_segments_to_consecutive_components() {
+        assert_eq!(
+            positions_from_components("models/user", "src/MODELS/USER.rs"),
+            Some(vec![4, 5, 6, 7, 8, 9, 11, 12, 13, 14])
+        );
+    }
+
+    #[test]
+    fn ignores_case_of_the_leaf() {
+        assert_eq!(
+            positions_from_components("ERR", "src/error.rs"),
+            Some(vec![4, 5, 6])
+        );
+    }
+
+    #[test]
+    fn matches_a_grapheme_in_a_leaf() {
+        assert_eq!(
+            positions_from_components("☕.txt", "abc/☕/abc/☕.txt"),
+            Some(vec![12, 15, 16, 17, 18])
+        );
+        assert_eq!(positions_from_components("é", "bé.txt"), Some(vec![1]));
+    }
+
+    #[test]
+    fn returns_none_when_no_component_contains_the_query() {
+        assert_eq!(positions_from_components("abcdef", "ab.txt"), None);
+        assert_eq!(positions_from_components("tb", "a/b.txt"), None);
+        assert_eq!(positions_from_components("a/b/c", "a/b.txt"), None);
+    }
+
+    #[test]
+    fn returns_none_for_a_separator_only_query() {
+        assert_eq!(positions_from_components("/", "a/b.txt"), None);
+        assert_eq!(positions_from_components("\\", "a/b.txt"), None);
+    }
+
+    #[test]
+    fn falls_back_to_scattered_match_for_a_separator_query() {
+        let sep = std::path::MAIN_SEPARATOR;
+        assert_eq!(
+            positions_from(
+                &format!("ab{}c", sep),
+                &format!("a{}b{}c{}d.txt", sep, sep, sep)
+            ),
+            Some(vec![0, 2, 3, 4])
+        );
+    }
+
+    #[test]
+    fn component_splitting_is_consistent() {
+        for path in ["", "/a/b.txt", "a\\b\\c", "src/error.rs", "a//b///", "/"] {
+            let with_start: Vec<&str> = split_components_with_start(path)
+                .into_iter()
+                .map(|(_, c)| c)
+                .collect();
+            let simple: Vec<&str> = split_components(path).collect();
+            assert_eq!(with_start, simple);
+        }
     }
 }
