@@ -136,7 +136,15 @@ impl Chunk {
 
 impl Display for Chunk {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        Display::fmt(&self.value, f)
+        // Filenames come from the filesystem and are untrusted; strip terminal
+        // control characters so a malicious filename cannot inject escape
+        // sequences into the user's terminal.
+        let sanitized: String = self
+            .value
+            .chars()
+            .map(|c| if c.is_control() { '\u{FFFD}' } else { c })
+            .collect();
+        Display::fmt(&sanitized, f)
     }
 }
 
@@ -940,6 +948,15 @@ mod tests {
                 },
             ],
         );
+    }
+
+    #[test]
+    fn strips_control_characters_when_displayed() {
+        let chunk = Chunk {
+            value: String::from("\u{1b}[2Jsteal\u{07}"),
+            matched: false,
+        };
+        assert_eq!(format!("{}", chunk), "\u{FFFD}[2Jsteal\u{FFFD}");
     }
 
     #[test]
