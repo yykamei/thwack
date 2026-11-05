@@ -334,7 +334,7 @@ impl<'a, T: Terminal, W: Write> Screen<'a, T, W> {
             self.stdout,
             cursor::MoveTo(0, 0),
             style::Print("Search: "),
-            style::Print(&self.query),
+            style::Print(sanitize(&self.query.to_string())),
         )?;
         Ok(())
     }
@@ -359,11 +359,11 @@ impl<'a, T: Terminal, W: Write> Screen<'a, T, W> {
                     queue!(
                         self.stdout,
                         style::SetAttribute(Attribute::Bold),
-                        style::Print(format!("{}", chunk)),
+                        style::Print(sanitize(&format!("{}", chunk))),
                         style::SetAttribute(Attribute::Reset),
                     )?;
                 } else {
-                    queue!(self.stdout, style::Print(format!("{}", chunk)))?;
+                    queue!(self.stdout, style::Print(sanitize(&format!("{}", chunk))))?;
                 }
             }
             queue!(self.stdout, cursor::MoveToNextLine(1))?;
@@ -387,7 +387,7 @@ impl<'a, T: Terminal, W: Write> Screen<'a, T, W> {
                 cursor::MoveTo(0, rows - 2),
                 style::SetAttribute(Attribute::Bold),
                 style::SetAttribute(Attribute::Reverse),
-                style::Print(format!("{:width$}", m, width = columns as usize)),
+                style::Print(format!("{:width$}", sanitize(m), width = columns as usize)),
                 style::SetAttribute(Attribute::Reset),
             )?;
         }
@@ -453,6 +453,12 @@ fn visible_paths_length(terminal: &dyn Terminal, preferences: &Preferences) -> R
     };
     visible = if visible < 1 { 0 } else { visible };
     Ok(visible as usize)
+}
+
+/// Strips control characters (C0 and C1, including ESC and DEL) so that
+/// untrusted strings cannot inject terminal escape sequences when rendered.
+fn sanitize(s: &str) -> String {
+    s.chars().filter(|c| !c.is_control()).collect()
 }
 
 #[derive(Debug)]
@@ -584,6 +590,15 @@ mod tests {
             let _ = self.inner.extend(buf);
             Ok(())
         }
+    }
+
+    #[test]
+    fn sanitize_strips_control_characters() {
+        assert_eq!(sanitize("hello"), "hello");
+        assert_eq!(sanitize("a\x1bb"), "ab"); // ESC stripped
+        assert_eq!(sanitize("a\x07b"), "ab"); // BEL stripped
+        assert_eq!(sanitize("a\u{9b}b"), "ab"); // C1 CSI stripped
+        assert_eq!(sanitize("a\u{7f}b"), "ab"); // DEL stripped
     }
 
     #[test]
