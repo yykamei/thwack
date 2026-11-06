@@ -17,6 +17,12 @@ impl Execvp for Libc {
     }
 }
 
+/// Strips control characters so that untrusted strings cannot inject terminal
+/// escape sequences when the failure message is printed to the terminal.
+fn sanitize(s: &str) -> String {
+    s.chars().filter(|c| !c.is_control()).collect()
+}
+
 /// Invoke the specified command with the selected path.
 pub(crate) fn invoke(libc_impl: &dyn Execvp, preferences: &Preferences, path: &str) -> Result<()> {
     let mut cstrings: Vec<CString> = Vec::with_capacity(10); // TODO: Why is it 10?
@@ -38,7 +44,9 @@ pub(crate) fn invoke(libc_impl: &dyn Execvp, preferences: &Preferences, path: &s
 
     Err(Error::exec(&format!(
         "`{} {}` failed and returned {}",
-        preferences.exec, path, errno
+        sanitize(&preferences.exec),
+        sanitize(path),
+        errno
     )))
 }
 
@@ -82,6 +90,21 @@ mod tests {
         assert_eq!(
             format!("{}", result.unwrap_err()),
             "`non_existent_command Hello, world!` failed and returned 1"
+        );
+    }
+
+    #[test]
+    fn invoke_fail_sanitizes_control_characters() {
+        let preferences = Preferences {
+            exec: String::from("non_existent_command"),
+            ..Preferences::default()
+        };
+        let mock_libc = MockLibc(1);
+        let result = invoke(&mock_libc, &preferences, "Hello\x1b[31m, world!");
+        assert!(result.is_err());
+        assert_eq!(
+            format!("{}", result.unwrap_err()),
+            "`non_existent_command Hello[31m, world!` failed and returned 1"
         );
     }
 }
