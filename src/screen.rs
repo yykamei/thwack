@@ -457,8 +457,23 @@ fn visible_paths_length(terminal: &dyn Terminal, preferences: &Preferences) -> R
 
 /// Strips control characters (C0 and C1, including ESC and DEL) so that
 /// untrusted strings cannot inject terminal escape sequences when rendered.
+/// It also strips Unicode bidirectional format characters so that a malicious
+/// filename cannot visually reorder the rendered path.
 fn sanitize(s: &str) -> String {
-    s.chars().filter(|c| !c.is_control()).collect()
+    s.chars()
+        .filter(|&c| !c.is_control() && !is_bidi_format(c))
+        .collect()
+}
+
+fn is_bidi_format(c: char) -> bool {
+    matches!(
+        c,
+        '\u{061C}'
+            | '\u{200E}'
+            | '\u{200F}'
+            | '\u{202A}'..='\u{202E}'
+            | '\u{2066}'..='\u{2069}'
+    )
 }
 
 #[derive(Debug)]
@@ -599,6 +614,13 @@ mod tests {
         assert_eq!(sanitize("a\x07b"), "ab"); // BEL stripped
         assert_eq!(sanitize("a\u{9b}b"), "ab"); // C1 CSI stripped
         assert_eq!(sanitize("a\u{7f}b"), "ab"); // DEL stripped
+    }
+
+    #[test]
+    fn sanitize_strips_bidi_format_characters() {
+        assert_eq!(sanitize("a\u{202e}b"), "ab"); // RLO stripped
+        assert_eq!(sanitize("a\u{2066}b"), "ab"); // LRI stripped
+        assert_eq!(sanitize("a\u{061c}b"), "ab"); // ALM stripped
     }
 
     #[test]
