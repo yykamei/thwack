@@ -31,7 +31,10 @@ fn extract_paths<P: AsRef<Path>>(
         if git_ignore(repo, &path) {
             continue;
         }
-        if path.is_dir() {
+        // Use `DirEntry::file_type`, which does not follow symlinks, so that a
+        // symlinked directory is not traversed. Traversing it could escape the
+        // starting point or recurse forever on a symlink cycle.
+        if entry.file_type()?.is_dir() {
             extract_paths(paths, &path, repo)?;
         } else if let Some(absolute) = path.to_str() {
             paths.push(absolute.to_string());
@@ -130,5 +133,28 @@ pub mod tests {
         for path in tree.iter() {
             assert!(path.starts_with(dir.path().to_str().unwrap()));
         }
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn does_not_recurse_into_symlinked_directories() {
+        use std::os::unix::fs::symlink;
+
+        let dir = create_files(false).unwrap();
+        let outside = tempdir().unwrap();
+        let _ = File::create(outside.path().join("secret.txt")).unwrap();
+        symlink(outside.path(), dir.path().join("link")).unwrap();
+
+        let tree = Tree::new(dir.path(), None).unwrap();
+        let paths: Vec<String> = tree.iter().cloned().collect();
+
+        assert!(
+            paths.iter().any(|p| p.ends_with("link")),
+            "the symlink entry itself should be listed"
+        );
+        assert!(
+            !paths.iter().any(|p| p.contains("secret.txt")),
+            "files behind a symlinked directory must not be traversed"
+        );
     }
 }
