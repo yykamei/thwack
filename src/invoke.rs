@@ -29,6 +29,11 @@ pub(crate) fn invoke(libc_impl: &dyn Execvp, preferences: &Preferences, path: &s
     for arg in preferences.exec.split_whitespace() {
         cstrings.push(CString::new(arg)?);
     }
+    if cstrings.is_empty() {
+        return Err(Error::args(
+            "The exec command must not be empty or whitespace.",
+        ));
+    }
     cstrings.push(CString::new(path)?);
     let argv: Vec<*const c_char> = cstrings
         .iter()
@@ -76,6 +81,16 @@ mod tests {
         };
         let mock_libc = MockLibc(0);
         assert!(invoke(&mock_libc, &preferences, "Hello, world!").is_ok());
+    }
+
+    #[test]
+    fn invoke_with_empty_exec_fails_instead_of_running_the_file() {
+        let preferences = Preferences {
+            exec: String::from(" "),
+            ..Preferences::default()
+        };
+        let mock_libc = MockLibc(0);
+        assert!(invoke(&mock_libc, &preferences, "Hello, world!").is_err());
     }
 
     #[test]
