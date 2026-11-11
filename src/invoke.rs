@@ -18,9 +18,24 @@ impl Execvp for Libc {
 }
 
 /// Strips control characters so that untrusted strings cannot inject terminal
-/// escape sequences when the failure message is printed to the terminal.
+/// escape sequences when the failure message is printed to the terminal. It
+/// also strips Unicode bidirectional format characters so that a malicious
+/// filename cannot visually reorder the rendered error message.
 fn sanitize(s: &str) -> String {
-    s.chars().filter(|c| !c.is_control()).collect()
+    s.chars()
+        .filter(|&c| !c.is_control() && !is_bidi_format(c))
+        .collect()
+}
+
+fn is_bidi_format(c: char) -> bool {
+    matches!(
+        c,
+        '\u{061C}'
+            | '\u{200E}'
+            | '\u{200F}'
+            | '\u{202A}'..='\u{202E}'
+            | '\u{2066}'..='\u{2069}'
+    )
 }
 
 /// Invoke the specified command with the selected path.
@@ -120,6 +135,21 @@ mod tests {
         assert_eq!(
             format!("{}", result.unwrap_err()),
             "`non_existent_command Hello[31m, world!` failed and returned 1"
+        );
+    }
+
+    #[test]
+    fn invoke_fail_sanitizes_bidi_format_characters() {
+        let preferences = Preferences {
+            exec: String::from("non_existent_command"),
+            ..Preferences::default()
+        };
+        let mock_libc = MockLibc(1);
+        let result = invoke(&mock_libc, &preferences, "Hello\u{202e}, world!");
+        assert!(result.is_err());
+        assert_eq!(
+            format!("{}", result.unwrap_err()),
+            "`non_existent_command Hello, world!` failed and returned 1"
         );
     }
 }
