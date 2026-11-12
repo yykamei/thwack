@@ -80,15 +80,53 @@ impl Error {
 
 impl From<io::Error> for Error {
     fn from(error: io::Error) -> Self {
+        let detail = sanitize(&error.to_string());
         Self {
             message: format!(
                 "Unhandled IO error happened. See the details from .source: {}",
-                error
+                detail
             ),
             kind: ErrorKind::IO,
             source: Some(Box::new(error)),
             exit_code: FAILURE,
         }
+    }
+}
+
+/// Strips control characters and Unicode bidirectional format characters so
+/// that untrusted strings embedded in error messages cannot inject terminal
+/// escape sequences or visually reorder the rendered message.
+fn sanitize(s: &str) -> String {
+    s.chars()
+        .filter(|&c| !c.is_control() && !is_bidi_format(c))
+        .collect()
+}
+
+fn is_bidi_format(c: char) -> bool {
+    matches!(
+        c,
+        '\u{061C}'
+            | '\u{200E}'
+            | '\u{200F}'
+            | '\u{202A}'..='\u{202E}'
+            | '\u{2066}'..='\u{2069}'
+    )
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn io_error_message_strips_control_characters() {
+        let err = Error::from(std::io::Error::new(
+            std::io::ErrorKind::Other,
+            "bad\x1b[31mname",
+        ));
+        assert_eq!(
+            format!("{}", err),
+            "Unhandled IO error happened. See the details from .source: bad[31mname"
+        );
     }
 }
 
