@@ -185,25 +185,20 @@ impl<'a, T: Terminal, W: Write> Screen<'a, T, W> {
 
     pub(crate) fn start(&mut self) -> Result<()> {
         execute!(self.stdout, EnterAlternateScreen, style::ResetColor)?;
-        self.terminal
-            .enable_raw_mode()
-            .expect("Failed to enable raw mode");
-        match self.render() {
-            Ok(_) => {}
-            Err(e) => {
-                self.leave_terminal().expect("Failed to disable raw mode");
-                return Err(e);
-            }
+        let result = self.run_session();
+        let leave_result = self.leave_terminal();
+        if let Err(e) = &leave_result {
+            warn!("Failed to restore the terminal: {}", e);
         }
-        match self.poll() {
-            Ok(_) => {}
-            Err(e) => {
-                self.leave_terminal().expect("Failed to disable raw mode");
-                return Err(e);
-            }
-        }
-        self.leave_terminal()?;
-        Ok(())
+        // The session error is the cause the user needs; cleanup failures are
+        // already logged and only surface when the session itself succeeded.
+        result.and(leave_result)
+    }
+
+    fn run_session(&mut self) -> Result<()> {
+        self.terminal.enable_raw_mode()?;
+        self.render()?;
+        self.poll()
     }
 
     fn poll(&mut self) -> Result<()> {
@@ -519,6 +514,7 @@ impl From<Event> for ThwackEvent {
 #[cfg(test)]
 mod tests {
     use std::ascii::escape_default;
+    use std::cell::Cell;
     use std::collections::VecDeque;
     use std::fmt::{Debug, Formatter};
     use std::io;
@@ -675,5 +671,78 @@ mod tests {
 
         let mut ctx = ClipboardContext::new().unwrap();
         assert_eq!(ctx.get_contents().unwrap(), "README.md");
+    }
+
+    #[derive(Default)]
+    struct RawModeFailTerminal {
+        raw_mode_disabled: Cell<bool>,
+        cleanup_error: bool,
+    }
+
+    impl Terminal for RawModeFailTerminal {
+        fn size(&self) -> Result<(u16, u16)> {
+            Ok((98, 20))
+        }
+
+        fn enable_raw_mode(&self) -> Result<()> {
+            Err(Error::args("raw mode unavailable"))
+        }
+
+        fn disable_raw_mode(&self) -> Result<()> {
+            self.raw_mode_disabled.set(true);
+            if self.cleanup_error {
+                return Err(Error::args("cleanup failed"));
+            }
+            Ok(())
+        }
+    }
+
+    #[test]
+    fn raw_mode_failure_returns_error_and_restores_terminal() {
+        let preferences = Preferences::default();
+        let terminal = RawModeFailTerminal::default();
+        let mut buffer = Buffer::new();
+        let result = {
+            let mut screen = Screen::new(&preferences, &terminal, &mut buffer).unwrap();
+            screen.start()
+        };
+
+        assert_eq!(result.unwrap_err().to_string(), "raw mode unavailable");
+        assert!(terminal.raw_mode_disabled.get());
+        // crossterm may execute this command through WinAPI on Windows, so the
+        // ANSI bytes are only guaranteed to reach the writer on other platforms.
+        #[cfg(not(windows))]
+        {
+            use crossterm::Command;
+
+            let mut leave_alternate_screen = String::new();
+            LeaveAlternateScreen
+                .write_ansi(&mut leave_alternate_screen)
+                .unwrap();
+            assert!(
+                buffer
+                    .inner
+                    .windows(leave_alternate_screen.len())
+                    .any(|window| window == leave_alternate_screen.as_bytes()),
+                "expected LeaveAlternateScreen to be emitted on failure"
+            );
+        }
+    }
+
+    #[test]
+    fn cleanup_failure_does_not_replace_the_session_error() {
+        let preferences = Preferences::default();
+        let terminal = RawModeFailTerminal {
+            cleanup_error: true,
+            ..Default::default()
+        };
+        let mut buffer = Buffer::new();
+        let result = {
+            let mut screen = Screen::new(&preferences, &terminal, &mut buffer).unwrap();
+            screen.start()
+        };
+
+        assert_eq!(result.unwrap_err().to_string(), "raw mode unavailable");
+        assert!(terminal.raw_mode_disabled.get());
     }
 }
