@@ -11,7 +11,7 @@ use log::{debug, info, trace, warn};
 
 use crate::candidates::Candidates;
 use crate::error::Result;
-use crate::invoke::{Libc, invoke};
+use crate::invoke::{Execvp, invoke};
 use crate::preferences::Preferences;
 use crate::query::Query;
 use crate::starting_point::StartingPoint;
@@ -125,8 +125,19 @@ macro_rules! enter {
     };
 }
 
+/// An interactive file-selection session.
+///
+/// It owns the terminal UI state and executes the configured command on the
+/// selected file. Production code passes `Libc`; tests inject a mock
+/// `Execvp` to observe the arguments:
+///
+/// ```ignore
+/// let mut screen = Screen::new(&preferences, &terminal, &Libc, &mut stdout)?;
+/// screen.start()?;
+/// ```
 pub(crate) struct Screen<'a, T: Terminal, W: Write> {
     preferences: &'a Preferences,
+    execvp: &'a dyn Execvp,
     query: Query,
     starting_point: StartingPoint,
     repo: Option<Repository>,
@@ -141,6 +152,7 @@ impl<'a, T: Terminal, W: Write> Screen<'a, T, W> {
     pub(crate) fn new(
         preferences: &'a Preferences,
         terminal: &'a T,
+        execvp: &'a dyn Execvp,
         stdout: &'a mut W,
     ) -> Result<Screen<'a, T, W>> {
         let query = Query::new(&preferences.query);
@@ -172,6 +184,7 @@ impl<'a, T: Terminal, W: Write> Screen<'a, T, W> {
 
         Ok(Screen {
             preferences,
+            execvp,
             query,
             starting_point,
             repo,
@@ -247,18 +260,14 @@ impl<'a, T: Terminal, W: Write> Screen<'a, T, W> {
                     self.render()?;
                 }
                 ThwackEvent::Invoke => {
-                    let path: Option<String> = match self.candidates.selected() {
-                        None => None,
-                        Some(p) => match self.preferences.status_line {
-                            StatusLine::None | StatusLine::Absolute => {
-                                Some(p.absolute().to_string())
-                            }
-                            StatusLine::Relative => Some(p.relative().to_string()),
-                        },
-                    };
-                    if let Some(p) = path {
+                    if let Some(p) = self.candidates.selected() {
+                        // Always execute the absolute path. The relative path is
+                        // relative to the starting point, not the current working
+                        // directory, so using it could run the command on a
+                        // different file. `--status-line` is display-only.
+                        let path = p.absolute().to_string();
                         self.leave_terminal()?;
-                        invoke(&Libc, &self.preferences, &p)?;
+                        invoke(self.execvp, &self.preferences, &path)?;
                     }
                 }
                 ThwackEvent::CopyAbsolutePath | ThwackEvent::CopyRelativePath => {
@@ -522,6 +531,7 @@ mod tests {
     use std::sync::{Arc, Mutex};
 
     use super::*;
+    use crate::invoke::Libc;
 
     #[derive(Debug, Default)]
     struct MockTerminal {
@@ -652,7 +662,7 @@ mod tests {
             .add_event(Event::Key(KeyCode::Esc.into()));
         let preferences = Preferences::default();
         let mut buffer = Buffer::new();
-        let mut screen = Screen::new(&preferences, &terminal, &mut buffer).unwrap();
+        let mut screen = Screen::new(&preferences, &terminal, &Libc, &mut buffer).unwrap();
         screen.start().unwrap();
     }
 
@@ -666,7 +676,7 @@ mod tests {
         let mut preferences = Preferences::default();
         preferences.query = "README.md".to_string();
         let mut buffer = Buffer::new();
-        let mut screen = Screen::new(&preferences, &terminal, &mut buffer).unwrap();
+        let mut screen = Screen::new(&preferences, &terminal, &Libc, &mut buffer).unwrap();
         screen.start().unwrap();
 
         let mut ctx = ClipboardContext::new().unwrap();
@@ -703,7 +713,7 @@ mod tests {
         let terminal = RawModeFailTerminal::default();
         let mut buffer = Buffer::new();
         let result = {
-            let mut screen = Screen::new(&preferences, &terminal, &mut buffer).unwrap();
+            let mut screen = Screen::new(&preferences, &terminal, &Libc, &mut buffer).unwrap();
             screen.start()
         };
 
@@ -738,11 +748,62 @@ mod tests {
         };
         let mut buffer = Buffer::new();
         let result = {
-            let mut screen = Screen::new(&preferences, &terminal, &mut buffer).unwrap();
+            let mut screen = Screen::new(&preferences, &terminal, &Libc, &mut buffer).unwrap();
             screen.start()
         };
 
         assert_eq!(result.unwrap_err().to_string(), "raw mode unavailable");
         assert!(terminal.raw_mode_disabled.get());
+    }
+
+    struct RecordingExecvp(Mutex<Vec<String>>);
+
+    impl Execvp for RecordingExecvp {
+        fn execvp(&self, _c: *const libc::c_char, argv: *const *const libc::c_char) -> libc::c_int {
+            let mut args = self.0.lock().unwrap();
+            let mut index = 0;
+            loop {
+                let arg = unsafe { *argv.add(index) };
+                if arg.is_null() {
+                    break;
+                }
+                args.push(
+                    unsafe { std::ffi::CStr::from_ptr(arg) }
+                        .to_string_lossy()
+                        .into_owned(),
+                );
+                index += 1;
+            }
+            1
+        }
+    }
+
+    #[test]
+    fn invoke_uses_the_absolute_path_with_relative_status_line() {
+        let dir = tempfile::tempdir().unwrap();
+        let _ = std::fs::File::create(dir.path().join("target.txt")).unwrap();
+        let terminal = MockTerminal::default()
+            .size(98, 20)
+            .add_event(Event::Key(KeyCode::Enter.into()));
+        let execvp = RecordingExecvp(Mutex::new(Vec::new()));
+        let mut preferences = Preferences::default();
+        preferences.starting_point = dir.path().to_str().unwrap().to_string();
+        preferences.status_line = StatusLine::Relative;
+        let mut buffer = Buffer::new();
+        let result = {
+            let mut screen = Screen::new(&preferences, &terminal, &execvp, &mut buffer).unwrap();
+            screen.start()
+        };
+
+        assert!(result.is_err());
+        let args = execvp.0.lock().unwrap();
+        assert_eq!(args.len(), 2);
+        assert_eq!(args[0], preferences.exec);
+        assert!(std::path::Path::new(&args[1]).is_absolute());
+        assert!(
+            args[1].starts_with(dir.path().canonicalize().unwrap().to_str().unwrap()),
+            "expected the absolute path under the starting point, got {:?}",
+            args[1]
+        );
     }
 }
