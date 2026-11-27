@@ -38,6 +38,26 @@ jobs:
         env:
           RUST_BACKTRACE: full
 
+  audit:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: dtolnay/rust-toolchain@683b588c487a69d01f6c6ddf40f036ff682cc2c8
+        with:
+          toolchain: stable
+
+      - run: cargo install cargo-audit --locked --version 0.23.0
+
+      # Fails on vulnerabilities; informational advisories (unmaintained,
+      # unsound) are reported but do not fail the job.
+      - run: cargo audit
+
   lint:
     runs-on: ubuntu-latest
     permissions:
