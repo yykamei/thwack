@@ -5,6 +5,7 @@ use std::process::exit;
 
 use crate::args::{Args, HELP};
 use crate::error::Result;
+use crate::invoke::Libc;
 use crate::logger;
 use crate::screen::Screen;
 use crate::terminal::Terminal;
@@ -40,7 +41,7 @@ pub fn entrypoint<A: Iterator<Item = OsString>, W: Write, T: Terminal>(
         return Ok(());
     }
 
-    Screen::new(&preferences, &terminal, stdout)?.start()
+    Screen::new(&preferences, &terminal, &Libc, stdout)?.start()
 }
 
 fn print_and_flush(buffer: &mut impl Write, content: &str) -> io::Result<()> {
