@@ -328,7 +328,8 @@ impl<'a, T: Terminal, W: Write> Screen<'a, T, W> {
     }
 
     fn place_cursor(&mut self) -> Result<()> {
-        let x = self.query.terminal_pos as u16 + 8; // 8 is the length of "Search: ".
+        let (columns, _) = terminal_size(self.terminal)?;
+        let x = cursor_x(self.query.terminal_pos, columns);
         queue!(self.stdout, cursor::MoveTo(x, 0))?;
         Ok(())
     }
@@ -337,7 +338,7 @@ impl<'a, T: Terminal, W: Write> Screen<'a, T, W> {
         queue!(
             self.stdout,
             cursor::MoveTo(0, 0),
-            style::Print("Search: "),
+            style::Print(SEARCH_PREFIX),
             style::Print(sanitize(&self.query.to_string())),
         )?;
         Ok(())
@@ -345,7 +346,7 @@ impl<'a, T: Terminal, W: Write> Screen<'a, T, W> {
 
     fn render_candidates(&mut self) -> Result<()> {
         let selected = self.candidates.selected();
-        let (columns, _) = self.terminal.size()?;
+        let (columns, _) = terminal_size(self.terminal)?;
 
         queue!(self.stdout, cursor::MoveTo(0, 1),)?;
 
@@ -358,7 +359,7 @@ impl<'a, T: Terminal, W: Write> Screen<'a, T, W> {
                     queue!(self.stdout, style::Print("  "),)?;
                 }
             }
-            for chunk in candidate.relative_chunks((columns - 2).into()) {
+            for chunk in candidate.relative_chunks(columns.saturating_sub(2).into()) {
                 if chunk.matched() {
                     queue!(
                         self.stdout,
@@ -377,7 +378,7 @@ impl<'a, T: Terminal, W: Write> Screen<'a, T, W> {
 
     fn render_status(&mut self) -> Result<()> {
         let selected = self.candidates.selected();
-        let (columns, rows) = self.terminal.size()?;
+        let (columns, rows) = terminal_size(self.terminal)?;
 
         let message = match (selected, self.preferences.status_line) {
             (_, StatusLine::None) => None,
@@ -388,7 +389,7 @@ impl<'a, T: Terminal, W: Write> Screen<'a, T, W> {
         if let Some(ref m) = message {
             queue!(
                 self.stdout,
-                cursor::MoveTo(0, rows - 2),
+                cursor::MoveTo(0, rows.saturating_sub(2)),
                 style::SetAttribute(Attribute::Bold),
                 style::SetAttribute(Attribute::Reverse),
                 style::Print(format!("{:width$}", sanitize(m), width = columns as usize)),
@@ -399,7 +400,7 @@ impl<'a, T: Terminal, W: Write> Screen<'a, T, W> {
     }
 
     fn render_short_help(&mut self) -> Result<()> {
-        let (columns, rows) = self.terminal.size()?;
+        let (columns, rows) = terminal_size(self.terminal)?;
 
         // TODO: This number is the same amount of columns occupied by this short help.
         if columns < 97 {
@@ -408,7 +409,7 @@ impl<'a, T: Terminal, W: Write> Screen<'a, T, W> {
         }
         queue!(
             self.stdout,
-            cursor::MoveTo(0, rows - 1),
+            cursor::MoveTo(0, rows.saturating_sub(1)),
             style::SetAttribute(Attribute::Bold),
             style::Print("<Up>/<Ctrl-p>:"),
             style::SetAttribute(Attribute::Reset),
@@ -449,14 +450,30 @@ impl<'a, T: Terminal, W: Write> Screen<'a, T, W> {
     }
 }
 
+const SEARCH_PREFIX: &str = "Search: ";
+const MIN_COLUMNS: u16 = 8;
+const MIN_ROWS: u16 = 4;
+
+/// Clamps the reported size to the smallest layout that keeps the fixed
+/// regions (query, candidates, status, and help) from underflowing.
+fn terminal_size(terminal: &dyn Terminal) -> Result<(u16, u16)> {
+    let (columns, rows) = terminal.size()?;
+    Ok((columns.max(MIN_COLUMNS), rows.max(MIN_ROWS)))
+}
+
+fn cursor_x(terminal_pos: usize, columns: u16) -> u16 {
+    let pos = terminal_pos.min(usize::from(u16::MAX)) as u16;
+    pos.saturating_add(SEARCH_PREFIX.len() as u16)
+        .min(columns.saturating_sub(1))
+}
+
 fn visible_paths_length(terminal: &dyn Terminal, preferences: &Preferences) -> Result<usize> {
-    let (_, rows) = terminal.size()?;
-    let mut visible = match preferences.status_line {
-        StatusLine::None => rows - 2,
-        _ => rows - 3,
+    let (_, rows) = terminal_size(terminal)?;
+    let visible = match preferences.status_line {
+        StatusLine::None => rows.saturating_sub(2),
+        _ => rows.saturating_sub(3),
     };
-    visible = if visible < 1 { 0 } else { visible };
-    Ok(visible as usize)
+    Ok(usize::from(visible))
 }
 
 /// Strips control characters (C0 and C1, including ESC and DEL) so that
@@ -754,6 +771,24 @@ mod tests {
 
         assert_eq!(result.unwrap_err().to_string(), "raw mode unavailable");
         assert!(terminal.raw_mode_disabled.get());
+    }
+
+    #[test]
+    fn render_with_a_tiny_terminal_does_not_underflow() {
+        let terminal = MockTerminal::default()
+            .size(1, 1)
+            .add_event(Event::Key(KeyCode::Esc.into()));
+        let preferences = Preferences::default();
+        let mut buffer = Buffer::new();
+        let mut screen = Screen::new(&preferences, &terminal, &Libc, &mut buffer).unwrap();
+        screen.start().unwrap();
+    }
+
+    #[test]
+    fn cursor_x_stays_within_the_terminal() {
+        assert_eq!(cursor_x(0, 8), 7);
+        assert_eq!(cursor_x(3, 80), 11);
+        assert_eq!(cursor_x(usize::MAX, 80), 79);
     }
 
     struct RecordingExecvp(Mutex<Vec<String>>);

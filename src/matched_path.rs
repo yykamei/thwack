@@ -343,7 +343,7 @@ fn width_of(path: &str) -> usize {
 fn chunks_from(path: &str, positions: &[usize], max_width: usize) -> Vec<Chunk> {
     let mut offset = 0;
     if width_of(path) > max_width {
-        let max_width = max_width - 3; // NOTE: `...` requires 3 columns.
+        let max_width = max_width.saturating_sub(3); // NOTE: `...` requires 3 columns.
         let mut accum = 0;
         for (idx, s) in path.grapheme_indices(true).rev() {
             accum += s.width_cjk();
@@ -600,6 +600,13 @@ mod tests {
             },
         );
         assert!(MatchedPath::new("a/b/c", "/", "/a/b.txt").is_none());
+    }
+
+    #[test]
+    fn chunks_do_not_underflow_for_small_widths() {
+        assert_chunks_eq_relative(new("abc", "/home", "/home/abc.txt"), 0);
+        assert_chunks_eq_relative(new("abc", "/home", "/home/abc.txt"), 1);
+        assert_chunks_eq_relative(new("abc", "/home", "/home/abc.txt"), 2);
     }
 
     #[test]
