@@ -11,7 +11,8 @@ pub(crate) struct Tree {
 impl Tree {
     pub(crate) fn new<P: AsRef<Path>>(dir: P, repo: Option<&Repository>) -> Result<Self> {
         let mut paths = Vec::new();
-        extract_paths(&mut paths, dir, repo)?;
+        let root = dir.as_ref().canonicalize()?;
+        extract_paths(&mut paths, dir.as_ref(), &root, repo)?;
         Ok(Self { paths })
     }
 
@@ -20,12 +21,13 @@ impl Tree {
     }
 }
 
-fn extract_paths<P: AsRef<Path>>(
+fn extract_paths(
     paths: &mut Vec<String>,
-    current_dir: P,
+    current_dir: &Path,
+    root: &Path,
     repo: Option<&Repository>,
 ) -> Result<()> {
-    for entry in read_dir(current_dir.as_ref())? {
+    for entry in read_dir(current_dir)? {
         let entry = entry?;
         let path = entry.path();
         if git_ignore(repo, &path) {
@@ -34,13 +36,27 @@ fn extract_paths<P: AsRef<Path>>(
         // Use `DirEntry::file_type`, which does not follow symlinks, so that a
         // symlinked directory is not traversed. Traversing it could escape the
         // starting point or recurse forever on a symlink cycle.
-        if entry.file_type()?.is_dir() {
-            extract_paths(paths, &path, repo)?;
+        let file_type = entry.file_type()?;
+        if file_type.is_dir() {
+            extract_paths(paths, &path, root, repo)?;
+        } else if file_type.is_symlink() && !is_inside(root, &path) {
+            continue;
         } else if let Some(absolute) = path.to_str() {
             paths.push(absolute.to_string());
         }
     }
     Ok(())
+}
+
+/// Returns whether `path` resolves to a location under `root`. Broken links and
+/// paths that cannot be resolved are treated as outside.
+///
+/// This is a listing filter: it does not cover a symlink replaced between the
+/// scan and the execution.
+fn is_inside(root: &Path, path: &Path) -> bool {
+    path.canonicalize()
+        .map(|target| target.starts_with(root))
+        .unwrap_or(false)
 }
 
 fn git_ignore(repo: Option<&Repository>, path: &PathBuf) -> bool {
@@ -149,12 +165,47 @@ pub mod tests {
         let paths: Vec<String> = tree.iter().cloned().collect();
 
         assert!(
-            paths.iter().any(|p| p.ends_with("link")),
-            "the symlink entry itself should be listed"
+            !paths.iter().any(|p| p.ends_with("link")),
+            "a symlink outside the starting point should not be listed"
         );
         assert!(
             !paths.iter().any(|p| p.contains("secret.txt")),
             "files behind a symlinked directory must not be traversed"
+        );
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn lists_only_symlinks_that_stay_inside_the_starting_point() {
+        use std::os::unix::fs::symlink;
+
+        let dir = create_files(false).unwrap();
+        let inside_link = dir.path().join("inside-link");
+        symlink(dir.path().join("README.md"), &inside_link).unwrap();
+
+        let outside = tempdir().unwrap();
+        let outside_target = outside.path().join("secret.txt");
+        let _ = File::create(&outside_target).unwrap();
+        let outside_link = dir.path().join("outside-link");
+        symlink(&outside_target, &outside_link).unwrap();
+
+        let broken_link = dir.path().join("broken-link");
+        symlink(dir.path().join("missing.txt"), &broken_link).unwrap();
+
+        let tree = Tree::new(dir.path(), None).unwrap();
+        let paths: Vec<String> = tree.iter().cloned().collect();
+
+        assert!(
+            paths.iter().any(|p| p.ends_with("inside-link")),
+            "a symlink inside the starting point should be listed"
+        );
+        assert!(
+            !paths.iter().any(|p| p.ends_with("outside-link")),
+            "a symlink outside the starting point should not be listed"
+        );
+        assert!(
+            !paths.iter().any(|p| p.ends_with("broken-link")),
+            "a broken symlink should not be listed"
         );
     }
 }
