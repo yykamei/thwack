@@ -128,8 +128,9 @@ macro_rules! enter {
 /// An interactive file-selection session.
 ///
 /// It owns the terminal UI state and executes the configured command on the
-/// selected file. Production code passes `Libc`; tests inject a mock
-/// `Execvp` to observe the arguments:
+/// selected file. Dropping the screen restores the terminal, so a panic during
+/// the session cannot leave it in raw mode. Production code passes `Libc`;
+/// tests inject a mock `Execvp` to observe the arguments:
 ///
 /// ```ignore
 /// let mut screen = Screen::new(&preferences, &terminal, &Libc, &mut stdout)?;
@@ -146,6 +147,7 @@ pub(crate) struct Screen<'a, T: Terminal, W: Write> {
     clipboard: Option<ClipboardContext>,
     terminal: &'a T,
     stdout: &'a mut W,
+    terminal_left: bool,
 }
 
 impl<'a, T: Terminal, W: Write> Screen<'a, T, W> {
@@ -193,11 +195,13 @@ impl<'a, T: Terminal, W: Write> Screen<'a, T, W> {
             clipboard,
             terminal,
             stdout,
+            terminal_left: false,
         })
     }
 
     pub(crate) fn start(&mut self) -> Result<()> {
         execute!(self.stdout, EnterAlternateScreen, style::ResetColor)?;
+        self.terminal_left = false;
         let result = self.run_session();
         let leave_result = self.leave_terminal();
         if let Err(e) = &leave_result {
@@ -443,10 +447,27 @@ impl<'a, T: Terminal, W: Write> Screen<'a, T, W> {
     }
 
     fn leave_terminal(&mut self) -> Result<()> {
+        if self.terminal_left {
+            return Ok(());
+        }
         execute!(self.stdout, LeaveAlternateScreen)?;
         self.terminal.disable_raw_mode()?;
+        self.terminal_left = true;
         debug!("Terminal left");
         Ok(())
+    }
+}
+
+impl<T: Terminal, W: Write> Drop for Screen<'_, T, W> {
+    fn drop(&mut self) {
+        if self.terminal_left {
+            return;
+        }
+        // Drop cannot return an error, so this cleanup is best effort. It runs
+        // when a panic unwinds through the session, where `leave_terminal` is
+        // not reached.
+        let _ = execute!(self.stdout, LeaveAlternateScreen);
+        let _ = self.terminal.disable_raw_mode();
     }
 }
 
@@ -789,6 +810,55 @@ mod tests {
         assert_eq!(cursor_x(0, 8), 7);
         assert_eq!(cursor_x(3, 80), 11);
         assert_eq!(cursor_x(usize::MAX, 80), 79);
+    }
+
+    #[derive(Default)]
+    struct CleanupTerminal {
+        raw_mode_disabled: Cell<bool>,
+    }
+
+    impl Terminal for CleanupTerminal {
+        fn size(&self) -> Result<(u16, u16)> {
+            Ok((98, 20))
+        }
+
+        fn enable_raw_mode(&self) -> Result<()> {
+            Ok(())
+        }
+
+        fn disable_raw_mode(&self) -> Result<()> {
+            self.raw_mode_disabled.set(true);
+            Ok(())
+        }
+    }
+
+    #[test]
+    fn dropping_restores_the_terminal() {
+        let preferences = Preferences::default();
+        let terminal = CleanupTerminal::default();
+        let mut buffer = Buffer::new();
+        {
+            let mut screen = Screen::new(&preferences, &terminal, &Libc, &mut buffer).unwrap();
+            screen.terminal.enable_raw_mode().unwrap();
+        }
+
+        assert!(terminal.raw_mode_disabled.get());
+        #[cfg(not(windows))]
+        {
+            use crossterm::Command;
+
+            let mut leave_alternate_screen = String::new();
+            LeaveAlternateScreen
+                .write_ansi(&mut leave_alternate_screen)
+                .unwrap();
+            assert!(
+                buffer
+                    .inner
+                    .windows(leave_alternate_screen.len())
+                    .any(|window| window == leave_alternate_screen.as_bytes()),
+                "expected LeaveAlternateScreen to be emitted on drop"
+            );
+        }
     }
 
     struct RecordingExecvp(Mutex<Vec<String>>);
